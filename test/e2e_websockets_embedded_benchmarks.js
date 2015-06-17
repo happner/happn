@@ -1,7 +1,6 @@
 var expect = require('expect.js');
 var happn = require('../lib/index');
 var service = happn.service;
-var faye = require('faye');
 var async = require('async');
 
 describe('e2e test', function () {
