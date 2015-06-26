@@ -1,3 +1,23 @@
+/*
+
+## To write to the benshmark csv
+
+```bash
+
+mocha test/e2e_eventemitter_embedded_benchmarks.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/.e2e_eventemitter_embedded_benchmarks.csv
+
+```
+
+To also see it.
+
+nother console
+
+```
+tail -f test/.e2e_eventemitter_embedded_benchmarks.csv
+```
+
+*/
+
 var expect = require('expect.js');
 var happn = require('../lib/index');
 var service = happn.service;
@@ -18,7 +38,7 @@ describe('e2e test', function () {
    the logon session. The utils setting will set the system to log non priority information
    */
 
-  it('should initialize the service', function(callback) {
+  before('should initialize the service', function(callback) {
     
     this.timeout(20000);
 
@@ -66,7 +86,7 @@ describe('e2e test', function () {
   We are initializing 2 clients to test saving data against the database, one client will push data into the 
   database whilst another listens for changes.
   */
-  it('should initialize the clients', function(callback) {
+  before('should initialize the clients', function(callback) {
     this.timeout(default_timeout);
 
     try{
@@ -100,7 +120,7 @@ describe('e2e test', function () {
     var count = 0;
     var expected = 1000;
     var receivedCount = 0;
-    var timerName = expected + 'Events - no wait';
+    var timerName = 'CSV.colm 1 ' + expected + 'Events - no wait';
 
     var writeData = function(){
       if (count == expected) return;
@@ -112,9 +132,8 @@ describe('e2e test', function () {
       });
     }
 
-    stressTestClient.on('/e2e_test1/testsubscribe/sequence5',{event_type:'set', count:0}, function (message) {
-
-  
+    stressTestClient.on('/e2e_test1/testsubscribe/sequence5',{event_type:'set', count:0}, function (message) {  
+        
         receivedCount++;
 
         if (receivedCount == expected) {
@@ -140,7 +159,7 @@ describe('e2e test', function () {
     var count = 0;
     var expected = 1000;
     var receivedCount = 0;
-    var timerName = expected + 'Events - no store';
+    var timerName = 'CSV.colm 2 ' + expected + 'Events - no store';
 
     var  writeData = function() {
 
@@ -200,7 +219,7 @@ describe('e2e test', function () {
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
-      var timerName = expected + 'Events - no wait - no store';
+      var timerName = 'CSV.colm 3 ' + expected + 'Events - no wait - no store';
 
       //first listen for the change
       stressTestClient.on('/e2e_test1/testsubscribe/sequence1',{event_type:'set', count:0}, function (message) {
@@ -267,6 +286,7 @@ describe('e2e test', function () {
 
         var count = 0;
         var expected = 1000;
+        var timerName = 'CSV.colm 4 testTime1';
         var receivedCount = 0;
 
         var received = {};
@@ -299,7 +319,7 @@ describe('e2e test', function () {
           //////console.log(sent.length);
 
           if (receivedCount == sent.length) {
-            console.timeEnd('timeTest1');
+            console.timeEnd(timerName);
             expect(Object.keys(received).length == expected).to.be(true);
             //////////console.log(received);
 
@@ -313,7 +333,7 @@ describe('e2e test', function () {
           if (!e) {
 
             expect(stressTestClient.events['/SET@/e2e_test1/testsubscribe/sequence_nostore'].length).to.be(1);
-            console.time('timeTest1');
+            console.time(timerName);
 
             while (count < expected) {
 
@@ -354,6 +374,7 @@ describe('e2e test', function () {
     if (e) return callback(e);
 
       var count = 0;
+      var timerName = 'CSV.colm 5 testTime2';
       var expected = 1000;
       var receivedCount = 0;
 
@@ -385,7 +406,7 @@ describe('e2e test', function () {
         //////console.log(sent.length);
 
         if (receivedCount == sent.length) {
-          console.timeEnd('timeTest1');
+          console.timeEnd(timerName);
           expect(Object.keys(received).length == expected).to.be(true);
           //////////console.log(received);
 
@@ -399,7 +420,7 @@ describe('e2e test', function () {
         if (!e) {
 
           expect(stressTestClient.events['/SET@/e2e_test1/testsubscribe/sequence_persist'].length).to.be(1);
-          console.time('timeTest1');
+          console.time(timerName);
 
           while (count < expected) {
 
@@ -440,7 +461,7 @@ describe('e2e test', function () {
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
-      var timerName = expected + 'Events - no wait';
+      var timerName = 'CSV.colm 6 ' + expected + 'Events - no wait';
 
       stressTestClient.on('/e2e_test1/testsubscribe/sequence4',{event_type:'set', count:0}, function (message) {
 
@@ -483,7 +504,7 @@ describe('e2e test', function () {
     var count = 0;
     var expected = 1000;
     var receivedCount = 0;
-    var timerName = expected + 'Events';
+    var timerName = 'CSV.colm 7 ' + expected + 'Events';
 
     listenerclient.on('/e2e_test1/testsubscribe/sequence32',{event_type:'set', count:0}, function (message) {
 
@@ -528,7 +549,7 @@ describe('e2e test', function () {
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
-      var timerName = expected + 'Events - no wait';
+      var timerName = 'CSV.colm 8 ' + expected + 'Events - no wait';
 
       var writeData = function(){
         if (count == expected) return;
@@ -571,7 +592,7 @@ it('should handle sequences of events by when the previous one is done', functio
     var count = 0;
     var expected = 1000;
     var receivedCount = 0;
-    var timerName = expected + 'Events';
+    var timerName = 'CSV.colm 9 ' + expected + 'Events';
 
     listenerclient.on('/e2e_test1/testsubscribe/sequence31',{event_type:'set', count:0}, function (message) {
 
@@ -615,7 +636,7 @@ it('should handle sequences of events by when the previous one is done', functio
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
-      var timerName = expected + 'Events - no wait';
+      var timerName = 'CSV.colm 10 ' + expected + 'Events - no wait';
 
       var writeData = function(){
         if (count == expected) return;
