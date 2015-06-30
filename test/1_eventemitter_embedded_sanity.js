@@ -89,6 +89,45 @@ describe('e2e test', function() {
 		}
 	});
 
+	it('the listener should pick up a single wildcard event', function(callback) {
+		
+		this.timeout(default_timeout);
+
+		try{
+
+			//first listen for the change
+			listenerclient.on('/e2e_test1/testsubscribe/data/event/*', {event_type:'set', count:1}, function(message){
+
+				expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event/*'].length).to.be(0);
+				callback();
+
+			}, function(e){
+
+				////////////////console.log('ON HAS HAPPENED: ' + e);
+
+				if (!e){
+
+					expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event/*'].length).to.be(1);
+					////////////////console.log('on subscribed, about to publish');
+
+					var stats = happnInstance.stats();
+
+					console.log(stats.pubsub.listeners_wildcard_SET);
+
+					//then make the change
+					publisherclient.set('/e2e_test1/testsubscribe/data/event/blah', {property1:'property1',property2:'property2',property3:'property3'}, null, function(e, result){
+						console.log('put happened - listening for result');
+					});
+				}else
+					callback(e);
+			});
+
+		}catch(e){
+			callback(e);
+		}
+	});
+
+
 	it('the publisher should set new data ', function(callback) {
 		
 		this.timeout(default_timeout);
@@ -396,6 +435,8 @@ describe('e2e test', function() {
 			callback(e);
 		}
 	});
+
+
 
 
 
