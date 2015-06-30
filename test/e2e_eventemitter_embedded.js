@@ -927,33 +927,5 @@ describe('e2e test', function() {
 			);
 		});
 	});
-
-	it('should fail to subscribe to an event', function(callback) {
-
-		this.timeout(default_timeout);
-		subWasSuccessful = true;
-
-		var badclient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
-    	if (e) return callback(e);
-
-			badclient.token = 'rubbish'; //we put in a rubbish token
-			badclient.onAll(function(message){
-
-				////console.log('badclient on all happened');
-				////console.log(arguments);
-
-			}, function(e){
-
-				////console.log(e);
-
-				if (e && e == 'Authentication failed: Error: Not enough or too many segments'){
-					callback();
-				}
-				else callback('unauthorized subscribe was let through');
-
-			});
-
-		});
-
-	});	
+	
 });
