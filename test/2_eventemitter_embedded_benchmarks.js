@@ -1,6 +1,6 @@
 /*
 
-## To write to the benshmark csv
+## To write to the benchmark csv
 
 ```bash
 
@@ -223,6 +223,72 @@ describe('e2e test', function () {
 
       //first listen for the change
       stressTestClient.on('/e2e_test1/testsubscribe/sequence1',{event_type:'set', count:0}, function (message) {
+
+       
+        receivedCount++;
+        //////////console.log('RCOUNT');
+
+
+        //////console.log(receivedCount);
+        //////console.log(sent.length);
+
+        if (receivedCount == expected) {
+          console.timeEnd(timerName);
+          //expect(Object.keys(received).length == expected).to.be(true);
+          //////////console.log(received);
+
+          callback();
+        }
+
+      }, function (e) {
+
+        //////////console.log('ON HAS HAPPENED: ' + e);
+
+        if (!e) {
+
+          //expect(stressTestClient.events['/PUT@/e2e_test1/testsubscribe/sequence'].length).to.be(1);
+          console.time(timerName);
+
+          function writeData() {
+
+            if (count == expected) {
+              return;
+            }
+
+            ////////////console.log('putting data: ', count);
+            publisherclient.set('/e2e_test1/testsubscribe/sequence1', {
+              property1: count++
+            }, {noStore: true}, function (e, result) {
+              writeData();
+            });
+          }
+
+          writeData();
+
+        }
+        else
+          callback(e);
+      });
+
+    });
+
+  });
+
+  it('should handle sequences of events by writing each one after each other asap, without storing - deferring setImmediate every 100', function (callback) {
+
+    this.timeout(default_timeout);
+
+    new happn.client({plugin:happn.client_plugins.intra_process, context:happnInstance}, function(e, stressTestClient){
+
+      if (e) return callback(e);
+
+      var count = 0;
+      var expected = 1000;
+      var receivedCount = 0;
+      var timerName = 'CSV.colm 3 ' + expected + 'Events - no wait - no store';
+
+      //first listen for the change
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence1',{event_type:'set', count:0, config:{deferSetImmediate:100}}, function (message) {
 
        
         receivedCount++;
