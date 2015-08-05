@@ -87,13 +87,16 @@ objective('client base', function(chai) {
       this.socketInstance.handlers.reconnected(RECONNECTION_MESSAGE);
     });
 
-    it('does not create a new socket instance', function() {
+    it('does not create a new socket instance', function(done, client) {
 
-
+      var _this = this;
+      client.does(function authenticate() {
+        should.exist(_this.socketInstance.MARK);
+        done();
+      });
 
       this.socketInstance.MARK = 1;
       this.socketInstance.handlers.reconnected(RECONNECTION_MESSAGE);
-      should.exist(this.socketInstance.MARK);
     });
 
 
