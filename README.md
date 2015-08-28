@@ -104,8 +104,9 @@ service.initialize(
 		}
 	},
 	utils:{
-		log_level:'info|error|warning',
-		log_component:'prepare'
+		logLevel:'info',  // possibles: off, fatal, error, warn, info, debug, trace 
+		logComponents: ['prepare'],
+		logFile: '/absolute/path.log'
 	}
 }, 
 function(e){
