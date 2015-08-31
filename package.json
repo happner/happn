@@ -1,7 +1,7 @@
 {
   "name": "@smc/happn",
   "description": "Pub/sub api as a service using primus and mongo & redis or nedb, can work as cluster, single process or embedded using nedb, use in production at your own risk",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "main": "./lib/index",
   "keywords": [
     "faye",
