@@ -247,7 +247,7 @@ describe('e2e test', function () {
       console.log(JSON.stringify(message.payload));
       console.log(JSON.stringify(firstTime));
 
-      expect(message.payload/*.data*/).to.eql(firstTime.data);
+      expect(message.payload.data).to.eql(firstTime.data);
       done();
     }, function (err) {
       expect(err).to.not.be.ok();
@@ -260,20 +260,16 @@ describe('e2e test', function () {
     })
   });
 
-  it('should contain the same payload between a merge and a normal store', function (done) {
+  it('should contain the same payload between a merge and a normal store for first store', function (done) {
     var object = {param1: 10, param2: 20};
-    var firstTime;
+    var firstTime = true;
 
     listenerclient.on('mergeTest/object', {event_type: 'set', count: 2}, function (message) {
-      if (firstTime === undefined) {
-        firstTime = message.payload;
+      expect(message.payload.data).to.eql(object);
+      if (firstTime) {
+        firstTime = false;
         return;
       }
-
-      console.log(JSON.stringify(message.payload));
-      console.log(JSON.stringify(firstTime));
-
-      expect(message.payload/*.data*/).to.eql(firstTime.data);
       done();
     }, function (err) {
       expect(err).to.not.be.ok();

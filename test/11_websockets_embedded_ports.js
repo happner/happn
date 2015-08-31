@@ -16,7 +16,6 @@ describe('e2e test', function() {
 	var service2Client;
 	var defaultClient;
 	
-	var test_secret = 'test_secret';
 	var mode = "embedded";
 
 	var default_timeout = 4000;
@@ -58,19 +57,19 @@ describe('e2e test', function() {
 		try{
 		  //plugin, config, context, 
 
-		  happn_client.create({config:{secret:test_secret, port:service1Port}}, function(e, instance) {
+		  happn_client.create({config:{port:service1Port}}, function(e, instance) {
 
 		  	if (e) return callback(e);
 
 		  	service1Client = instance;
 
-		    happn_client.create({config:{secret:test_secret, port:service2Port}}, function(e, instance) {
+		    happn_client.create({config:{port:service2Port}}, function(e, instance) {
 
 		    	if (e) return callback(e);
 
 		  		service2Client = instance;
 
-		      	happn_client.create({config:{secret:test_secret, port:55000}}, function(e, instance) {
+		      	happn_client.create({config:{port:55000}}, function(e, instance) {
 
 		      		if (e) return callback(e);
 
