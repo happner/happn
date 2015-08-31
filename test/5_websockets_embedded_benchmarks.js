@@ -2,10 +2,10 @@ var expect = require('expect.js');
 var happn = require('../lib/index');
 var service = happn.service;
 var async = require('async');
+var happn_client = happn.client;
 
 describe('e2e test', function () {
 
-  var testport = 8000;
   var test_secret = 'test_secret';
   var mode = "embedded";
   var default_timeout = 5000;
@@ -55,33 +55,33 @@ describe('e2e test', function () {
 
   var publisherclient;
   var listenerclient;
-
   /*
-  We are initializing 2 clients to test saving data against the database, one client will push data into the 
-  database whilst another listens for changes.
+    We are initializing 2 clients to test saving data against the database, one client will push data into the 
+    database whilst another listens for changes.
   */
   it('should initialize the clients', function(callback) {
-    
-    this.timeout(default_timeout);
+      this.timeout(default_timeout);
 
-    try{
-      //plugin, config, context, 
+      try {
+        happn_client.create({config:{secret:test_secret}}, function(e, instance) {
 
-      publisherclient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
+          if (e) return callback(e);
 
-        if (e)
-          return callback(e);
+          publisherclient = instance;
+          happn_client.create({config:{secret:test_secret}}, function(e, instance) {
 
-        listenerclient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
-            callback(e);
+            if (e) return callback(e);
+            listenerclient = instance;
+            callback();
+
+          });
+
         });
 
-      });
-
-    }catch(e){
-      callback(e);
-    }
-  });
+      } catch (e) {
+        callback(e);
+      }
+   });
 
 
 
@@ -89,7 +89,7 @@ describe('e2e test', function () {
 
     this.timeout(default_timeout);
 
-    var stressTestClient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
+    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
     if (e) return callback(e);
 
     var count = 0;
@@ -187,7 +187,7 @@ describe('e2e test', function () {
 
     this.timeout(default_timeout);
 
-    var stressTestClient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
+    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
 
       if (e) return callback(e);
 
@@ -253,7 +253,7 @@ describe('e2e test', function () {
 
     this.timeout(default_timeout);
 
-    var stressTestClient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
+    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
       
       if (e) return callback(e);
       setTimeout(function () {
@@ -346,7 +346,7 @@ describe('e2e test', function () {
 
     this.timeout(default_timeout);
 
-    var stressTestClient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
+    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
       
       if (e) return callback(e);
       setTimeout(function () {
@@ -425,7 +425,7 @@ describe('e2e test', function () {
 
     this.timeout(default_timeout);
 
-    var stressTestClient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
+    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
     if (e) return callback(e);
 
       var count = 0;
@@ -508,7 +508,7 @@ describe('e2e test', function () {
 
     this.timeout(default_timeout);
 
-    var stressTestClient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
+    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
       
       if (e) return callback(e);
       var count = 0;
@@ -594,7 +594,7 @@ describe('e2e test', function () {
 
     this.timeout(default_timeout);
 
-      var stressTestClient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
+      happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
       if (e) return callback(e);
 
       var count = 0;
@@ -679,7 +679,7 @@ it('should handle sequences of events by when the previous one is done', functio
 
     this.timeout(default_timeout);
 
-      var stressTestClient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
+      happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
       if (e) return callback(e);
 
       var count = 0;

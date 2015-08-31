@@ -62,7 +62,7 @@ describe('e2e test', function () {
   var publisherclient;
   var listenerclient;
 
-  /*
+   /*
    We are initializing 2 clients to test saving data against the database, one client will push data into the 
    database whilst another listens for changes.
    */
@@ -70,21 +70,25 @@ describe('e2e test', function () {
     this.timeout(default_timeout);
 
     try {
-      //plugin, config, context, 
-
-      publisherclient = new happn.client({
+     
+      happn_client.create({
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
-      }, function (e) {
+      }, function (e, instance) {
 
-        if (e)
-          return callback(e);
+        if (e) return callback(e);
 
-        listenerclient = new happn.client({
+        publisherclient = instance;
+
+        happn_client.create({
           plugin: happn.client_plugins.intra_process,
           context: happnInstance
-        }, function (e) {
-          callback(e);
+        }, function (e, instance) {
+
+          if (e) return callback(e);
+          listenerclient = instance;
+          callback();
+
         });
 
       });
@@ -1027,27 +1031,20 @@ describe('e2e test', function () {
     var caught = {};
 
     this.timeout(10000);
+    var caughtCount = 0;
 
     listenerclient.onAll(function (eventData) {
 
+      if (eventData.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all_array' || 
+          eventData.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
+          eventData.action == '/SET@/e2e_test1/testsubscribe/data/catch_all_array' || 
+          eventData.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
+        caughtCount++;
 
-      //console.log('onall ran');
-      //////console.log([e, eventData]);
-      //////console.log(caught);
-
-      if (!caught[eventData.message.action])
-        caught[eventData.message.action] = 0;
-
-      caught[eventData.message.action]++;
-
-      if (caught['set'] == 2 && caught['remove'] == 2)
+      if (caughtCount == 4)
         callback();
 
-
     }, function (e) {
-
-      //console.log('on all ok?');
-      //console.log(e);
 
       if (e) return callback(e);
 
@@ -1058,27 +1055,15 @@ describe('e2e test', function () {
         property3: 'property3'
       }, null, function (e, put_result) {
 
-        //////////////////////console.log('put_result');
-        //////////////////////console.log(put_result);
-
         publisherclient.setChild('/e2e_test1/testsubscribe/data/catch_all_array', {
           property1: 'property1',
           property2: 'property2',
           property3: 'property3'
         }, function (e, post_result) {
 
-          //////////////////////console.log('post_result');
-          //////////////////////console.log(post_result);
-
           publisherclient.remove('/e2e_test1/testsubscribe/data/catch_all', null, function (e, del_result) {
 
-            //////////////////////console.log('del_result');
-            //////////////////////console.log(del_result);
-
             publisherclient.removeChild('/e2e_test1/testsubscribe/data/catch_all_array', post_result.payload._id, function (e, del_ar_result) {
-
-              //////////////////////console.log('del_ar_result');
-              //////////////////////console.log(del_ar_result);
 
             });
 

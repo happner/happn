@@ -10,7 +10,7 @@ describe('e2e test', function() {
 
 	var gatewayPort = 8000;
 	var device1Port = 8001;
-	var device2Port = 8001;
+	var device2Port = 8002;
 
 	var test_secret = 'test_secret';
 	var mode = "embedded";
@@ -55,10 +55,7 @@ describe('e2e test', function() {
 				initializeService(device1, device1Port, function(e){
 					if (e) return callback(e);
 
-					initializeService(device2, device2Port, function(e){
-						if (e) return callback(e);
-
-					});
+					initializeService(device2, device2Port, callback);
 				});
 			});
 
@@ -108,8 +105,8 @@ describe('e2e test', function() {
 
 	});
 
-	var externalclient;// a client that is connecting to the device, via the gateway
-	var internalclient;// a client that connect directly to the device
+	var device1client;// a client that is connecting to the device 1
+	var device2client;// a client that is connecting to the device 2
 	var gatewayclient;// a client that connects to the gateway for services on the gateway (non proxied requests)
 
 	it('should initialize the clients', function(callback) {
@@ -118,17 +115,27 @@ describe('e2e test', function() {
 		try{
 		  //plugin, config, context, 
 
-		  externalclient = new happn.client({config:{port:gatewayPort, secret:test_secret}}, function(e){
+		  happn_client.create({config:{secret:test_secret, port:device1Port}}, function(e, instance) {
 
-		    if (e)
-		      return callback(e);
+		  	if (e) return callback(e);
 
-		    internalclient = new happn.client({config:{port:devicePort, secret:test_secret}}, function(e){
+		  	device1client = instance;
 
-		    	 if (e)
-		      		return callback(e);
+		    happn_client.create({config:{secret:test_secret, port:device2Port}}, function(e, instance) {
 
-		      	gatewayclient = new happn.client({config:{port:gatewayPort, secret:test_secret}}, callback);
+		    	if (e) return callback(e);
+
+		  		device2client = instance;
+
+		      	happn_client.create({config:{secret:test_secret, port:gatewayPort}}, function(e, instance) {
+
+		      		if (e) return callback(e);
+
+		      		gatewayclient = instance;
+
+		      		callback();
+
+		      	});
 		    });
 
 		  });
@@ -145,7 +152,7 @@ describe('e2e test', function() {
 
 		 	var testValue = Math.random();
 			  //plugin, config, context, 
-			  externalclient.on('/device1/setValue', {event_type:'set', count:1}, function(message){
+			  gatewayclient.on('/device1/setValue', {event_type:'set', count:1}, function(message){
 		  		//check the message here
 
 				callback();
@@ -154,7 +161,7 @@ describe('e2e test', function() {
 
 				if (!e){
 
-					externalclient.set('/device1/setValue', {value:testValue}, null, function(e, result){
+					gatewayclient.set('/device1/setValue', {value:testValue}, null, function(e, result){
 						console.log('set happened - listening for result');
 					});
 				}else
@@ -175,7 +182,7 @@ describe('e2e test', function() {
 
 			var responseCount = 0;
 
-			externalclient.set('/events', {value:testValue}, null, function(e, result){
+			gatewayclient.set('/events', {value:testValue}, null, function(e, result){
 				
 				if (e) return callback(e);
 
@@ -199,7 +206,7 @@ describe('e2e test', function() {
 
 			var responseCount = 0;
 
-			externalclient.get('/settings', null, function(e, results){
+			gatewayclient.get('/settings', null, function(e, results){
 				
 				if (e) return callback(e);
 

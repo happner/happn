@@ -6,11 +6,11 @@ var async = require('async');
 
 describe('e2e test', function() {
 
-	var testport = 8000;
 	var test_secret = 'test_secret';
 	var mode = "embedded";
 	var default_timeout = 4000;
 	var happnInstance = null;
+
 	/*
 	This test demonstrates starting up the happn service - 
 	the authentication service will use authTokenSecret to encrypt web tokens identifying
@@ -62,33 +62,34 @@ describe('e2e test', function() {
 	var listenerclient;
 
 	/*
-	We are initializing 2 clients to test saving data against the database, one client will push data into the 
-	database whilst another listens for changes.
+  	We are initializing 2 clients to test saving data against the database, one client will push data into the 
+  	database whilst another listens for changes.
 	*/
 	it('should initialize the clients', function(callback) {
-		this.timeout(default_timeout);
+	    this.timeout(default_timeout);
 
-		try{
-		  //plugin, config, context, 
+	    try {
+	      happn_client.create({config:{secret:test_secret}}, function(e, instance) {
 
-		  publisherclient = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
+	        if (e) return callback(e);
 
-		    if (e)
-		      return callback(e);
+	        publisherclient = instance;
 
-		  	//console.log('FB');
-		  	//console.log(happnInstance);
+	        happn_client.create({plugin:happn.client_plugins.intra_process,
+	        					 context: happnInstance},
+	        function(e, instance) {
 
-		    listenerclient = new happn.client({plugin:happn.client_plugins.intra_process, context:happnInstance}, function(e){
-		        callback(e);
-		    });
+	          if (e) return callback(e);
+	          listenerclient = instance;
+	          callback();
 
-		  });
+	        });
+	      });
+	    } catch (e) {
+	      callback(e);
+	    }
 
-		}catch(e){
-		  callback(e);
-		}
-	});
+	 });
 
 	it('the publisher should set new data ', function(callback) {
 		
@@ -826,6 +827,7 @@ describe('e2e test', function() {
 		});
 	});
 
+	var caughtCount = 0;
 	it('should subscribe to the catch all notification', function(callback) {
 
 		var caught = {};
@@ -834,19 +836,15 @@ describe('e2e test', function() {
 		
 		listenerclient.onAll(function(eventData){
 
-			
-			//console.log('onall ran');
-			//////console.log([e, eventData]);
-			//////console.log(caught);
+			if (eventData.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all_array' || 
+	          	eventData.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
+	          	eventData.action == '/SET@/e2e_test1/testsubscribe/data/catch_all_array' || 
+	          	eventData.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
 
-			if (!caught[eventData.message.action])
-				caught[eventData.message.action] = 0;
+	        caughtCount++;
 
-			caught[eventData.message.action]++;
-		
-			if (caught['set'] == 2 && caught['remove'] == 2)
-				callback();
-
+	      	if (caughtCount == 4)
+	        	callback();
 
 		}, function(e){
 

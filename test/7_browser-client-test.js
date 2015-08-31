@@ -6,8 +6,6 @@ var async = require('async');
 var request = require('request');
 
 describe('browser client tests', function() {
-
-	var testport = 8000;
 	var test_secret = 'test_secret';
 
 	/*
@@ -64,7 +62,7 @@ describe('browser client tests', function() {
 
 		try{
 
-			require('request')({uri:'http://127.0.0.1:' + testport + '/browser_client',
+			require('request')({uri:'http://127.0.0.1:55000/browser_client',
 					 method:'GET'
 					}, 
 					function(e, r, b){
