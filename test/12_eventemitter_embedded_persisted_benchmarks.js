@@ -1,27 +1,10 @@
-/*
-
-## To write to the benchmark csv
-
-```bash
-
-mocha test/e2e_eventemitter_embedded_benchmarks.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/.e2e_eventemitter_embedded_benchmarks.csv
-
-```
-
-To also see it.
-
-nother console
-
-```
-tail -f test/.e2e_eventemitter_embedded_benchmarks.csv
-```
-
-*/
 var expect = require('expect.js');
 var happn = require('../lib/index');
 var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
+var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
+var fs = require('fs');
 
 describe('e2e test', function() {
 
@@ -48,7 +31,9 @@ describe('e2e test', function() {
             },
             data: {
               path: './services/data_embedded/service.js',
-              config: {}
+              config: {
+                dbfile:tempFile
+              }
             },
             pubsub: {
               path: './services/pubsub/service.js',
@@ -70,6 +55,16 @@ describe('e2e test', function() {
     } catch (e) {
       callback(e);
     }
+  });
+
+  after('should delete the temp data file', function(callback) {
+
+    this.timeout(20000);
+    
+    fs.unlink(tempFile, function(e){
+      callback(e);
+    });
+
   });
 
   var publisherclient;

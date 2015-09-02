@@ -21,7 +21,7 @@ describe('e2e test', function() {
 		this.timeout(20000);
 
 		try{
-			service.initialize({
+			service.create({
 					mode:'embedded', 
 					services:{
 						auth:{

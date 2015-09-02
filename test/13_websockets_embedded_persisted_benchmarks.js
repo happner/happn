@@ -3,6 +3,8 @@ var happn = require('../lib/index');
 var service = happn.service;
 var async = require('async');
 var happn_client = happn.client;
+var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
+var fs = require('fs');
 
 describe('e2e test', function () {
 
@@ -16,7 +18,7 @@ describe('e2e test', function () {
   the logon session. The utils setting will set the system to log non priority information
   */
 
-  it('should initialize the service', function(callback) {
+  before('should initialize the service', function(callback) {
     
     this.timeout(20000);
 
@@ -33,7 +35,9 @@ describe('e2e test', function () {
             },
             data:{
               path:'./services/data_embedded/service.js',
-              config:{}
+              config:{
+                 dbfile:tempFile
+              }
             },
             pubsub:{
               path:'./services/pubsub/service.js',
@@ -51,6 +55,16 @@ describe('e2e test', function () {
     }catch(e){
       callback(e);
     }
+  });
+
+  after('should delete the temp data file', function(callback) {
+
+    this.timeout(20000);
+    
+    fs.unlink(tempFile, function(e){
+      callback(e);
+    });
+
   });
 
   var publisherclient;
