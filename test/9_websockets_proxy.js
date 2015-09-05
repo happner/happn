@@ -43,6 +43,9 @@ describe('e2e test', function() {
 		);
 	}
 
+	// Suggestion:
+  // before(function(done) {/* to start servers before test */});
+  // after(function(done) {/* to stop servers after test */});
 	it('should initialize the services', function(callback) {
 		
 		this.timeout(20000);

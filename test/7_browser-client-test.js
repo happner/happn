@@ -14,7 +14,7 @@ describe('browser client tests', function() {
 	the logon session. The utils setting will set the system to log non priority information
 	*/
 
-	it('should initialize the service', function(callback) {
+	after('should initialize the service', function(callback) {
 		
 		this.timeout(20000);
 
@@ -54,6 +54,10 @@ describe('browser client tests', function() {
 			callback(e);
 		}
 	});
+
+  after(function(done) {
+    happnInstance.stop(done);
+  });
 
 
 	it('should fetch the browser client', function(callback) {
