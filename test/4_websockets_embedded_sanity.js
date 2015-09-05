@@ -53,9 +53,9 @@ describe('e2e test', function() {
 		}
 	});
 
-  after(function(done) {
-    happnInstance.stop(done);
-  });
+  // after(function(done) {
+  //   happnInstance.stop(done);
+  // });
 
 	var publisherclient;
 	var listenerclient;

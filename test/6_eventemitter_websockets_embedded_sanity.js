@@ -17,7 +17,7 @@ describe('e2e test', function() {
 	the logon session. The utils setting will set the system to log non priority information
 	*/
 
-	after('should initialize the service', function(callback) {
+	it('should initialize the service', function(callback) {
 		
 		this.timeout(20000);
 
@@ -58,9 +58,9 @@ describe('e2e test', function() {
 		}
 	});
 
-  after(function(done) {
-    happnInstance.stop(done);
-  });
+  // after(function(done) {
+  //   happnInstance.stop(done);
+  // });
 
 	var publisherclient;
 	var listenerclient;
