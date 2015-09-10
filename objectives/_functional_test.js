@@ -1,5 +1,7 @@
 objective('functional', function() {
 
+  var should = require('should');
+
   require('./start_stop')();
 
   context('on', function() {
@@ -20,14 +22,22 @@ objective('functional', function() {
 
       it('sets remote object data', function(done, remote, should) {
 
-        var data = {a:1, b:1};
+        var data = {a:1, b:2};
 
         remote.set('/the/remote/garden/path', data, {}, function(e, r) {
           if (e) return done(e);
 
-          Object.keys(r._store).should.eql(['modified', 'path', 'id']);
-          Object.keys(r._event).should.eql(['type', 'status', 'published', 'id']);
-          Object.keys(r).should.eql(['a', 'b', '_event', '_store']);
+          r._store.path.should.equal('/the/remote/garden/path');
+          r._store.id.length;
+          r._store.modified.length;
+
+          r._event.type.length;
+          r._event.status.length;
+          r._event.published.length;
+          r._event.id.length;
+
+          r.a.should.equal(1);
+          r.b.should.equal(2);
           done();
         });
       });
@@ -45,11 +55,18 @@ objective('functional', function() {
           r[0].a.should.equal(1);
           r[0].b.should.equal(1);
           r[0]._store.path.should.equal('/my/array');
+          r[0]._store.id.length;
+          r[0]._store.modified.length;
 
           r[1].c.should.equal(1);
           r[1].d.should.equal(1);
           r[1]._store.path.should.equal('/my/array');
+          r[1]._store.id.length;
+          r[1]._store.modified.length;
 
+          r._event.type.length;
+          r._event.status.length;
+          r._event.published.length;
           r._event.id.length;
           done();
 
@@ -58,92 +75,84 @@ objective('functional', function() {
         .catch(done);
       });
 
-    });
+      xit('has a created date, second save preserves created date');
 
+    });
+    
 
     context('local', function() {
 
-      it('sets local object data', function(done, data, pubsub, local, should) {
+      it('sets remote object data', function(done, local, should) {
 
-        trace.filter = true;
+        var data = {a:1, b:2};
 
-        // local.spy(
-        //   function performRequest() {
-        //     console.log('performRequest()', arguments);
-        //   },
-        //   function setInternal() {
-        //     console.log('setInternal()', arguments);
-        //   }
-        // );
-
-        // data.spy(
-        //   function upsert() {
-        //     console.log('upsert()', arguments);
-        //   },
-        //   function upsertInternal() {
-        //     console.log('upsertInternal()', arguments);
-        //     trace();
-        //   }
-        // );
-
-        // pubsub.spy(
-        //   function publish() {
-        //     console.log('publish()', arguments);
-        //   },
-        //   function createResponse() {
-        //     console.log('createResponse()', arguments);
-        //   }
-        // );
-
-        var myData = {a:1, b:1};
-
-        local.set('/the/local/garden/path', myData, {}, function(e, r) {
+        local.set('/the/local/garden/path', data, {}, function(e, r) {
           if (e) return done(e);
 
-          Object.keys(r._store).should.eql(['modified', 'path', 'id']);
-          Object.keys(r._event).should.eql(['type', 'status', 'published', 'id']);
-          Object.keys(r).should.eql(['a', 'b', '_store', '_event']);
+          r._store.path.should.equal('/the/local/garden/path');
+          r._store.id.length;
+          r._store.modified.length;
+
+          r._event.type.length;
+          r._event.status.length;
+          r._event.published.length;
+          r._event.id.length;
+
+          r.a.should.equal(1);
+          r.b.should.equal(2);
           done();
         });
       });
-  
 
-      it('sets local array data', function(done, local) {
+      it('sets remote array data', function(done, local, should) {
 
         var myData = [{a:1, b:1}, {c:1, d:1}];
 
         trace.filter = true;
 
-        local.set('/my/array', myData)
+        local.set('/mi/array', myData)
 
         .then(function(r) {
 
           r[0].a.should.equal(1);
           r[0].b.should.equal(1);
-          r[0]._store.path.should.equal('/my/array');
+          r[0]._store.path.should.equal('/mi/array');
+          r[0]._store.id.length;
+          r[0]._store.modified.length;
 
           r[1].c.should.equal(1);
           r[1].d.should.equal(1);
-          r[1]._store.path.should.equal('/my/array');
+          r[1]._store.path.should.equal('/mi/array');
+          r[1]._store.id.length;
+          r[1]._store.modified.length;
 
+          r._event.type.length;
+          r._event.status.length;
+          r._event.published.length;
           r._event.id.length;
           done();
 
         })
 
         .catch(done);
-
-
-
       });
+
+      xit('has a created date, second save preserves created date');
+
     });
+
+
   });
 
   context('get', function() {
 
     before(function(done, local) {
 
-      local.set('/up/for/grabs', {key: 'value'})
+      local.set('/up/for/grabs/obj', {key: 'value'})
+
+      .then(function() {
+        return local.set('/up/for/grabs/array', [{key1: 'value1'}, {key2: 'value2'}]);
+      })
 
       .then(done).catch(done);
 
@@ -155,7 +164,7 @@ objective('functional', function() {
 
     context('remote', function() {
 
-      it('gets remote object data', function(done, remote, pubsub, should) {
+      it('gets remote object data', function(done, remote, pubsub) {
 
         trace.filter = true;
 
@@ -163,11 +172,11 @@ objective('functional', function() {
         //   console.log('handle_message()', arguments);
         // });
 
-        remote.get('/up/for/grabs')
+        remote.get('/up/for/grabs/obj')
 
         .then(function(r) {
-          r[0].key.should.equal('value');
-          r[0]._store.id.length // fails if no id
+          r.key.should.equal('value');
+          r._store.id.length // fails if no id
           done();
         })
 
@@ -175,12 +184,104 @@ objective('functional', function() {
 
       });
 
-      xit('handles empty result array as not error???');
+      xit('handles empty result array as not error');
 
 
-      xit('gets remote array data', function() {
+      it('gets remote array data', function(done, remote) {
+
+        trace.filter = true;
+
+        remote.get('/up/for/grabs/array')
+
+        .then(function(r) {
+          r._event.type.length;
+
+          r[0].key1.should.equal('value1');
+          r[1].key2.should.equal('value2');
+
+          r[0]._store.id.length;
+          r[0]._store.path.length;
+          // r[0]._store.created.length;
+          r[0]._store.modified.length;
+
+          r[1]._store.id.length;
+          r[1]._store.path.length;
+
+          r._store.id.length;
+          r._store.path.length;
+          // r[0]._store.created.length;
+          r._store.modified.length;
+          done();
+        })
+
+        .catch(done);
+      });
+
+      it('can get remote with *', function(done, remote) {
+
+        remote.set('/at/path/one', {xxx: 'one'})
+
+        .then(function() {
+
+          return remote.set('/at/path/two', {xxx: 'two'})
+
+        })
+
+        .then(function() {
+
+          return remote.get('/at/path/*')
+
+          .then(function(r) {
+
+            r._event.type.length;
+
+            r[0].xxx.length
+            r[1].xxx.length;
+
+            r[0]._store.id.length
+            r[0]._store.path.length
+            // r[0]._store.created.length
+            r[0]._store.modified.length
+
+            r[1]._store.id.length
+            r[1]._store.path.length
+            // r[1]._store.created.length
+            r[1]._store.modified.length
+
+            done()
+          });
+
+        })
+
+        .catch(done);
 
       });
+
+      xit('keeps the created date', function(done, remote) {
+
+        var created;
+
+        remote.set('/keeps/created', {data: 'DATA'})
+
+        .then(function(r) {
+          created = r._store.created;
+          return remote.set('/keeps/created',r)  /// as existing?
+          return remote.set('/keeps/created', {data: 'DATA'})  /// as new?
+        })
+
+        .then(function(r) {
+
+          console.log('CREATED', created);
+          console.log('CREATED', r._store.created);
+
+        })
+
+        .catch(done);
+
+      });
+
+      it('bug? tag does not save on first');
+
 
     });
 
@@ -188,23 +289,91 @@ objective('functional', function() {
 
       it('gets local object data', function(done, local) {
 
-        local.get('/up/for/grabs')
+        local.get('/up/for/grabs/obj')
 
         .then(function(r) {
-          r[0].key.should.equal('value');
-          r[0]._store.id.length // fails if no id
+
+          r.key.should.equal('value');
+          r._store.id.length // fails if no id
+          r._store.path.length
+          r._store.modified.length
           done();
         })
 
-        .catch(function(e) {
-          console.log('EEE', e.stack);
-          done(e);
-        });
-        
+        .catch(done);
       });
 
-      it('gets local array data', function() {
-        
+      it('gets local array data', function(done, local) {
+
+        trace.filter = true;
+
+        local.get('/up/for/grabs/array')
+
+        .then(function(r) {
+
+          r._event.type.length;
+
+          r[0].key1.should.equal('value1');
+          r[1].key2.should.equal('value2');
+
+          r[0]._store.id.length;
+          r[0]._store.path.length;
+          // r[0]._store.created.length;
+          r[0]._store.modified.length;
+
+          r[1]._store.id.length;
+          r[1]._store.path.length;
+
+          r._store.id.length;
+          r._store.path.length;
+          // r[0]._store.created.length;
+          r._store.modified.length;
+          done();
+        })
+
+        .catch(done);
+      });
+
+      xit('handles empty result array as not error');
+
+      it('can get local with *', function(done, local) {
+
+        local.set('/at/path/one', {xxx: 'one'})
+
+        .then(function() {
+
+          return local.set('/at/path/two', {xxx: 'two'})
+
+        })
+
+        .then(function() {
+
+          return local.get('/at/path/*')
+
+          .then(function(r) {
+
+            r._event.type.length;
+
+            r[0].xxx.length
+            r[1].xxx.length;
+
+            r[0]._store.id.length
+            r[0]._store.path.length
+            // r[0]._store.created.length
+            r[0]._store.modified.length
+
+            r[1]._store.id.length
+            r[1]._store.path.length
+            // r[1]._store.created.length
+            r[1]._store.modified.length
+
+            done()
+          });
+
+        })
+
+        .catch(done);
+
       });
 
     });
@@ -213,13 +382,134 @@ objective('functional', function() {
 
   context('getPaths', function() {
 
+    context('local', function() {
+
+      it('gets path with wildcards', function(done, local, Promise) {
+
+        Promise.all([
+          local.set('/wildcard/path/one',   {data: 1}),
+          local.set('/wildcard/path/two',   {data: 2}),
+          local.set('/wildcard/path/three', {data: 3}),
+          local.set('/wildcard/path/four',  {data: 4}),
+          local.set('/wildcard/path/five',  {data: 5})
+        ])
+
+        .then(function() {
+
+          // return local.getPaths('/wildcar*');
+          return local.getPaths('/wildcard/*');
+
+        })
+
+        .then(function(r) {
+
+          r.map(function(item) {
+            return item.path;
+          }).sort(function(a, b) {
+            if (a < b) return -1;
+            if (a > b) return 1;
+            return 0;
+          }).should.eql([
+            '/wildcard/path/five',
+            '/wildcard/path/four', 
+            '/wildcard/path/one',   
+            '/wildcard/path/three', 
+            '/wildcard/path/two',   
+          ]);
+
+          done();
+
+        })
+
+        .catch(done);
+      });
+
+    });
+
+    context('remote', function() {
+
+      it('gets path with wildcards', function(done, remote, Promise) {
+
+        trace.filter = true;
+
+        Promise.all([
+          remote.set('/mildcard/path/one',   {data: 1}),
+          remote.set('/mildcard/path/two',   {data: 2}),
+          remote.set('/mildcard/path/three', {data: 3}),
+          remote.set('/mildcard/path/four',  {data: 4}),
+          remote.set('/mildcard/path/five',  {data: 5})
+        ])
+
+        .then(function() {
+
+          // return local.getPaths('/wildcar*');
+          return remote.getPaths('/wildcard/*');
+
+        })
+
+        .then(function(r) {
+
+          // require('should'); //!!!!!  WTF
+
+          var sort = r.map(function(item) {
+            return item.path;
+          }).sort(function(a, b) {
+            if (a < b) return -1;
+            if (a > b) return 1;
+            return 0;
+          });
+
+          // console.log('xxx' , sort.should);
+
+          // sort.should.eql([
+          //   '/mildcard/path/five',
+          //   '/mildcard/path/four', 
+          //   '/mildcard/path/one',   
+          //   '/mildcard/path/three', 
+          //   '/mildcard/path/two',   
+          // ]);
+
+          done();
+
+        })
+
+        .catch(done);
+
+      });
+
+    });
+
   });
 
   context('getChild', function() {
 
+    context('local', function() {
+
+      it('can get specific child after storing array')
+
+      it('can get child after setting it')
+
+
+
+    });
+
+    context('remote', function() {
+
+    });
+
   });
 
   context('setChild', function() {
+
+    context('local', function() {
+
+      it('can set specific child after storing array')
+
+      it('can set new child in array')
+
+      it('can set the first child at empty branch')
+
+    });
 
   });
 
@@ -232,6 +522,10 @@ objective('functional', function() {
   });
 
   context('removeChild', function() {
+
+  });
+
+  context('tagging', function() {
 
   });
 
