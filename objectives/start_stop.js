@@ -34,19 +34,21 @@ module.exports = function() {
       Index.client.create({
         plugin: Index.client_plugins.intra_process,
         context: server
-      }, function(e, client) {
-        if (e) return done(e);
+      })
 
-        mock('local', client);              // mock
+      .then(function(client) {
+        mock('local', client);                // mock intra-process client
+        return Index.client.create({});
+      })
 
-        Index.client.create({}, function(e, client) {
-          if (e) return done(e);
+      .then(function(client) {
+        mock('remote', client);               // mock socket client
+      })
 
-          mock('remote', client);           // mock
+      .then(done)
 
-          done();
-        });
-      });
+      .catch(done);
+
     });
   });
 
