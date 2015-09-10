@@ -20,21 +20,46 @@ objective('functional', function() {
 
       it('sets remote object data', function(done, remote, should) {
 
-        data = {a:1, b:1};
+        var data = {a:1, b:1};
 
         remote.set('/the/remote/garden/path', data, {}, function(e, r) {
           if (e) return done(e);
 
           Object.keys(r._store).should.eql(['modified', 'path', 'id']);
           Object.keys(r._event).should.eql(['type', 'status', 'published', 'id']);
-          Object.keys(r).should.eql(['a', 'b', '_store', '_event']);
+          Object.keys(r).should.eql(['a', 'b', '_event', '_store']);
           done();
         });
       });
 
-      it('sets remote array data');
+      it('sets remote array data', function(done, remote, should) {
+
+        var myData = [{a:1, b:1}, {c:1, d:1}];
+
+        trace.filter = true;
+
+        remote.set('/my/array', myData)
+
+        .then(function(r) {
+
+          r[0].a.should.equal(1);
+          r[0].b.should.equal(1);
+          r[0]._store.path.should.equal('/my/array');
+
+          r[1].c.should.equal(1);
+          r[1].d.should.equal(1);
+          r[1]._store.path.should.equal('/my/array');
+
+          r._event.id.length;
+          done();
+
+        })
+
+        .catch(done);
+      });
 
     });
+
 
     context('local', function() {
 
@@ -70,10 +95,7 @@ objective('functional', function() {
         //   }
         // );
 
-        // myData = [{a:1, b:1}, {c:1, d:1}];
-
-        console.log('TODO: Array');
-        myData = {a:1, b:1};
+        var myData = {a:1, b:1};
 
         local.set('/the/local/garden/path', myData, {}, function(e, r) {
           if (e) return done(e);
@@ -86,11 +108,35 @@ objective('functional', function() {
       });
   
 
-      it('sets local array data');
+      it('sets local array data', function(done, local) {
+
+        var myData = [{a:1, b:1}, {c:1, d:1}];
+
+        trace.filter = true;
+
+        local.set('/my/array', myData)
+
+        .then(function(r) {
+
+          r[0].a.should.equal(1);
+          r[0].b.should.equal(1);
+          r[0]._store.path.should.equal('/my/array');
+
+          r[1].c.should.equal(1);
+          r[1].d.should.equal(1);
+          r[1]._store.path.should.equal('/my/array');
+
+          r._event.id.length;
+          done();
+
+        })
+
+        .catch(done);
 
 
+
+      });
     });
-
   });
 
   context('get', function() {
