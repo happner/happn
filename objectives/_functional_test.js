@@ -481,13 +481,35 @@ objective('functional', function() {
 
   });
 
-  context('getChild', function() {
+  xcontext('getChild', function() {
 
     context('local', function() {
 
-      it('can get specific child after storing array')
+      it('can get specific child after storing array', function(done, local) {
 
-      it('can get child after setting it')
+        var child;
+
+        local.set('/with/child', [{child: 1}, {child: 2}])
+
+        .then(function(r) {
+          child = r[0];
+          return local.getChild('/with/child', child._store.id)
+        })
+
+        .then(function(c) {
+          console.log(c);
+          done();
+
+        })
+
+        .catch(done);
+
+
+
+
+      });
+
+      it('can get child after setting it');
 
 
 
@@ -499,15 +521,15 @@ objective('functional', function() {
 
   });
 
-  context('setChild', function() {
+  xcontext('setChild', function() {
 
     context('local', function() {
 
-      it('can set specific child after storing array')
+      it('can set specific child after storing array');
 
-      it('can set new child in array')
+      it('can set new child in array');
 
-      it('can set the first child at empty branch')
+      it('can set the first child at empty branch');
 
     });
 
