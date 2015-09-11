@@ -8,6 +8,10 @@ objective('functional', function() {
 
   });
 
+  context('onAll', function() {
+
+  });
+
   context('off', function() {
 
   });
@@ -488,30 +492,20 @@ objective('functional', function() {
       it('can get specific child after storing array', function(done, local) {
 
         var child;
-
         local.set('/with/child', [{child: 1}, {child: 2}])
-
         .then(function(r) {
           child = r[0];
           return local.getChild('/with/child', child._store.id)
         })
-
         .then(function(c) {
           console.log(c);
           done();
 
         })
-
         .catch(done);
-
-
-
-
       });
 
       it('can get child after setting it');
-
-
 
     });
 
@@ -537,13 +531,64 @@ objective('functional', function() {
 
   context('setSibling', function() {
 
+    context('local', function() {
+
+      it('it creates a sibling from local', function(done, local) {
+
+        local.setSibling('/for/sibling', {the: 'SIBLING'})
+
+        .then(function(r) {
+          r.the.should.equal('SIBLING');
+          r._store.modified.length;
+          r._store.path.length;
+          r._store.id.length;
+          r._event.type.length;
+          r._event.status.length;
+          r._event.published.length;
+          r._event.id.length;
+          r._store.path.split('/').length.should.equal(4);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+    });
+
+
+    context('remote', function() {
+
+      it('it creates a sibling from remote', function(done, remote) {
+
+        remote.setSibling('/for/sibling', {the: 'SIBLING'})
+
+        .then(function(r) {
+          r.the.should.equal('SIBLING');
+          r._store.modified.length;
+          r._store.path.length;
+          r._store.id.length;
+          r._event.type.length;
+          r._event.status.length;
+          r._event.published.length;
+          r._event.id.length;
+          r._store.path.split('/').length.should.equal(4);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+    });
+
   });
 
   context('remove', function() {
 
   });
 
-  context('removeChild', function() {
+  xcontext('removeChild', function() {
 
   });
 
