@@ -6,17 +6,49 @@ objective('functional', function() {
 
   context('on', function() {
 
+    context('local', function() {
+
+    });
+
+    context('remote', function() {
+
+    });
+
   });
 
   context('onAll', function() {
+
+    context('local', function() {
+
+    });
+
+    context('remote', function() {
+
+    });
 
   });
 
   context('off', function() {
 
+    context('local', function() {
+
+    });
+
+    context('remote', function() {
+
+    });
+
   });
 
   context('offAll', function() {
+
+    context('local', function() {
+
+    });
+
+    context('remote', function() {
+
+    });
 
   });
 
@@ -643,7 +675,25 @@ objective('functional', function() {
 
   });
 
-  context('tagging', function() {
+  context('tagging', {
+    question: 'does the creation of a tag publish a set event?'
+  }, function() {
+
+    it('can create new record and tag simultaneously');
+
+    it('can create a new tag on existing record with no new data');
+
+    it('can create a new tag on existing record with new data', {
+      question: 'should the new data appear in the existing record and in the tag?'
+    });
+
+    it('can retrieve a tag');
+
+    it('can replace a tag');
+
+    it('can remove a tag');
+
+    it('can remove multiple tags');
 
   });
 
