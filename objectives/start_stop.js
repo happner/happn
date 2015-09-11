@@ -2,6 +2,9 @@ module.exports = function() {
 
   before(function(done, Index) {
     mock('Promise', require('bluebird'));
+    mock('Should', new require('chai').should());
+    mock('expect', require('chai').expect);
+
     this.timeout(1000);
     var _this = this;
     Index.service.create({

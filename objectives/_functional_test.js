@@ -1,7 +1,5 @@
 objective('functional', function() {
 
-  var should = require('should');
-
   require('./start_stop')();
 
   context('on', function() {
@@ -56,7 +54,7 @@ objective('functional', function() {
 
     context('remote', function() {
 
-      it('sets remote object data', function(done, remote, should) {
+      it('sets remote object data', function(done, remote) {
 
         var data = {a:1, b:2};
 
@@ -78,7 +76,7 @@ objective('functional', function() {
         });
       });
 
-      it('sets remote array data', function(done, remote, should) {
+      it('sets remote array data', function(done, remote, Should) {
 
         var myData = [{a:1, b:1}, {c:1, d:1}];
 
@@ -88,17 +86,17 @@ objective('functional', function() {
 
         .then(function(r) {
 
-          r[0].a.should.equal(1);
-          r[0].b.should.equal(1);
-          r[0]._store.path.should.equal('/my/array');
-          r[0]._store.id.length;
-          r[0]._store.modified.length;
+          r[0].a.should.eql(1);
+          r[0].b.should.eql(1);
+          r[1].c.should.eql(1);
+          r[1].d.should.eql(1);
 
-          r[1].c.should.equal(1);
-          r[1].d.should.equal(1);
-          r[1]._store.path.should.equal('/my/array');
-          r[1]._store.id.length;
-          r[1]._store.modified.length;
+          Should.not.exist(r[0]._store);
+          Should.not.exist(r[1]._store);
+
+          r._store.modified.length;
+          r._store.id.length;
+          r._store.path.length;
 
           r._event.type.length;
           r._event.status.length;
@@ -118,7 +116,7 @@ objective('functional', function() {
 
     context('local', function() {
 
-      it('sets remote object data', function(done, local, should) {
+      it('sets local object data', function(done, local) {
 
         var data = {a:1, b:2};
 
@@ -140,27 +138,20 @@ objective('functional', function() {
         });
       });
 
-      it('sets remote array data', function(done, local, should) {
+      it('sets local array data', function(done, local) {
 
         var myData = [{a:1, b:1}, {c:1, d:1}];
 
-        trace.filter = true;
-
-        local.set('/mi/array', myData)
+        local.set('/my/array', myData)
 
         .then(function(r) {
 
-          r[0].a.should.equal(1);
-          r[0].b.should.equal(1);
-          r[0]._store.path.should.equal('/mi/array');
-          r[0]._store.id.length;
-          r[0]._store.modified.length;
+          r[0].should.eql({a:1, b:1});
+          r[1].should.eql({c:1, d:1});
 
-          r[1].c.should.equal(1);
-          r[1].d.should.equal(1);
-          r[1]._store.path.should.equal('/mi/array');
-          r[1]._store.id.length;
-          r[1]._store.modified.length;
+          r._store.modified.length;
+          r._store.id.length;
+          r._store.path.length;
 
           r._event.type.length;
           r._event.status.length;
@@ -230,23 +221,17 @@ objective('functional', function() {
         remote.get('/up/for/grabs/array')
 
         .then(function(r) {
-          r._event.type.length;
 
-          r[0].key1.should.equal('value1');
-          r[1].key2.should.equal('value2');
-
-          r[0]._store.id.length;
-          r[0]._store.path.length;
-          // r[0]._store.created.length;
-          r[0]._store.modified.length;
-
-          r[1]._store.id.length;
-          r[1]._store.path.length;
+          r[0].key1.should.eql('value1');
+          r[1].key2.should.eql('value2');
 
           r._store.id.length;
           r._store.path.length;
-          // r[0]._store.created.length;
           r._store.modified.length;
+          r._event.type.length;
+          r._event.status.length;
+          r._event.published.length;
+          r._event.id.length;
           done();
         })
 
@@ -347,23 +332,16 @@ objective('functional', function() {
 
         .then(function(r) {
 
-          r._event.type.length;
-
-          r[0].key1.should.equal('value1');
-          r[1].key2.should.equal('value2');
-
-          r[0]._store.id.length;
-          r[0]._store.path.length;
-          // r[0]._store.created.length;
-          r[0]._store.modified.length;
-
-          r[1]._store.id.length;
-          r[1]._store.path.length;
+          r[0].should.eql({key1: 'value1'});
+          r[1].should.eql({key2: 'value2'});
 
           r._store.id.length;
           r._store.path.length;
-          // r[0]._store.created.length;
           r._store.modified.length;
+          r._event.type.length;
+          r._event.status.length;
+          r._event.published.length;
+          r._event.id.length;
           done();
         })
 
@@ -464,7 +442,7 @@ objective('functional', function() {
 
     context('remote', function() {
 
-      it('gets path with wildcards', function(done, remote, Promise) {
+      it('gets path with wildcards', function(done, remote, Promise, expect) {
 
         trace.filter = true;
 
@@ -479,7 +457,7 @@ objective('functional', function() {
         .then(function() {
 
           // return local.getPaths('/wildcar*');
-          return remote.getPaths('/wildcard/*');
+          return remote.getPaths('/mildcard/*');
 
         })
 
@@ -497,13 +475,15 @@ objective('functional', function() {
 
           // console.log('xxx' , sort.should);
 
-          // sort.should.eql([
-          //   '/mildcard/path/five',
-          //   '/mildcard/path/four', 
-          //   '/mildcard/path/one',   
-          //   '/mildcard/path/three', 
-          //   '/mildcard/path/two',   
-          // ]);
+          // should is (semi) broken in callback /?or?/ promise from websocket
+
+          expect(sort).to.eql([
+            '/mildcard/path/five',
+            '/mildcard/path/four', 
+            '/mildcard/path/one',   
+            '/mildcard/path/three', 
+            '/mildcard/path/two',   
+          ]);
 
           done();
 

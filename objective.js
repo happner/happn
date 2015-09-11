@@ -12,8 +12,8 @@ objective({
       testDir: 'objectives',
       testAppend: '_test',
       runAll: true,
-      showTrace: false,
-      filterTrace: false
+      showTrace: true,
+      filterTrace: true
     }
   }
 }).run(function() {});
