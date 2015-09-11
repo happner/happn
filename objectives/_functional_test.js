@@ -586,6 +586,57 @@ objective('functional', function() {
 
   context('remove', function() {
 
+    context('local', function() {
+
+      it('removes one from local', function(done, local) {
+
+        trace.filter = true;
+
+        local.set('/pending/remove', {data: 'DATA'})
+
+        .then(function() {
+          return local.get('/pending/remove')
+        })
+
+        .then(function(got) {
+          return local.remove('/pending/remove')
+        })
+
+        .then(function(r) {
+          r.removed.should.equal(1);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+      it('removes many from local', function(done, local, Promise) {
+
+        trace.filter = true;
+
+        Promise.all([
+          local.set('/pending/multiple/remove/a', {data: 'DATA'}),
+          local.set('/pending/multiple/remove/b', {data: 'DATA'}),
+          local.set('/pending/multiple/remove/c', {data: 'DATA'}),
+          local.set('/pending/multiple/remove/d', {data: 'DATA'}),
+        ])
+
+        .then(function() {
+          return local.remove('/pending/multiple/remove/*')
+        })
+
+        .then(function(r) {
+          r.removed.should.equal(4);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+    });
+
   });
 
   xcontext('removeChild', function() {
