@@ -1,10 +1,12 @@
 objective('functional', function() {
 
-  require('./start_stop')();
+  require('./start_stop');
 
   context('on', function() {
 
     context('local', function() {
+
+      // after merge
 
     });
 
@@ -185,19 +187,11 @@ objective('functional', function() {
 
     });
 
-    // after(function() {  // <----------BUG in objective, afterhook not running
-    //   console.log('after');
-    // });
-
     context('remote', function() {
 
       it('gets remote object data', function(done, remote, pubsub) {
 
         trace.filter = true;
-
-        // pubsub.spy(function handle_message() {
-        //   console.log('handle_message()', arguments);
-        // });
 
         remote.get('/up/for/grabs/obj')
 
@@ -300,9 +294,6 @@ objective('functional', function() {
         .catch(done);
 
       });
-
-      it('bug? tag does not save on first');
-
 
     });
 
@@ -497,50 +488,6 @@ objective('functional', function() {
 
   });
 
-  xcontext('getChild', function() {
-
-    context('local', function() {
-
-      it('can get specific child after storing array', function(done, local) {
-
-        var child;
-        local.set('/with/child', [{child: 1}, {child: 2}])
-        .then(function(r) {
-          child = r[0];
-          return local.getChild('/with/child', child._store.id)
-        })
-        .then(function(c) {
-          console.log(c);
-          done();
-
-        })
-        .catch(done);
-      });
-
-      it('can get child after setting it');
-
-    });
-
-    context('remote', function() {
-
-    });
-
-  });
-
-  xcontext('setChild', function() {
-
-    context('local', function() {
-
-      it('can set specific child after storing array');
-
-      it('can set new child in array');
-
-      it('can set the first child at empty branch');
-
-    });
-
-  });
-
   context('setSibling', function() {
 
     context('local', function() {
@@ -651,29 +598,160 @@ objective('functional', function() {
 
   });
 
-  xcontext('removeChild', function() {
-
-  });
 
   context('tagging', {
     question: 'does the creation of a tag publish a set event?'
   }, function() {
 
-    it('can create new record and tag simultaneously');
+    context('local',  function() {
 
-    it('can create a new tag on existing record with no new data');
+      xit('can create new record and tag simultaneously');
 
-    it('can create a new tag on existing record with new data', {
-      question: 'should the new data appear in the existing record and in the tag?'
+      it('can create a new tag on existing record with no new data', function(done, local, expect) {
+
+        local.set('/patha/item/1', {key: 'value'})
+
+        .then(function(r) {
+          return local.set('/patha/item/1', {}, {tag: 'tagname', merge: true});
+        })
+
+        .then(function(r) {
+          expect(r.snapshot.data).to.eql({key: 'value'});
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+      xit('can create a new tag on existing record with new data', {
+        question: 'should the new data appear in the existing record and in the tag?'
+      });
+
+      // it.only('can retrieve a tag', function(done) {
+      //   console.log('RUN!');
+      //   done();
+      // });
+      // it.only('can retrieve a tag 1', function(done) {
+      //   done();
+      // });
+
+      xit('can replace a tag');
+
+      it('can remove a tag');
+
+      xit('can remove multiple tags');
+
     });
 
-    it('can retrieve a tag');
+    context('remote',  function() {
 
-    it('can replace a tag');
+      xit('can create new record and tag simultaneously');
 
-    it('can remove a tag');
+      it('can create a new tag on existing record with no new data', function(done, remote, expect) {
 
-    it('can remove multiple tags');
+        remote.set('/pathb/item/1', {key: 'value'})
+
+        .then(function(r) {
+          return remote.set('/pathb/item/1', {}, {tag: 'tagname', merge: true});
+        })
+
+        .then(function(r) {
+          expect(r.snapshot.data).to.eql({key: 'value'});
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+      xit('can create a new tag on existing record with new data', {
+        question: 'should the new data appear in the existing record and in the tag?'
+      });
+
+      it('can retrieve a tag');
+
+      xit('can replace a tag');
+
+      it('can remove a tag');
+
+      xit('can remove multiple tags');
+
+    });
+
+  });
+
+  context('merging', function() {
+
+    context('local', function() {
+
+      xit('merges at path', function(done, local) {
+
+        local.set('/for/local/merge', {key1: 1, key2: 2})
+
+        .then(function() {
+          return local.set('/for/local/merge', {key1: 'one', key3: 3}, {merge: true})
+        })
+
+        .then(function(r) {
+
+          r.key1.should.equal('one');
+          r.key2.should.equal(2);
+          r.key3.should.equal(3);
+
+          r._event.type.length;
+          r._event.status.length;
+          r._event.published.length;
+          r._event.id.length;
+
+          r._store.modified.length;
+          r._store.path.length;
+          r._store.id.length;
+
+          done();
+
+        })
+
+        .catch(done);
+
+      });
+
+    });
+
+    context('remote', function() {
+
+      xit('merges at path', function(done, remote) {
+
+        remote.set('/for/remote/merge', {key1: 1, key2: 2})
+
+        .then(function() {
+          return remote.set('/for/remote/merge', {key1: 'one', key3: 3}, {merge: true})
+        })
+
+        .then(function(r) {
+
+          r.key1.should.equal('one');
+          r.key2.should.equal(2);
+          r.key3.should.equal(3);
+
+          r._event.type.length;
+          r._event.status.length;
+          r._event.published.length;
+          r._event.id.length;
+
+          r._store.modified.length;
+          r._store.path.length;
+          r._store.id.length;
+
+          done();
+
+        })
+
+        .catch(done);
+
+      });
+
+    });
 
   });
 

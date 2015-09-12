@@ -11,9 +11,10 @@ objective({
       sourceDir: 'lib',
       testDir: 'objectives',
       testAppend: '_test',
-      runAll: true,
+      timeout: 500,
+      runAll: false,
       showTrace: true,
-      filterTrace: true
+      filterTrace: true,
     }
   }
 }).run(function() {});

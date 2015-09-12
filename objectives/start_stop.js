@@ -1,6 +1,7 @@
-module.exports = function() {
 
-  before(function(done, Index) {
+
+  before('start server', function(done, Index) {
+
     mock('Promise', require('bluebird'));
     mock('Should', new require('chai').should());
     mock('expect', require('chai').expect);
@@ -49,16 +50,16 @@ module.exports = function() {
         mock('remote', client);               // mock socket client
       })
 
-      .then(done)
-
-      .catch(done);
+      .then(done).catch(done);
 
     });
   });
 
-  after(function(server, done) {
-    console.log('STOP');
-    server.stop(done);
+  after('stop server', function(done, server, remote) {
+
+    remote.stop().then(function() {
+      return server.stop();
+    }).then(done).catch(done);
+
   });
 
-}
