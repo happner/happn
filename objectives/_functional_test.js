@@ -374,13 +374,85 @@ objective('happn', function() {
 
   });
 
-  context('onAll()', function() {
+  context('onAll() and offAll()', function() {
 
     context('local', function() {
+
+      it('listens to all and then none from local', function(done, local, Promise) {
+
+        var collect = [];
+
+        local.onAll(function(data) {
+          collect.push(JSON.parse(JSON.stringify(data)))
+        })
+
+        .then(function() {
+          return Promise.all([
+            local.set('/a', {}),
+            local.set('/a/c/d/c', {}),
+            local.set('/c/a', {}),
+            local.set('/b', {}),
+            local.set('/a/b', {}),
+          ]);
+        })
+
+        .then(function() {
+          collect.length.should.equal(5);
+          collect.length = 0; // flush
+        })
+
+        .then(function() {
+          return local.offAll()
+        })
+
+        .then(function() {
+          collect.length.should.equal(0);
+          done();
+        })
+
+        .catch(done);
+
+      });
 
     });
 
     context('remote', function() {
+
+      it('listens to all and then none from remote', function(done, remote, Promise) {
+
+        var collect = [];
+
+        remote.onAll(function(data) {
+          collect.push(JSON.parse(JSON.stringify(data)))
+        })
+
+        .then(function() {
+          return Promise.all([
+            remote.set('/a', {}),
+            remote.set('/a/c/d/c', {}),
+            remote.set('/c/a', {}),
+            remote.set('/b', {}),
+            remote.set('/a/b', {}),
+          ]);
+        })
+
+        .then(function() {
+          collect.length.should.equal(5);
+          collect.length = 0; // flush
+        })
+
+        .then(function() {
+          return remote.offAll()
+        })
+
+        .then(function() {
+          collect.length.should.equal(0);
+          done();
+        })
+
+        .catch(done);
+
+      });
 
     });
 
@@ -554,18 +626,6 @@ objective('happn', function() {
 
       xit('has a usefull callback')
 
-
-    });
-
-  });
-
-  context('offAll()', function() {
-
-    context('local', function() {
-
-    });
-
-    context('remote', function() {
 
     });
 
@@ -1184,6 +1244,7 @@ objective('happn', function() {
         })
 
         .then(function(r) {
+
           expect(r.snapshot.data).to.eql({key: 'value'});
           done();
         })
