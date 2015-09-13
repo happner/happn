@@ -1,12 +1,372 @@
-objective('functional', function() {
+objective('happn', function() {
 
   require('./start_stop');
 
-  context('on', function() {
+  context('control data', function() {
+
+    context('error', function() {
+
+      it('does not hide the _event but does hide _store');
+
+    });
+
+    context('ok', function() {
+
+      it('hides both the _event and the _store');
+
+    });
+
+  });
+
+  context('on()', function() {
 
     context('local', function() {
 
-      // after merge
+      it('subscribes to all events on a path', function(done, local) {
+
+        var collect = [];
+
+        local.on('/pending/set/one', function(data) {
+
+          // intra-process has sme object on client and server
+          // need to deep copy this before the set callback
+          // assembles it's result object on it. 
+          collect.push(JSON.parse(JSON.stringify(data)));
+        })
+
+        .then(function() {
+          return local.set('/pending/set/one', {key: 'value1'})
+        })
+
+        .then(function() {
+          return local.set('/pending/set/one', {key: 'value2', key2: 'merge?'}, {merge: true})
+        })
+
+        .then(function() {
+          return local.remove('/pending/set/one')
+        })
+
+        .then(function() {
+
+          // console.log(collect);
+
+          collect[0].key.should.equal('value1');
+          collect[0]._store.modified.length;
+          collect[0]._store.path.should.equal('/pending/set/one');
+          collect[0]._store.id.length;
+          collect[0]._event.timestamp.length; // mostly duplicate of _store.modified
+                                             // except in case of delete
+          collect[0]._event.action.should.equal('/SET@/pending/set/one');   
+          collect[0]._event.type.should.equal('data');
+          collect[0]._event.id.length;
+          collect[0]._event.channel.should.equal('/ALL@/pending/set/one');
+
+          // console.log(collect[1]);
+
+          collect[1].key.should.equal('value2');
+          collect[1].key2.should.equal('merge?');
+          collect[1]._store.modified.length;
+          collect[1]._store.path.should.equal('/pending/set/one');
+          // collect[1]._store.id.length; // missing on merge
+          collect[1]._event.timestamp.length;
+          collect[1]._event.action.should.equal('/SET@/pending/set/one');   
+          collect[1]._event.type.should.equal('data');
+          collect[1]._event.id.length;
+          collect[1]._event.channel.should.equal('/ALL@/pending/set/one');
+
+          collect[2].removed.should.equal(1);
+          collect[2]._store.path.should.equal('/pending/set/one');
+          collect[2]._event.timestamp.length;
+          collect[2]._event.action.should.equal('/REMOVE@/pending/set/one');   
+          collect[2]._event.type.should.equal('data');
+          collect[2]._event.id.length;
+          collect[2]._event.channel.should.equal('/ALL@/pending/set/one');
+
+          done();
+
+        })
+
+        .catch(done);
+
+      })
+
+      it('subscribes to only set events on a path', function(done, local) {
+
+        var collect = [];
+
+        local.on('/pending/set/two', {event_type: 'set'}, function(data) {
+          collect.push(JSON.parse(JSON.stringify(data)));
+        })
+
+        .then(function() {
+          return local.set('/pending/set/two', {key: 'value1'})
+        })
+
+        .then(function() {
+          return local.set('/pending/set/two', {key: 'value2'})
+        })
+
+        .then(function() {
+          return local.remove('/pending/set/two')
+        })
+
+        .then(function() {
+
+          // console.log(collect);
+
+          collect[0].key.should.equal('value1');
+          collect[0]._store.modified.length;
+          collect[0]._store.path.should.equal('/pending/set/two');
+          collect[0]._store.id.length;
+          collect[0]._event.timestamp.length; // mostly duplicate of _store.modified
+                                             // except in case of delete
+          collect[0]._event.action.should.equal('/SET@/pending/set/two');   
+          collect[0]._event.type.should.equal('data');
+          collect[0]._event.id.length;
+          collect[0]._event.channel.should.equal('/SET@/pending/set/two');
+
+          collect[1].key.should.equal('value2');
+          collect[1]._store.modified.length;
+          collect[1]._store.path.should.equal('/pending/set/two');
+          collect[1]._store.id.length;
+          collect[1]._event.timestamp.length;
+          collect[1]._event.action.should.equal('/SET@/pending/set/two');   
+          collect[1]._event.type.should.equal('data');
+          collect[1]._event.id.length;
+          collect[1]._event.channel.should.equal('/SET@/pending/set/two');
+
+          collect.length.should.equal(2);
+
+          done();
+
+        })
+
+        .catch(done);
+
+      })
+
+      it('subscribes to only remove events on a path', function(done, local) {
+
+        var collect = [];
+
+        local.on('/pending/set/three', {event_type: 'remove'}, function(data) {
+          collect.push(JSON.parse(JSON.stringify(data)));
+        })
+
+        .then(function() {
+          return local.set('/pending/set/three', {key: 'value1'})
+        })
+
+        .then(function() {
+          return local.set('/pending/set/three', {key: 'value2'})
+        })
+
+        .then(function() {
+          return local.remove('/pending/set/three')
+        })
+
+        .then(function() {
+
+          // console.log(collect);
+
+          collect[0].removed.should.equal(1);
+          collect[0]._store.path.should.equal('/pending/set/three');
+          collect[0]._event.timestamp.length;
+          collect[0]._event.action.should.equal('/REMOVE@/pending/set/three');   
+          collect[0]._event.type.should.equal('data');
+          collect[0]._event.id.length;
+          collect[0]._event.channel.should.equal('/REMOVE@/pending/set/three');
+
+          collect.length.should.equal(1);
+
+          done();
+
+        })
+
+        .catch(done);
+
+      })
+    
+    });
+
+    context('remote', function() {
+
+
+      it('subscribes to all events on a path', function(done, remote) {
+
+        var collect = [];
+
+        remote.on('/pending/set/four', function(data) {
+
+          // intra-process has sme object on client and server
+          // need to deep copy this before the set callback
+          // assembles it's result object on it. 
+          collect.push(JSON.parse(JSON.stringify(data)));
+        })
+
+        .then(function() {
+          return remote.set('/pending/set/four', {key: 'value1'})
+        })
+
+        .then(function() {
+          return remote.set('/pending/set/four', {key: 'value2', key2: 'merge?'}, {merge: true})
+        })
+
+        .then(function() {
+          return remote.remove('/pending/set/four')
+        })
+
+        .then(function() {
+
+          // console.log(collect);
+
+          collect[0].key.should.equal('value1');
+          collect[0]._store.modified.length;
+          collect[0]._store.path.should.equal('/pending/set/four');
+          collect[0]._store.id.length;
+          collect[0]._event.timestamp.length; // mostly duplicate of _store.modified
+                                             // except in case of delete
+          collect[0]._event.action.should.equal('/SET@/pending/set/four');   
+          collect[0]._event.type.should.equal('data');
+          collect[0]._event.id.length;
+          collect[0]._event.channel.should.equal('/ALL@/pending/set/four');
+
+          // console.log(collect[1]);
+
+          collect[1].key.should.equal('value2');
+          collect[1].key2.should.equal('merge?');
+          collect[1]._store.modified.length;
+          collect[1]._store.path.should.equal('/pending/set/four');
+          // collect[1]._store.id.length; // missing on merge
+          collect[1]._event.timestamp.length;
+          collect[1]._event.action.should.equal('/SET@/pending/set/four');   
+          collect[1]._event.type.should.equal('data');
+          collect[1]._event.id.length;
+          collect[1]._event.channel.should.equal('/ALL@/pending/set/four');
+
+          collect[2].removed.should.equal(1);
+          collect[2]._store.path.should.equal('/pending/set/four');
+          collect[2]._event.timestamp.length;
+          collect[2]._event.action.should.equal('/REMOVE@/pending/set/four');   
+          collect[2]._event.type.should.equal('data');
+          collect[2]._event.id.length;
+          collect[2]._event.channel.should.equal('/ALL@/pending/set/four');
+
+          done();
+
+        })
+
+        .catch(function(e) {
+          console.log('ERRR', e);
+        });
+
+      })
+
+      it('subscribes to only set events on a path', function(done, remote) {
+
+        var collect = [];
+
+        remote.on('/pending/set/five', {event_type: 'set'}, function(data) {
+          collect.push(JSON.parse(JSON.stringify(data)));
+        })
+
+        .then(function() {
+          return remote.set('/pending/set/five', {key: 'value1'})
+        })
+
+        .then(function() {
+          return remote.set('/pending/set/five', {key: 'value2'})
+        })
+
+        .then(function() {
+          return remote.remove('/pending/set/five')
+        })
+
+        .then(function() {
+
+          // console.log(collect);
+
+          collect[0].key.should.equal('value1');
+          collect[0]._store.modified.length;
+          collect[0]._store.path.should.equal('/pending/set/five');
+          collect[0]._store.id.length;
+          collect[0]._event.timestamp.length; // mostly duplicate of _store.modified
+                                             // except in case of delete
+          collect[0]._event.action.should.equal('/SET@/pending/set/five');   
+          collect[0]._event.type.should.equal('data');
+          collect[0]._event.id.length;
+          collect[0]._event.channel.should.equal('/SET@/pending/set/five');
+
+          collect[1].key.should.equal('value2');
+          collect[1]._store.modified.length;
+          collect[1]._store.path.should.equal('/pending/set/five');
+          collect[1]._store.id.length;
+          collect[1]._event.timestamp.length;
+          collect[1]._event.action.should.equal('/SET@/pending/set/five');   
+          collect[1]._event.type.should.equal('data');
+          collect[1]._event.id.length;
+          collect[1]._event.channel.should.equal('/SET@/pending/set/five');
+
+          collect.length.should.equal(2);
+
+          done();
+
+        })
+
+        .catch(done);
+
+      })
+
+      it('subscribes to only remove events on a path', function(done, remote) {
+
+        var collect = [];
+
+        remote.on('/pending/set/six', {event_type: 'remove'}, function(data) {
+          collect.push(JSON.parse(JSON.stringify(data)));
+        })
+
+        .then(function() {
+          return remote.set('/pending/set/six', {key: 'value1'})
+        })
+
+        .then(function() {
+          return remote.set('/pending/set/six', {key: 'value2'})
+        })
+
+        .then(function() {
+          return remote.remove('/pending/set/six')
+        })
+
+        .then(function() {
+
+          // console.log(collect);
+
+          collect[0].removed.should.equal(1);
+          collect[0]._store.path.should.equal('/pending/set/six');
+          collect[0]._event.timestamp.length;
+          collect[0]._event.action.should.equal('/REMOVE@/pending/set/six');   
+          collect[0]._event.type.should.equal('data');
+          collect[0]._event.id.length;
+          collect[0]._event.channel.should.equal('/REMOVE@/pending/set/six');
+
+          collect.length.should.equal(1);
+
+          done();
+
+        })
+
+        .catch(done);
+
+      })
+
+
+    });
+
+  });
+
+  context('onAll()', function() {
+
+    context('local', function() {
 
     });
 
@@ -16,7 +376,7 @@ objective('functional', function() {
 
   });
 
-  context('onAll', function() {
+  context('off()', function() {
 
     context('local', function() {
 
@@ -28,7 +388,7 @@ objective('functional', function() {
 
   });
 
-  context('off', function() {
+  context('offAll()', function() {
 
     context('local', function() {
 
@@ -40,19 +400,7 @@ objective('functional', function() {
 
   });
 
-  context('offAll', function() {
-
-    context('local', function() {
-
-    });
-
-    context('remote', function() {
-
-    });
-
-  });
-
-  context('set', function() {
+  context('set()', function() {
 
     context('remote', function() {
 
@@ -173,9 +521,11 @@ objective('functional', function() {
 
   });
 
-  context('get', function() {
+  context('get()', function() {
 
     before(function(done, local) {
+
+      console.log('GET before');
 
       local.set('/up/for/grabs/obj', {key: 'value'})
 
@@ -385,7 +735,7 @@ objective('functional', function() {
 
   });
 
-  context('getPaths', function() {
+  context('getPaths()', function() {
 
     context('local', function() {
 
@@ -488,7 +838,7 @@ objective('functional', function() {
 
   });
 
-  context('setSibling', function() {
+  context('setSibling()', function() {
 
     context('local', function() {
 
@@ -543,7 +893,7 @@ objective('functional', function() {
 
   });
 
-  context('remove', function() {
+  context('remove()', function() {
 
     context('local', function() {
 
@@ -599,20 +949,16 @@ objective('functional', function() {
   });
 
 
-  context('tagging', {
-    question: 'does the creation of a tag publish a set event?'
-  }, function() {
+  context('tagging()', function() {
 
     context('local',  function() {
-
-      xit('can create new record and tag simultaneously');
 
       it('can create a new tag on existing record with no new data', function(done, local, expect) {
 
         local.set('/patha/item/1', {key: 'value'})
 
         .then(function(r) {
-          return local.set('/patha/item/1', {}, {tag: 'tagname', merge: true});
+          return local.set('/patha/item/1', null, {tag: 'tagname'});
         })
 
         .then(function(r) {
@@ -620,7 +966,10 @@ objective('functional', function() {
           done();
         })
 
-        .catch(done);
+        .catch(function(e) {
+          console.log(e);
+          done(e);
+        });
 
       });
 
@@ -638,7 +987,7 @@ objective('functional', function() {
 
       xit('can replace a tag');
 
-      it('can remove a tag');
+      xit('can remove a tag');
 
       xit('can remove multiple tags');
 
@@ -646,14 +995,12 @@ objective('functional', function() {
 
     context('remote',  function() {
 
-      xit('can create new record and tag simultaneously');
-
       it('can create a new tag on existing record with no new data', function(done, remote, expect) {
 
         remote.set('/pathb/item/1', {key: 'value'})
 
         .then(function(r) {
-          return remote.set('/pathb/item/1', {}, {tag: 'tagname', merge: true});
+          return remote.set('/pathb/item/1', null, {tag: 'tagname'});
         })
 
         .then(function(r) {
@@ -665,15 +1012,13 @@ objective('functional', function() {
 
       });
 
-      xit('can create a new tag on existing record with new data', {
-        question: 'should the new data appear in the existing record and in the tag?'
-      });
+      xit('can create a new tag on existing record with new data');
 
       it('can retrieve a tag');
 
       xit('can replace a tag');
 
-      it('can remove a tag');
+      xit('can remove a tag');
 
       xit('can remove multiple tags');
 

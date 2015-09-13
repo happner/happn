@@ -1,7 +1,7 @@
 
 
   before('start server', function(done, Index) {
-
+    console.log('START');
     mock('Promise', require('bluebird'));
     mock('Should', new require('chai').should());
     mock('expect', require('chai').expect);
@@ -56,7 +56,7 @@
   });
 
   after('stop server', function(done, server, remote) {
-
+    console.log('STOP');
     remote.stop().then(function() {
       return server.stop();
     }).then(done).catch(done);
