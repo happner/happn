@@ -185,7 +185,19 @@ objective('happn', function() {
 
         .catch(done);
 
-      })
+      });
+  
+      it('has a usefull callback', function(done, local) {
+
+        local.on('/one/two/three', function() {})
+        .then(function(r) {
+           // r is the handlerId, can be used to remove listener
+           done();
+        })
+        .catch(done);
+
+      });
+      
     
     });
 
@@ -256,9 +268,7 @@ objective('happn', function() {
 
         })
 
-        .catch(function(e) {
-          console.log('ERRR', e);
-        });
+        .catch(done);
 
       })
 
@@ -380,9 +390,170 @@ objective('happn', function() {
 
     context('local', function() {
 
+      it('removes all subscriptions from a path from local', function(done, local) {
+
+        var collect = [];
+
+        local.on('/temp1/sub/one', function(data) {
+          collect.push(JSON.parse(JSON.stringify(data)));
+        })
+
+        .then(function(r) {
+          // subscribe a second time
+          return local.on('/temp1/sub/one', function(data) {
+            collect.push(JSON.parse(JSON.stringify(data)));
+          })
+        })
+
+        .then(function() {
+          return local.set('/temp1/sub/one', {key: 1})
+        })
+
+        .then(function() {
+          collect.length.should.equal(2);
+          // unsubscribe
+          return local.off('/temp1/sub/one') // unsub
+        })
+
+        .then(function(r) {
+          // console.log('off result', r);
+          return local.set('/temp1/sub/one', {key: 1});
+        })
+
+        .then(function() {
+          collect.length.should.equal(2);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+      it('removes a specific subscription from local', function(local, done) {
+
+        var collect = [];
+        var id1, id2;
+
+        local.on('/temp2/sub/one', function(data) {
+          collect.push(JSON.parse(JSON.stringify(data)));
+        })
+
+        .then(function(id) {
+          id1 = id;
+          return local.on('/temp2/sub/one', function(data) {
+            collect.push(JSON.parse(JSON.stringify(data)));
+          })
+        })
+
+        .then(function(id) {
+          id2 = id;
+          return local.set('/temp2/sub/one', {key: 1})
+        })
+
+        .then(function() {
+          collect.length.should.equal(2);
+          // unsubscribe
+          return local.off(id1) // unsub
+        })
+
+        .then(function(r) {
+          // console.log('off result', r);
+          return local.set('/temp2/sub/one', {key: 1});
+        })
+
+        .then(function() {
+          collect.length.should.equal(3);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+      xit('has a usefull callback')
+
+
     });
 
     context('remote', function() {
+
+      it('removes all subscriptions from a path from remote', function(done, remote) {
+
+        var collect = [];
+
+        remote.on('/temp1/sub/one', function(data) {
+          collect.push(JSON.parse(JSON.stringify(data)));
+        })
+
+        .then(function(r) {
+          return remote.on('/temp1/sub/one', function(data) {
+            collect.push(JSON.parse(JSON.stringify(data)));
+          })
+        })
+
+        .then(function() {
+          return remote.set('/temp1/sub/one', {key: 1})
+        })
+
+        .then(function() {
+          collect.length.should.equal(2);
+          return remote.off('/temp1/sub/one') // unsub
+        })
+
+        .then(function() {
+          return remote.set('/temp1/sub/one', {key: 1});
+        })
+
+        .then(function() {
+          collect.length.should.equal(2);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+      it('removes a specific subscription from remote', function(remote, done) {
+
+        var collect = [];
+        var id1, id2;
+
+        remote.on('/temp2/sub/one', function(data) {
+          collect.push(JSON.parse(JSON.stringify(data)));
+        })
+
+        .then(function(id) {
+          id1 = id;
+          return remote.on('/temp2/sub/one', function(data) {
+            collect.push(JSON.parse(JSON.stringify(data)));
+          })
+        })
+
+        .then(function(id) {
+          id2 = id;
+          return remote.set('/temp2/sub/one', {key: 1})
+        })
+
+        .then(function() {
+          collect.length.should.equal(2);
+          return remote.off(id1) // unsub
+        })
+
+        .then(function(r) {
+          return remote.set('/temp2/sub/one', {key: 1});
+        })
+
+        .then(function() {
+          collect.length.should.equal(3);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+      xit('has a usefull callback')
+
 
     });
 
@@ -933,6 +1104,57 @@ objective('happn', function() {
 
         .then(function() {
           return local.remove('/pending/multiple/remove/*')
+        })
+
+        .then(function(r) {
+          r.removed.should.equal(4);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+    });
+
+    context('remote', function() {
+
+      it('removes one from remote', function(done, remote) {
+
+        trace.filter = true;
+
+        remote.set('/pending2/remove', {data: 'DATA'})
+
+        .then(function() {
+          return remote.get('/pending2/remove')
+        })
+
+        .then(function(got) {
+          return remote.remove('/pending2/remove')
+        })
+
+        .then(function(r) {
+          r.removed.should.equal(1);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+      it('removes many from local', function(done, remote, Promise) {
+
+        trace.filter = true;
+
+        Promise.all([
+          remote.set('/pending2/multiple/remove/a', {data: 'DATA'}),
+          remote.set('/pending2/multiple/remove/b', {data: 'DATA'}),
+          remote.set('/pending2/multiple/remove/c', {data: 'DATA'}),
+          remote.set('/pending2/multiple/remove/d', {data: 'DATA'}),
+        ])
+
+        .then(function() {
+          return remote.remove('/pending2/multiple/remove/*')
         })
 
         .then(function(r) {
