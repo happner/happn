@@ -2,11 +2,39 @@ objective('happn', function() {
 
   require('./start_stop');
 
+  context('todo', function() {
+
+    xit('created timestamp', function() {
+
+      // currently there is no fetch of the data before setting,
+      // it simply overwrites unless merge is set
+
+    });
+
+    xit('expand tagging feature', function() {
+
+      // tagging creates a 'snapshot', what then?
+
+    });
+
+    xit('per path express mode', function() {
+
+      // set specific paths to bypass all data processing and
+      // message assemblies and do pure pubsub.
+      // (for high speed apps) 
+
+    });
+
+  });
+
   context('you get what you set', function() {
 
     context('local (intra_process)', function() {
 
       it('supports objects', function(done, local) {
+                    //
+                   // And arrays.
+                  //  Not strings or numbers.
 
         var received = false;
 
@@ -17,7 +45,7 @@ objective('happn', function() {
           obj.should.eql( {MY: 'DATA'} );
           
           // _store contains the storage details,
-          // it is available but not enumerated in iteration or serialization to
+          // it is available but not enumerated in iteration or serialization
           // 
           obj._store.path.should.equal('/some/object');
           obj._store.id.length;
@@ -222,19 +250,6 @@ objective('happn', function() {
         .catch(done);
 
       });
-
-    });
-
-  });
-
-
-  context('re-setting with _store and _event defined', function() {
-
-    context('local', function() {
-
-    });
-
-    context('remote', function() {
 
     });
 
@@ -908,9 +923,6 @@ objective('happn', function() {
 
       });
 
-      xit('handles empty result array as not error');
-
-
       it('gets remote array data', function(done, remote) {
 
         trace.filter = true;
@@ -973,6 +985,20 @@ objective('happn', function() {
 
         .catch(done);
 
+      });
+
+      it('handles empty result array as not error', function(done, remote, expect) {
+
+        remote.get('/non/existant/*')
+
+        .then(function(r) {
+          expect(r).to.eql([]);
+          done();
+        })
+
+        .catch(function(e) {
+          done(new Error('bad'))
+        })
       });
 
       xit('keeps the created date', function(done, remote) {
@@ -1042,8 +1068,6 @@ objective('happn', function() {
         .catch(done);
       });
 
-      xit('handles empty result array as not error');
-
       it('can get local with *', function(done, local) {
 
         local.set('/at/path/one', {xxx: 'one'})
@@ -1082,6 +1106,20 @@ objective('happn', function() {
 
         .catch(done);
 
+      });
+
+      it('handles empty result array as not error', function(done, local, expect) {
+
+        local.get('/non/existant/*')
+
+        .then(function(r) {
+          expect(r).to.eql([]);
+          done();
+        })
+
+        .catch(function(e) {
+          done(new Error('bad'))
+        })
       });
 
     });
@@ -1421,7 +1459,7 @@ objective('happn', function() {
 
     context('local', function() {
 
-      xit('merges at path', function(done, local) {
+      it('merges at path', function(done, local) {
 
         local.set('/for/local/merge', {key1: 1, key2: 2})
 
@@ -1431,9 +1469,7 @@ objective('happn', function() {
 
         .then(function(r) {
 
-          r.key1.should.equal('one');
-          r.key2.should.equal(2);
-          r.key3.should.equal(3);
+          r.should.eql({key1: 'one', key2: 2, key3: 3})
 
           r._event.type.length;
           r._event.status.length;
@@ -1442,7 +1478,7 @@ objective('happn', function() {
 
           r._store.modified.length;
           r._store.path.length;
-          r._store.id.length;
+          // r._store.id.length; ??
 
           done();
 
@@ -1456,7 +1492,7 @@ objective('happn', function() {
 
     context('remote', function() {
 
-      xit('merges at path', function(done, remote) {
+      it('merges at path', function(done, remote, expect) {
 
         remote.set('/for/remote/merge', {key1: 1, key2: 2})
 
@@ -1466,9 +1502,7 @@ objective('happn', function() {
 
         .then(function(r) {
 
-          r.key1.should.equal('one');
-          r.key2.should.equal(2);
-          r.key3.should.equal(3);
+          expect(r).to.eql({key1: 'one', key2: 2, key3: 3})
 
           r._event.type.length;
           r._event.status.length;
@@ -1477,7 +1511,7 @@ objective('happn', function() {
 
           r._store.modified.length;
           r._store.path.length;
-          r._store.id.length;
+          // r._store.id.length; ??
 
           done();
 
