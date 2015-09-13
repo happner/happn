@@ -2,17 +2,239 @@ objective('happn', function() {
 
   require('./start_stop');
 
-  context('control data', function() {
+  context('you get what you set', function() {
 
-    context('error', function() {
+    context('local (intra_process)', function() {
 
-      it('does not hide the _event but does hide _store');
+      it('supports objects', function(done, local) {
+
+        var received = false;
+
+        // Listen on path for object
+
+        local.on('/some/object', function(obj) {
+
+          obj.should.eql( {MY: 'DATA'} );
+          
+          // _store contains the storage details,
+          // it is available but not enumerated in iteration or serialization to
+          // 
+          obj._store.path.should.equal('/some/object');
+          obj._store.id.length;
+          obj._store.modified.length;
+
+          // _event contains details of the event,
+          // also not enumerable
+          //
+          obj._event.action.should.equal('/SET@/some/object'); // possibly unnecessary
+          obj._event.type.should.equal('data');
+          obj._event.id.length;
+          obj._event.channel.should.equal('/ALL@/some/object'); // possibly unnecessary
+
+          received = true;
+
+        })
+        
+        .then(function() {
+
+          // Set the object, listener above receives it
+
+          return local.set('/some/object', {MY: 'DATA'} )
+        })
+
+        .then(function() {
+
+          // Fetch the object
+
+          return local.get('/some/object')
+        })
+
+        .then(function(obj) {
+
+          // Get what you set.
+
+          obj.should.eql( {MY: 'DATA'} );
+
+          obj._store.path.should.equal('/some/object');
+          obj._store.id.length;
+          obj._store.modified.length;
+
+          received.should.equal(true);
+          done();
+
+        })
+
+        .catch(done);
+
+      });
+
+      it('supports arrays', function(done, local) {
+
+        var received = false;
+
+        local.on('/some/array', function(obj) {
+
+          obj.should.eql( [1,2,3] );
+          
+          obj._store.path.should.equal('/some/array');
+          obj._store.id.length;
+          obj._store.modified.length;
+          obj._event.action.should.equal('/SET@/some/array');
+          obj._event.type.should.equal('data');
+          obj._event.id.length;
+          obj._event.channel.should.equal('/ALL@/some/array');
+          received = true;
+        })
+        
+        .then(function() {
+          return local.set('/some/array', [1,2,3] )
+        })
+
+        .then(function() {
+          return local.get('/some/array')
+        })
+
+        .then(function(obj) {
+
+          obj.should.eql( [1,2,3] );
+
+          obj._store.path.should.equal('/some/array');
+          obj._store.id.length;
+          obj._store.modified.length;
+          received.should.equal(true);
+          done();
+        })
+
+        .catch(done);
+
+      });
+  
+    });
+
+    context('remote (websocket)', function() {
+
+      it('supports objects', function(done, remote, expect) {
+
+        var received = false;
+
+        remote.on('/some/remote/object', function(obj) {
+
+          expect(obj).to.eql( {MY: 'DATA'} );
+          
+          obj._store.path.should.equal('/some/remote/object');
+          obj._store.id.length;
+          obj._store.modified.length;
+          obj._event.action.should.equal('/SET@/some/remote/object');
+          obj._event.type.should.equal('data');
+          obj._event.id.length;
+          obj._event.channel.should.equal('/ALL@/some/remote/object');
+          received = true;
+
+        })
+        
+        .then(function() {
+          return remote.set('/some/remote/object', {MY: 'DATA'} )
+        })
+
+        .then(function() {
+          return remote.get('/some/remote/object')
+        })
+
+        .then(function(obj) {
+
+          expect(obj).to.eql( {MY: 'DATA'} );
+
+          obj._store.path.should.equal('/some/remote/object');
+          obj._store.id.length;
+          obj._store.modified.length;
+          received.should.equal(true);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
+      it('supports arrays', function(done, remote, expect) {
+
+        var received = false;
+
+        remote.on('/some/remote/array', function(obj) {
+
+          expect(obj).to.eql( [1,2,3] );
+          
+          obj._store.path.should.equal('/some/remote/array');
+          obj._store.id.length;
+          obj._store.modified.length;
+          obj._event.action.should.equal('/SET@/some/remote/array');
+          obj._event.type.should.equal('data');
+          obj._event.id.length;
+          obj._event.channel.should.equal('/ALL@/some/remote/array');
+          received = true;
+        })
+        
+        .then(function() {
+          return remote.set('/some/remote/array', [1,2,3] )
+        })
+
+        .then(function() {
+          return remote.get('/some/remote/array')
+        })
+
+        .then(function(obj) {
+
+          expect(obj).to.eql( [1,2,3] );
+
+          obj._store.path.should.equal('/some/remote/array');
+          obj._store.id.length;
+          obj._store.modified.length;
+          received.should.equal(true);
+          done();
+        })
+
+        .catch(done);
+
+      });
+  
+    });
+
+  });
+
+  context('error', function() {
+
+    context('local', function() {
+
+      it('does not hide the _event but does hide _store', function(done, local) {
+
+        local.set('/create/error', {}, {tag: 'TAG'})
+
+        .then(function(r) {
+          // done()
+        })
+
+        .catch(function(e) {
+          Object.keys(e).should.eql(['_event']);
+          e._event.status.should.equal('error');
+          e._event.error.length;
+          done(e);  // not an error?
+        })
+
+        .catch(done);
+
+      });
 
     });
 
-    context('ok', function() {
+  });
 
-      it('hides both the _event and the _store');
+
+  context('re-setting with _store and _event defined', function() {
+
+    context('local', function() {
+
+    });
+
+    context('remote', function() {
 
     });
 
@@ -25,13 +247,17 @@ objective('happn', function() {
       it('subscribes to all events on a path', function(done, local) {
 
         var collect = [];
+        var _stores = [];
+        var _events = [];
 
         local.on('/pending/set/one', function(data) {
 
-          // intra-process has sme object on client and server
-          // need to deep copy this before the set callback
-          // assembles it's result object on it. 
+          // intra-process has SAME object in client and server,
+          // -- Need to deep copy this before the set callback
+          //    assembles it's result object on it.
           collect.push(JSON.parse(JSON.stringify(data)));
+          _stores.push(JSON.parse(JSON.stringify(data._store))); // non enumerable
+          _events.push(JSON.parse(JSON.stringify(data._event)));
         })
 
         .then(function() {
@@ -48,39 +274,11 @@ objective('happn', function() {
 
         .then(function() {
 
-          // console.log(collect);
 
           collect[0].key.should.equal('value1');
-          collect[0]._store.modified.length;
-          collect[0]._store.path.should.equal('/pending/set/one');
-          collect[0]._store.id.length;
-          collect[0]._event.timestamp.length; // mostly duplicate of _store.modified
-                                             // except in case of delete
-          collect[0]._event.action.should.equal('/SET@/pending/set/one');   
-          collect[0]._event.type.should.equal('data');
-          collect[0]._event.id.length;
-          collect[0]._event.channel.should.equal('/ALL@/pending/set/one');
-
-          // console.log(collect[1]);
-
           collect[1].key.should.equal('value2');
           collect[1].key2.should.equal('merge?');
-          collect[1]._store.modified.length;
-          collect[1]._store.path.should.equal('/pending/set/one');
-          // collect[1]._store.id.length; // missing on merge
-          collect[1]._event.timestamp.length;
-          collect[1]._event.action.should.equal('/SET@/pending/set/one');   
-          collect[1]._event.type.should.equal('data');
-          collect[1]._event.id.length;
-          collect[1]._event.channel.should.equal('/ALL@/pending/set/one');
-
           collect[2].removed.should.equal(1);
-          collect[2]._store.path.should.equal('/pending/set/one');
-          collect[2]._event.timestamp.length;
-          collect[2]._event.action.should.equal('/REMOVE@/pending/set/one');   
-          collect[2]._event.type.should.equal('data');
-          collect[2]._event.id.length;
-          collect[2]._event.channel.should.equal('/ALL@/pending/set/one');
 
           done();
 
@@ -115,26 +313,7 @@ objective('happn', function() {
           // console.log(collect);
 
           collect[0].key.should.equal('value1');
-          collect[0]._store.modified.length;
-          collect[0]._store.path.should.equal('/pending/set/two');
-          collect[0]._store.id.length;
-          collect[0]._event.timestamp.length; // mostly duplicate of _store.modified
-                                             // except in case of delete
-          collect[0]._event.action.should.equal('/SET@/pending/set/two');   
-          collect[0]._event.type.should.equal('data');
-          collect[0]._event.id.length;
-          collect[0]._event.channel.should.equal('/SET@/pending/set/two');
-
           collect[1].key.should.equal('value2');
-          collect[1]._store.modified.length;
-          collect[1]._store.path.should.equal('/pending/set/two');
-          collect[1]._store.id.length;
-          collect[1]._event.timestamp.length;
-          collect[1]._event.action.should.equal('/SET@/pending/set/two');   
-          collect[1]._event.type.should.equal('data');
-          collect[1]._event.id.length;
-          collect[1]._event.channel.should.equal('/SET@/pending/set/two');
-
           collect.length.should.equal(2);
 
           done();
@@ -170,15 +349,7 @@ objective('happn', function() {
           // console.log(collect);
 
           collect[0].removed.should.equal(1);
-          collect[0]._store.path.should.equal('/pending/set/three');
-          collect[0]._event.timestamp.length;
-          collect[0]._event.action.should.equal('/REMOVE@/pending/set/three');   
-          collect[0]._event.type.should.equal('data');
-          collect[0]._event.id.length;
-          collect[0]._event.channel.should.equal('/REMOVE@/pending/set/three');
-
           collect.length.should.equal(1);
-
           done();
 
         })
@@ -230,40 +401,12 @@ objective('happn', function() {
 
         .then(function() {
 
-          // console.log(collect);
-
           collect[0].key.should.equal('value1');
-          collect[0]._store.modified.length;
-          collect[0]._store.path.should.equal('/pending/set/four');
-          collect[0]._store.id.length;
-          collect[0]._event.timestamp.length; // mostly duplicate of _store.modified
-                                             // except in case of delete
-          collect[0]._event.action.should.equal('/SET@/pending/set/four');   
-          collect[0]._event.type.should.equal('data');
-          collect[0]._event.id.length;
-          collect[0]._event.channel.should.equal('/ALL@/pending/set/four');
-
-          // console.log(collect[1]);
 
           collect[1].key.should.equal('value2');
           collect[1].key2.should.equal('merge?');
-          collect[1]._store.modified.length;
-          collect[1]._store.path.should.equal('/pending/set/four');
-          // collect[1]._store.id.length; // missing on merge
-          collect[1]._event.timestamp.length;
-          collect[1]._event.action.should.equal('/SET@/pending/set/four');   
-          collect[1]._event.type.should.equal('data');
-          collect[1]._event.id.length;
-          collect[1]._event.channel.should.equal('/ALL@/pending/set/four');
 
           collect[2].removed.should.equal(1);
-          collect[2]._store.path.should.equal('/pending/set/four');
-          collect[2]._event.timestamp.length;
-          collect[2]._event.action.should.equal('/REMOVE@/pending/set/four');   
-          collect[2]._event.type.should.equal('data');
-          collect[2]._event.id.length;
-          collect[2]._event.channel.should.equal('/ALL@/pending/set/four');
-
           done();
 
         })
@@ -294,31 +437,9 @@ objective('happn', function() {
 
         .then(function() {
 
-          // console.log(collect);
-
           collect[0].key.should.equal('value1');
-          collect[0]._store.modified.length;
-          collect[0]._store.path.should.equal('/pending/set/five');
-          collect[0]._store.id.length;
-          collect[0]._event.timestamp.length; // mostly duplicate of _store.modified
-                                             // except in case of delete
-          collect[0]._event.action.should.equal('/SET@/pending/set/five');   
-          collect[0]._event.type.should.equal('data');
-          collect[0]._event.id.length;
-          collect[0]._event.channel.should.equal('/SET@/pending/set/five');
-
           collect[1].key.should.equal('value2');
-          collect[1]._store.modified.length;
-          collect[1]._store.path.should.equal('/pending/set/five');
-          collect[1]._store.id.length;
-          collect[1]._event.timestamp.length;
-          collect[1]._event.action.should.equal('/SET@/pending/set/five');   
-          collect[1]._event.type.should.equal('data');
-          collect[1]._event.id.length;
-          collect[1]._event.channel.should.equal('/SET@/pending/set/five');
-
           collect.length.should.equal(2);
-
           done();
 
         })
@@ -349,18 +470,8 @@ objective('happn', function() {
 
         .then(function() {
 
-          // console.log(collect);
-
           collect[0].removed.should.equal(1);
-          collect[0]._store.path.should.equal('/pending/set/six');
-          collect[0]._event.timestamp.length;
-          collect[0]._event.action.should.equal('/REMOVE@/pending/set/six');   
-          collect[0]._event.type.should.equal('data');
-          collect[0]._event.id.length;
-          collect[0]._event.channel.should.equal('/REMOVE@/pending/set/six');
-
           collect.length.should.equal(1);
-
           done();
 
         })
@@ -690,6 +801,12 @@ objective('happn', function() {
         .catch(done);
       });
 
+      it('flushes the _store from the inbound re set', function() {
+
+        console.log('TODO');
+
+      });
+
       xit('has a created date, second save preserves created date');
 
     });
@@ -745,6 +862,13 @@ objective('happn', function() {
         .catch(done);
       });
 
+      it('flushes the _store from the inbound re set', function(done) {
+
+        console.log('TODO');
+        done();
+
+      });
+
       xit('has a created date, second save preserves created date');
 
     });
@@ -755,8 +879,6 @@ objective('happn', function() {
   context('get()', function() {
 
     before(function(done, local) {
-
-      console.log('GET before');
 
       local.set('/up/for/grabs/obj', {key: 'value'})
 
@@ -1260,19 +1382,9 @@ objective('happn', function() {
         question: 'should the new data appear in the existing record and in the tag?'
       });
 
-      // it.only('can retrieve a tag', function(done) {
-      //   console.log('RUN!');
-      //   done();
-      // });
-      // it.only('can retrieve a tag 1', function(done) {
-      //   done();
-      // });
+      xit('can do "things?" with tags');
 
-      xit('can replace a tag');
-
-      xit('can remove a tag');
-
-      xit('can remove multiple tags');
+      xit('publishes the snapshot?');
 
     });
 
@@ -1297,13 +1409,9 @@ objective('happn', function() {
 
       xit('can create a new tag on existing record with new data');
 
-      it('can retrieve a tag');
+      xit('can do "things?" with tags');
 
-      xit('can replace a tag');
-
-      xit('can remove a tag');
-
-      xit('can remove multiple tags');
+      xit('publishes the snapshot?');
 
     });
 
