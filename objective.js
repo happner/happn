@@ -15,6 +15,7 @@ objective({
       runAll: false,
       showTrace: true,
       filterTrace: true,
+      // reporter: 'Dot',
     }
   }
 }).run(function() {});
