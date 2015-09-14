@@ -1059,6 +1059,19 @@ objective('happn', function() {
 
       });
 
+      it('handles get nonexistant', function(done, remote) {
+
+        remote.get('/adf/asfd/asdf/asdf')
+
+        .then(function(r) {
+          (r == null).should.equal(true);
+          done();
+        })
+
+        .catch(done);
+
+      });
+
     });
 
     context('local', function() {
@@ -1155,6 +1168,19 @@ objective('happn', function() {
         .catch(function(e) {
           done(new Error('bad'))
         })
+      });
+
+      it('handles get nonexistant', function(done, local) {
+
+        local.get('/adf/asfd/asdf/asdf')
+
+        .then(function(r) {
+          (r == null).should.equal(true);
+          done();
+        })
+
+        .catch(done);
+
       });
 
     });

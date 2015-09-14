@@ -111,7 +111,7 @@ describe('e2e test', function() {
 
           if (e) return callback(e);
           
-          expect(response.payload[0].data.property1).to.be("prop1");
+          expect(response.property1).to.be("prop1");
           callback();
         });
 
@@ -135,11 +135,13 @@ describe('e2e test', function() {
 
         if (e) return callback(e);
 
+        console.log(persistKey);
+
         testclient.get(persistKey, null, function(e, response){
 
           if (e) return callback(e);
 
-          expect(response.payload.length).to.be(0);
+          expect(response).to.eql(undefined);
           callback();
         });
 

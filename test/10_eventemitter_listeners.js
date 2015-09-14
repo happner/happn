@@ -248,7 +248,7 @@ describe('e2e test', function () {
           //console.log(eventData);
 
           //we needed to have removed a single item
-          expect(eventData.payload.removed).to.be(1);
+          expect(eventData.removed).to.be(1);
 
           //////////////////////////console.log(message);
 
@@ -361,13 +361,11 @@ describe('e2e test', function () {
 
     listenerclient.onAll(function (eventData) {
 
-      if (eventData.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all_array' || 
-          eventData.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
-          eventData.action == '/SET@/e2e_test1/testsubscribe/data/catch_all_array' || 
-          eventData.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
+      if (eventData._event.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
+          eventData._event.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
         caughtCount++;
 
-      if (caughtCount == 4)
+      if (caughtCount == 2)
         callback();
 
     }, function (e) {
@@ -381,19 +379,10 @@ describe('e2e test', function () {
         property3: 'property3'
       }, null, function (e, put_result) {
 
-        publisherclient.setChild('/e2e_test1/testsubscribe/data/catch_all_array', {
-          property1: 'property1',
-          property2: 'property2',
-          property3: 'property3'
-        }, function (e, post_result) {
+       
 
-          publisherclient.remove('/e2e_test1/testsubscribe/data/catch_all', null, function (e, del_result) {
+        publisherclient.remove('/e2e_test1/testsubscribe/data/catch_all', null, function (e, del_result) {
 
-            publisherclient.removeChild('/e2e_test1/testsubscribe/data/catch_all_array', post_result.payload._id, function (e, del_ar_result) {
-
-            });
-
-          });
 
         });
 

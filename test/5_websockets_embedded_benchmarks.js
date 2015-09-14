@@ -54,7 +54,7 @@ describe('e2e test', function () {
   });
 
   after(function(done) {
-    happnInstance.stop(done);
+    // happnInstance.stop(done);
   });
 
   var publisherclient;
@@ -287,10 +287,10 @@ describe('e2e test', function () {
 
           receivedCount++;
 
-          if (received[message.payload.data.property1])
-            received[message.payload.data.property1] = received[message.payload.data.property1] + 1;
+          if (received[message.property1])
+            received[message.property1] = received[message.property1] + 1;
           else
-            received[message.payload.data.property1] = 1;
+            received[message.property1] = 1;
 
           ////////////console.log('RCOUNT');
 
@@ -375,10 +375,10 @@ describe('e2e test', function () {
 
           receivedCount++;
 
-          if (received[message.payload.data.property1])
-            received[message.payload.data.property1] = received[message.payload.data.property1] + 1;
+          if (received[message.property1])
+            received[message.property1] = received[message.property1] + 1;
           else
-            received[message.payload.data.property1] = 1;
+            received[message.property1] = 1;
 
           ////////////console.log('RCOUNT');
 
@@ -451,10 +451,10 @@ describe('e2e test', function () {
 
         receivedCount++;
 
-        if (received[message.payload.data.property1])
-          received[message.payload.data.property1] = received[message.payload.data.property1] + 1;
+        if (received[message.property1])
+          received[message.property1] = received[message.property1] + 1;
         else
-          received[message.payload.data.property1] = 1;
+          received[message.property1] = 1;
 
         ////////////console.log('RCOUNT');
 
