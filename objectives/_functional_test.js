@@ -816,9 +816,27 @@ objective('happn', function() {
         .catch(done);
       });
 
-      it('flushes the _store from the inbound re set', function() {
+      it('ignores the _store from the inbound re set', function(done, local) {
 
-        console.log('TODO');
+        local.set('/identified/data', {key: 'value'})
+
+        .then(function(r) {
+
+          // re - store with bungled _store
+
+          r._store.id = 'kjlndfsn';
+          r._store.path = '/sdf/sdf/sfd'
+          
+          return local.set('/identified/data', r);
+        })
+
+        .then(function(r) {
+          r._store.path.should.equal('/identified/data');
+          r._store.id.should.not.equal('kjlndfsn');
+          done();
+        })
+
+        .catch(done)
 
       });
 
@@ -877,10 +895,27 @@ objective('happn', function() {
         .catch(done);
       });
 
-      it('flushes the _store from the inbound re set', function(done) {
+      it('ignores the _store from the inbound re set', function(done, remote) {
 
-        console.log('TODO');
-        done();
+        remote.set('/identified/data2', {key: 'value'})
+
+        .then(function(r) {
+
+          // re - store with bungled _store
+
+          r._store.id = 'kjlndfsn';
+          r._store.path = '/sdf/sdf/sfd'
+          
+          return remote.set('/identified/data2', r);
+        })
+
+        .then(function(r) {
+          r._store.path.should.equal('/identified/data2');
+          r._store.id.should.not.equal('kjlndfsn');
+          done();
+        })
+
+        .catch(done)
 
       });
 
