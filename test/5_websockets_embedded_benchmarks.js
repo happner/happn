@@ -54,6 +54,7 @@ describe('e2e test', function () {
   });
 
   after(function(done) {
+    done();
     // happnInstance.stop(done);
   });
 

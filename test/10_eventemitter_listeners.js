@@ -359,10 +359,10 @@ describe('e2e test', function () {
     this.timeout(10000);
     var caughtCount = 0;
 
-    listenerclient.onAll(function (eventData) {
+    listenerclient.onAll(function (eventData, meta) {
 
-      if (eventData._event.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
-          eventData._event.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
+      if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
+          meta.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
         caughtCount++;
 
       if (caughtCount == 2)

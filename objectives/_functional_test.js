@@ -27,7 +27,7 @@ objective('happn', function() {
 
   });
 
-  context('you get what you set', function() {
+  context('you get what you set (almost)', function() {
 
     context('local (intra_process)', function() {
 
@@ -40,24 +40,24 @@ objective('happn', function() {
 
         // Listen on path for object
 
-        local.on('/some/object', function(obj) {
+        local.on('/some/object', function(obj, meta) {
 
           obj.should.eql( {MY: 'DATA'} );
           
           // _store contains the storage details,
           // it is available but not enumerated in iteration or serialization
           // 
-          obj._store.path.should.equal('/some/object');
-          obj._store.id.length;
-          obj._store.modified.length;
+          meta.path.should.equal('/some/object');
+          meta.id.length;
+          meta.modified.length;
 
           // _event contains details of the event,
           // also not enumerable
           //
-          obj._event.action.should.equal('/SET@/some/object'); // possibly unnecessary
-          obj._event.type.should.equal('data');
-          obj._event.id.length;
-          obj._event.channel.should.equal('/ALL@/some/object'); // possibly unnecessary
+          meta.action.should.equal('/SET@/some/object'); // possibly unnecessary
+          meta.type.should.equal('data');
+          meta.id.length;
+          meta.channel.should.equal('/ALL@/some/object'); // possibly unnecessary
 
           received = true;
 
@@ -81,11 +81,14 @@ objective('happn', function() {
 
           // Get what you set.
 
+          var _meta = obj._meta;
+          delete obj._meta;
+
           obj.should.eql( {MY: 'DATA'} );
 
-          obj._store.path.should.equal('/some/object');
-          obj._store.id.length;
-          obj._store.modified.length;
+          _meta.path.should.equal('/some/object');
+          _meta.id.length;
+          _meta.modified.length;
 
           received.should.equal(true);
           done();
@@ -100,17 +103,17 @@ objective('happn', function() {
 
         var received = false;
 
-        local.on('/some/array', function(obj) {
+        local.on('/some/array', function(obj, meta) {
 
           obj.should.eql( [1,2,3] );
           
-          obj._store.path.should.equal('/some/array');
-          obj._store.id.length;
-          obj._store.modified.length;
-          obj._event.action.should.equal('/SET@/some/array');
-          obj._event.type.should.equal('data');
-          obj._event.id.length;
-          obj._event.channel.should.equal('/ALL@/some/array');
+          meta.path.should.equal('/some/array');
+          meta.id.length;
+          meta.modified.length;
+          meta.action.should.equal('/SET@/some/array');
+          meta.type.should.equal('data');
+          meta.id.length;
+          meta.channel.should.equal('/ALL@/some/array');
           received = true;
         })
         
@@ -124,11 +127,14 @@ objective('happn', function() {
 
         .then(function(obj) {
 
+          var _meta = obj._meta;
+          delete obj._meta;
+
           obj.should.eql( [1,2,3] );
 
-          obj._store.path.should.equal('/some/array');
-          obj._store.id.length;
-          obj._store.modified.length;
+          _meta.path.should.equal('/some/array');
+          _meta.id.length;
+          _meta.modified.length;
           received.should.equal(true);
           done();
         })
@@ -145,17 +151,17 @@ objective('happn', function() {
 
         var received = false;
 
-        remote.on('/some/remote/object', function(obj) {
+        remote.on('/some/remote/object', function(obj, meta) {
 
           expect(obj).to.eql( {MY: 'DATA'} );
 
-          obj._store.path.should.equal('/some/remote/object');
-          obj._store.id.length;
-          obj._store.modified.length;
-          obj._event.action.should.equal('/SET@/some/remote/object');
-          obj._event.type.should.equal('data');
-          obj._event.id.length;
-          obj._event.channel.should.equal('/ALL@/some/remote/object');
+          meta.path.should.equal('/some/remote/object');
+          meta.id.length;
+          meta.modified.length;
+          meta.action.should.equal('/SET@/some/remote/object');
+          meta.type.should.equal('data');
+          meta.id.length;
+          meta.channel.should.equal('/ALL@/some/remote/object');
           received = true;
 
         })
@@ -170,11 +176,14 @@ objective('happn', function() {
 
         .then(function(obj) {
 
+          var _meta = obj._meta;
+          delete obj._meta;
+
           expect(obj).to.eql( {MY: 'DATA'} );
 
-          obj._store.path.should.equal('/some/remote/object');
-          obj._store.id.length;
-          obj._store.modified.length;
+          _meta.path.should.equal('/some/remote/object');
+          _meta.id.length;
+          _meta.modified.length;
           received.should.equal(true);
           done();
         })
@@ -187,17 +196,17 @@ objective('happn', function() {
 
         var received = false;
 
-        remote.on('/some/remote/array', function(obj) {
+        remote.on('/some/remote/array', function(obj, meta) {
 
           expect(obj).to.eql( [1,2,3] );
           
-          obj._store.path.should.equal('/some/remote/array');
-          obj._store.id.length;
-          obj._store.modified.length;
-          obj._event.action.should.equal('/SET@/some/remote/array');
-          obj._event.type.should.equal('data');
-          obj._event.id.length;
-          obj._event.channel.should.equal('/ALL@/some/remote/array');
+          meta.path.should.equal('/some/remote/array');
+          meta.id.length;
+          meta.modified.length;
+          meta.action.should.equal('/SET@/some/remote/array');
+          meta.type.should.equal('data');
+          meta.id.length;
+          meta.channel.should.equal('/ALL@/some/remote/array');
           received = true;
         })
         
@@ -211,11 +220,14 @@ objective('happn', function() {
 
         .then(function(obj) {
 
+          var _meta = obj._meta;
+          delete obj._meta;
+
           expect(obj).to.eql( [1,2,3] );
 
-          obj._store.path.should.equal('/some/remote/array');
-          obj._store.id.length;
-          obj._store.modified.length;
+          _meta.path.should.equal('/some/remote/array');
+          _meta.id.length;
+          _meta.modified.length;
           received.should.equal(true);
           done();
         })
@@ -232,7 +244,7 @@ objective('happn', function() {
 
     context('local', function() {
 
-      it('does not hide the _event but does hide _store', function(done, local) {
+      it('puts error in _meta', function(done, local) {
 
         local.set('/create/error', {}, {tag: 'TAG'})
 
@@ -241,9 +253,9 @@ objective('happn', function() {
         })
 
         .catch(function(e) {
-          Object.keys(e).should.eql(['_event']);
-          e._event.status.should.equal('error');
-          e._event.error.length;
+          Object.keys(e).should.eql(['_meta']);
+          e._meta.status.should.equal('error');
+          e._meta.error.length;
           done(e);  // not an error?
         })
 
@@ -262,17 +274,13 @@ objective('happn', function() {
       it('subscribes to all events on a path', function(done, local) {
 
         var collect = [];
-        var _stores = [];
-        var _events = [];
+        var _meta = [];
 
-        local.on('/pending/set/one', function(data) {
+        local.on('/pending/set/one', function(data, meta) {
 
-          // intra-process has SAME object in client and server,
-          // -- Need to deep copy this before the set callback
-          //    assembles it's result object on it.
           collect.push(JSON.parse(JSON.stringify(data)));
-          _stores.push(JSON.parse(JSON.stringify(data._store))); // non enumerable
-          _events.push(JSON.parse(JSON.stringify(data._event)));
+          _meta.push(JSON.parse(JSON.stringify(meta)));          
+
         })
 
         .then(function() {
@@ -768,14 +776,17 @@ objective('happn', function() {
         remote.set('/the/remote/garden/path', data, {}, function(e, r) {
           if (e) return done(e);
 
-          r._store.path.should.equal('/the/remote/garden/path');
-          r._store.id.length;
-          r._store.modified.length;
+          var _meta = r._meta;
+          delete r._meta;
 
-          r._event.type.length;
-          r._event.status.length;
-          r._event.published.length;
-          r._event.id.length;
+          _meta.path.should.equal('/the/remote/garden/path');
+          _meta.id.length;
+          _meta.modified.length;
+
+          _meta.type.length;
+          _meta.status.length;
+          _meta.published.length;
+          _meta.id.length;
 
           r.a.should.equal(1);
           r.b.should.equal(2);
@@ -793,22 +804,22 @@ objective('happn', function() {
 
         .then(function(r) {
 
+          var _meta = r._meta;
+          delete r._meta;
+
           r[0].a.should.eql(1);
           r[0].b.should.eql(1);
           r[1].c.should.eql(1);
           r[1].d.should.eql(1);
 
-          Should.not.exist(r[0]._store);
-          Should.not.exist(r[1]._store);
+          _meta.modified.length;
+          _meta.id.length;
+          _meta.path.length;
 
-          r._store.modified.length;
-          r._store.id.length;
-          r._store.path.length;
-
-          r._event.type.length;
-          r._event.status.length;
-          r._event.published.length;
-          r._event.id.length;
+          _meta.type.length;
+          _meta.status.length;
+          _meta.published.length;
+          _meta.id.length;
           done();
 
         })
@@ -816,7 +827,7 @@ objective('happn', function() {
         .catch(done);
       });
 
-      it('ignores the _store from the inbound re set', function(done, local) {
+      it('ignores the _meta from the inbound re set', function(done, local) {
 
         local.set('/identified/data', {key: 'value'})
 
@@ -824,15 +835,15 @@ objective('happn', function() {
 
           // re - store with bungled _store
 
-          r._store.id = 'kjlndfsn';
-          r._store.path = '/sdf/sdf/sfd'
+          r._meta.id = 'kjlndfsn';
+          r._meta.path = '/sdf/sdf/sfd'
           
           return local.set('/identified/data', r);
         })
 
         .then(function(r) {
-          r._store.path.should.equal('/identified/data');
-          r._store.id.should.not.equal('kjlndfsn');
+          r._meta.path.should.equal('/identified/data');
+          r._meta.id.should.not.equal('kjlndfsn');
           done();
         })
 
@@ -854,14 +865,17 @@ objective('happn', function() {
         local.set('/the/local/garden/path', data, {}, function(e, r) {
           if (e) return done(e);
 
-          r._store.path.should.equal('/the/local/garden/path');
-          r._store.id.length;
-          r._store.modified.length;
+          var _meta = r._meta;
+          delete r._meta;
 
-          r._event.type.length;
-          r._event.status.length;
-          r._event.published.length;
-          r._event.id.length;
+          _meta.path.should.equal('/the/local/garden/path');
+          _meta.id.length;
+          _meta.modified.length;
+
+          _meta.type.length;
+          _meta.status.length;
+          _meta.published.length;
+          _meta.id.length;
 
           r.a.should.equal(1);
           r.b.should.equal(2);
@@ -877,17 +891,20 @@ objective('happn', function() {
 
         .then(function(r) {
 
+          var _meta = r._meta;
+          delete r._meta;
+
           r[0].should.eql({a:1, b:1});
           r[1].should.eql({c:1, d:1});
 
-          r._store.modified.length;
-          r._store.id.length;
-          r._store.path.length;
+          _meta.modified.length;
+          _meta.id.length;
+          _meta.path.length;
 
-          r._event.type.length;
-          r._event.status.length;
-          r._event.published.length;
-          r._event.id.length;
+          _meta.type.length;
+          _meta.status.length;
+          _meta.published.length;
+          _meta.id.length;
           done();
 
         })
@@ -895,7 +912,7 @@ objective('happn', function() {
         .catch(done);
       });
 
-      it('ignores the _store from the inbound re set', function(done, remote) {
+      it('ignores the _meta from the inbound re set', function(done, remote) {
 
         remote.set('/identified/data2', {key: 'value'})
 
@@ -903,15 +920,15 @@ objective('happn', function() {
 
           // re - store with bungled _store
 
-          r._store.id = 'kjlndfsn';
-          r._store.path = '/sdf/sdf/sfd'
+          r._meta.id = 'kjlndfsn';
+          r._meta.path = '/sdf/sdf/sfd'
           
           return remote.set('/identified/data2', r);
         })
 
         .then(function(r) {
-          r._store.path.should.equal('/identified/data2');
-          r._store.id.should.not.equal('kjlndfsn');
+          r._meta.path.should.equal('/identified/data2');
+          r._meta.id.should.not.equal('kjlndfsn');
           done();
         })
 
@@ -950,7 +967,7 @@ objective('happn', function() {
 
         .then(function(r) {
           r.key.should.equal('value');
-          r._store.id.length // fails if no id
+          r._meta.id.length // fails if no id
           done();
         })
 
@@ -969,13 +986,13 @@ objective('happn', function() {
           r[0].key1.should.eql('value1');
           r[1].key2.should.eql('value2');
 
-          r._store.id.length;
-          r._store.path.length;
-          r._store.modified.length;
-          r._event.type.length;
-          r._event.status.length;
-          r._event.published.length;
-          r._event.id.length;
+          r._meta.id.length;
+          r._meta.path.length;
+          r._meta.modified.length;
+          r._meta.type.length;
+          r._meta.status.length;
+          r._meta.published.length;
+          r._meta.id.length;
           done();
         })
 
@@ -998,20 +1015,18 @@ objective('happn', function() {
 
           .then(function(r) {
 
-            r._event.type.length;
+            r._meta.type.length;
 
             r[0].xxx.length
             r[1].xxx.length;
 
-            r[0]._store.id.length
-            r[0]._store.path.length
-            // r[0]._store.created.length
-            r[0]._store.modified.length
+            r[0]._meta.id.length
+            r[0]._meta.path.length
+            r[0]._meta.modified.length
 
-            r[1]._store.id.length
-            r[1]._store.path.length
-            // r[1]._store.created.length
-            r[1]._store.modified.length
+            r[1]._meta.id.length
+            r[1]._meta.path.length
+            r[1]._meta.modified.length
 
             done()
           });
@@ -1027,6 +1042,7 @@ objective('happn', function() {
         remote.get('/non/existant/*')
 
         .then(function(r) {
+          delete r._meta;
           expect(r).to.eql([]);
           done();
         })
@@ -1043,7 +1059,7 @@ objective('happn', function() {
         remote.set('/keeps/created', {data: 'DATA'})
 
         .then(function(r) {
-          created = r._store.created;
+          created = r._meta.created;
           return remote.set('/keeps/created',r)  /// as existing?
           return remote.set('/keeps/created', {data: 'DATA'})  /// as new?
         })
@@ -1083,9 +1099,9 @@ objective('happn', function() {
         .then(function(r) {
 
           r.key.should.equal('value');
-          r._store.id.length // fails if no id
-          r._store.path.length
-          r._store.modified.length
+          r._meta.id.length // fails if no id
+          r._meta.path.length
+          r._meta.modified.length
           done();
         })
 
@@ -1103,13 +1119,13 @@ objective('happn', function() {
           r[0].should.eql({key1: 'value1'});
           r[1].should.eql({key2: 'value2'});
 
-          r._store.id.length;
-          r._store.path.length;
-          r._store.modified.length;
-          r._event.type.length;
-          r._event.status.length;
-          r._event.published.length;
-          r._event.id.length;
+          r._meta.id.length;
+          r._meta.path.length;
+          r._meta.modified.length;
+          r._meta.type.length;
+          r._meta.status.length;
+          r._meta.published.length;
+          r._meta.id.length;
           done();
         })
 
@@ -1132,20 +1148,18 @@ objective('happn', function() {
 
           .then(function(r) {
 
-            r._event.type.length;
+            r._meta.type.length;
 
             r[0].xxx.length
             r[1].xxx.length;
 
-            r[0]._store.id.length
-            r[0]._store.path.length
-            // r[0]._store.created.length
-            r[0]._store.modified.length
+            r[0]._meta.id.length
+            r[0]._meta.path.length
+            r[0]._meta.modified.length
 
-            r[1]._store.id.length
-            r[1]._store.path.length
-            // r[1]._store.created.length
-            r[1]._store.modified.length
+            r[1]._meta.id.length
+            r[1]._meta.path.length
+            r[1]._meta.modified.length
 
             done()
           });
@@ -1161,6 +1175,7 @@ objective('happn', function() {
         local.get('/non/existant/*')
 
         .then(function(r) {
+          delete r._meta;
           expect(r).to.eql([]);
           done();
         })
@@ -1300,14 +1315,14 @@ objective('happn', function() {
 
         .then(function(r) {
           r.the.should.equal('SIBLING');
-          r._store.modified.length;
-          r._store.path.length;
-          r._store.id.length;
-          r._event.type.length;
-          r._event.status.length;
-          r._event.published.length;
-          r._event.id.length;
-          r._store.path.split('/').length.should.equal(4);
+          r._meta.modified.length;
+          r._meta.path.length;
+          r._meta.id.length;
+          r._meta.type.length;
+          r._meta.status.length;
+          r._meta.published.length;
+          r._meta.id.length;
+          r._meta.path.split('/').length.should.equal(4);
           done();
         })
 
@@ -1326,14 +1341,14 @@ objective('happn', function() {
 
         .then(function(r) {
           r.the.should.equal('SIBLING');
-          r._store.modified.length;
-          r._store.path.length;
-          r._store.id.length;
-          r._event.type.length;
-          r._event.status.length;
-          r._event.published.length;
-          r._event.id.length;
-          r._store.path.split('/').length.should.equal(4);
+          r._meta.modified.length;
+          r._meta.path.length;
+          r._meta.id.length;
+          r._meta.type.length;
+          r._meta.status.length;
+          r._meta.published.length;
+          r._meta.id.length;
+          r._meta.path.split('/').length.should.equal(4);
           done();
         })
 
@@ -1530,16 +1545,18 @@ objective('happn', function() {
 
         .then(function(r) {
 
-          r.should.eql({key1: 'one', key2: 2, key3: 3})
+          var _meta = r._meta;
+          delete r._meta;
 
-          r._event.type.length;
-          r._event.status.length;
-          r._event.published.length;
-          r._event.id.length;
+          r.should.eql({key1: 'one', key2: 2, key3: 3});
 
-          r._store.modified.length;
-          r._store.path.length;
-          // r._store.id.length; ??
+          _meta.type.length;
+          _meta.status.length;
+          _meta.published.length;
+          _meta.id.length;
+
+          _meta.modified.length;
+          _meta.path.length;
 
           done();
 
@@ -1563,16 +1580,19 @@ objective('happn', function() {
 
         .then(function(r) {
 
+
+          var _meta = r._meta;
+          delete r._meta;
+
           expect(r).to.eql({key1: 'one', key2: 2, key3: 3})
 
-          r._event.type.length;
-          r._event.status.length;
-          r._event.published.length;
-          r._event.id.length;
+          _meta.type.length;
+          _meta.status.length;
+          _meta.published.length;
+          _meta.id.length;
 
-          r._store.modified.length;
-          r._store.path.length;
-          // r._store.id.length; ??
+          _meta.modified.length;
+          _meta.path.length;
 
           done();
 

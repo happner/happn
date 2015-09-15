@@ -322,6 +322,7 @@ describe('e2e test', function () {
     }
 
     publisherclient.set('/e2e_test1/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function (e, put_result) {
+
       expect(e == null).to.be(true);
       publisherclient.set('/e2e_test1/testsubscribe/data/complex/' + test_path_end + '/1', complex_obj, null, function (e, put_result) {
         expect(e == null).to.be(true);
@@ -374,7 +375,7 @@ describe('e2e test', function () {
         publisherclient.remove('/e2e_test1/testsubscribe/data/delete_me', {noPublish: true}, function (e, result) {
 
           expect(e).to.be(null);
-          expect(result._event.status).to.be('ok');
+          expect(result._meta.status).to.be('ok');
 
           //////////////////console.log('DELETE RESULT');
           //////////////////console.log(result);
@@ -413,7 +414,7 @@ describe('e2e test', function () {
         }, {noPublish: true}, function (e, updateResult) {
 
           expect(e).to.be(null);
-          expect(updateResult._store._id == insertResult._store._id).to.be(true);
+          expect(updateResult._meta.id == insertResult._meta.id).to.be(true);
           callback();
 
         });
@@ -447,38 +448,35 @@ describe('e2e test', function () {
         noPublish: true
       }, function (e, result) {
 
-        if (!e) return callback(e);
+        console.log(e);
+
+        if (e) return callback(e);
 
         //////////////////console.log('merge tag results');
         //////////////////console.log(e);
         //////////////////console.log(result);
 
-        console.log('RESULT', result);
-
-        expect(result.snapshot.data.property1).to.be('property1');
-        expect(result.snapshot.data.property2).to.be('property2');
-        expect(result.snapshot.data.property3).to.be('property3');
-
-        console.log('ok');
+        expect(result.data.property1).to.be('property1');
+        expect(result.data.property2).to.be('property2');
+        expect(result.data.property3).to.be('property3');
 
         publisherclient.get('/_TAGS/e2e_test1/test/tag/*', null, function (e, results) {
 
-          console.log(e, results);
-
           expect(e).to.be(null);
           
-          expect(results.payload.length > 0).to.be(true);
+          expect(results.length > 0).to.be(true);
 
           var found = false;
 
-          results.payload.map(function (tagged) {
+          results.map(function (tagged) {
 
             if (found)
               return;
 
-            if (tagged.snapshot.tag == randomTag) {
-              expect(tagged.snapshot.data.property1).to.be('property1');
-              expect(tagged.snapshot.data.property4).to.be('property4');
+            if (tagged._meta.tag == randomTag) {
+              expect(tagged.data.property1).to.be('property1');
+              expect(tagged.data.property2).to.be('property2');
+              expect(tagged.data.property3).to.be('property3');
               found = true;
             }
 
@@ -601,7 +599,7 @@ describe('e2e test', function () {
         }, null, function (e, updateResult) {
 
           expect(e == null).to.be(true);
-          expect(updateResult._store._id == insertResult._store._id).to.be(true);
+          expect(updateResult._meta._id == insertResult._meta._id).to.be(true);
           callback();
 
         });
@@ -909,10 +907,10 @@ describe('e2e test', function () {
     this.timeout(10000);
     var caughtCount = 0;
 
-    listenerclient.onAll(function (eventData) {
+    listenerclient.onAll(function (eventData, meta) {
 
-      if (eventData._event.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
-          eventData._event.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
+      if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
+          meta.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
         caughtCount++;
 
       if (caughtCount == 2)
