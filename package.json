@@ -3,6 +3,9 @@
   "description": "Pub/sub api as a service using primus and mongo & redis or nedb, can work as cluster, single process or embedded using nedb, use in production at your own risk",
   "version": "0.1.28",
   "main": "./lib/index",
+  "scripts": {
+    "test": "LOG_LEVEL=off objective --once"
+  },
   "keywords": [
     "faye",
     "mongo",
@@ -35,7 +38,7 @@
     "chai": "^3.2.0",
     "expect.js": "*",
     "mocha": "*",
-    "objective": "0.0.32"
+    "objective": "0.0.34"
   },
   "readmeFilename": "README.md"
 }
