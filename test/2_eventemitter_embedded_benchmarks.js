@@ -4,7 +4,9 @@
 
 ```bash
 
-mocha test/e2e_eventemitter_embedded_benchmarks.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/.e2e_eventemitter_embedded_benchmarks.csv
+
+mocha test/2_eventemitter_embedded_benchmarks.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/2_eventemitter_embedded_benchmarks.csv
+
 
 ```
 

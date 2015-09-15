@@ -148,7 +148,7 @@ objective('happn', function() {
         remote.on('/some/remote/object', function(obj) {
 
           expect(obj).to.eql( {MY: 'DATA'} );
-          
+
           obj._store.path.should.equal('/some/remote/object');
           obj._store.id.length;
           obj._store.modified.length;
@@ -1466,7 +1466,7 @@ objective('happn', function() {
 
         .then(function(r) {
 
-          expect(r.snapshot.data).to.eql({key: 'value'});
+          expect(r.data).to.eql({key: 'value'});
           done();
         })
 
@@ -1498,7 +1498,7 @@ objective('happn', function() {
         })
 
         .then(function(r) {
-          expect(r.snapshot.data).to.eql({key: 'value'});
+          expect(r.data).to.eql({key: 'value'});
           done();
         })
 
