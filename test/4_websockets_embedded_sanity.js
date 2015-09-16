@@ -1,15 +1,16 @@
 var expect = require('expect.js');
-var happn = require('../lib/index')
+var happn = require('../lib/index');
 var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('e2e test', function() {
+
+describe('4_websockets_embedded_sanity', function() {
 
 	var test_secret = 'test_secret';
 	var mode = "embedded";
 	var default_timeout = 4000;
-
+  	var happnInstance = null;
 	/*
 	This test demonstrates starting up the happn service - 
 	the authentication service will use authTokenSecret to encrypt web tokens identifying
@@ -44,18 +45,21 @@ describe('e2e test', function() {
 						log_level:'info|error|warning',
 						log_component:'prepare'
 					}
-				}, 
-				function(e){
-					callback(e);
-				});
+				},function (e, happn) {
+		          if (e)
+		            return callback(e);
+
+		          happnInstance = happn;
+		          callback();
+		        });
 		}catch(e){
 			callback(e);
 		}
 	});
 
-  // after(function(done) {
-  //   happnInstance.stop(done);
-  // });
+	after(function(done) {
+	  happnInstance.stop(done);
+	});
 
 	var publisherclient;
 	var listenerclient;
@@ -281,7 +285,7 @@ describe('e2e test', function() {
 				publisherclient.set('e2e_test1/testsubscribe/data/' + test_path_end, {property1:'property1',property2:'property2',property3:'property3', property4:'property4'}, {noPublish:true}, function(e, updateResult){
 
 					expect(e).to.be(null);
-					expect(updateResult._id == insertResult._id).to.be(true);
+					expect(updateResult._meta._id == insertResult._meta._id).to.be(true);
 					callback();
 
 				});
@@ -437,7 +441,7 @@ describe('e2e test', function() {
 				publisherclient.set('e2e_test1/testsubscribe/data/' + test_path_end, {property1:'property1',property2:'property2',property3:'property3', property4:'property4'}, null, function(e, updateResult){
 
 					expect(e == null).to.be(true);
-					expect(updateResult._id == insertResult._id).to.be(true);
+					expect(updateResult._meta._id == insertResult._meta._id).to.be(true);
 					callback();
 
 				});

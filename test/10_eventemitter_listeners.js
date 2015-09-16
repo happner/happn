@@ -4,7 +4,7 @@ var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('e2e test', function () {
+describe('10_eventemitter_listeners', function () {
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -16,6 +16,10 @@ describe('e2e test', function () {
    the authentication service will use authTokenSecret to encrypt web tokens identifying
    the logon session. The utils setting will set the system to log non priority information
    */
+
+  after(function(done) {
+      happnInstance.stop(done);
+  });
 
   it('should initialize the service', function (callback) {
 

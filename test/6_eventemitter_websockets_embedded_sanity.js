@@ -4,7 +4,7 @@ var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('e2e test', function() {
+describe('6_eventemitter_websockets_embedded_sanity', function() {
 
 	var test_secret = 'test_secret';
 	var mode = "embedded";
@@ -58,9 +58,9 @@ describe('e2e test', function() {
 		}
 	});
 
-  // after(function(done) {
-  //   happnInstance.stop(done);
-  // });
+  	after(function(done) {
+    	happnInstance.stop(done);
+  	});
 
 	var publisherclient;
 	var listenerclient;

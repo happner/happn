@@ -6,7 +6,7 @@ var async = require('async');
 var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
 var fs = require('fs');
 
-describe('e2e test', function() {
+describe('12_eventemitter_embedded_persisted_benchmarks', function() {
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -62,10 +62,12 @@ describe('e2e test', function() {
     this.timeout(20000);
     
     fs.unlink(tempFile, function(e){
-      callback(e);
+      if (e) return callback(e);
+      happnInstance.stop(callback);
     });
 
   });
+
 
   var publisherclient;
   var listenerclient;

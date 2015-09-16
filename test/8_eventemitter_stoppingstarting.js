@@ -4,7 +4,7 @@ var async = require('async');
 var fs = require('fs');
 var happn = require('../lib/index');
 
-describe('e2e test', function() {
+describe('8_eventemitter_stoppingstarting', function() {
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -66,7 +66,8 @@ describe('e2e test', function() {
     this.timeout(20000);
     
     fs.unlink(tempFile, function(e){
-      callback(e);
+      if (e) return callback(e);
+      currentService.stop(callback);
     });
 
   });
@@ -131,6 +132,8 @@ describe('e2e test', function() {
 
       if (e) return callback(e);
 
+      currentService = happnService;
+     
       getClient(happnService, function(e, testclient){
 
         if (e) return callback(e);

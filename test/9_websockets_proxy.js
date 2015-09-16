@@ -6,7 +6,7 @@ var device2 = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('e2e test', function() {
+describe('9_websockets_proxy', function() {
 
 	var gatewayPort = 8000;
 	var device1Port = 8001;
@@ -16,6 +16,17 @@ describe('e2e test', function() {
 	var mode = "embedded";
 
 	var default_timeout = 4000;
+	var instances = [];
+
+	after('stop all services', function(callback) {
+
+	   async.eachSeries(instances, function(instance, eachCallback){
+	   	instance.stop(eachCallback);
+	   },
+	   callback
+	   );
+
+	});
 
 	var initializeService = function(instance, port, callback){
 		instance.initialize({
@@ -39,7 +50,11 @@ describe('e2e test', function() {
 					log_component:'prepare'
 				}
 			},
-			callback
+			function(e, instance){
+				if (e) return callback(e);
+				instances.push(instance);
+				callback();
+			}
 		);
 	}
 

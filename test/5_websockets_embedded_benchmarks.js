@@ -4,11 +4,12 @@ var service = happn.service;
 var async = require('async');
 var happn_client = happn.client;
 
-describe('e2e test', function () {
+describe('5_websockets_embedded_benchmarks', function () {
 
   var test_secret = 'test_secret';
   var mode = "embedded";
   var default_timeout = 5000;
+  var happnInstance = null;
 
   /*
   This test demonstrates starting up the happn service - 
@@ -45,8 +46,10 @@ describe('e2e test', function () {
             log_component:'prepare'
           }
         }, 
-        function(e){
-          callback(e);
+        function(e, instance){
+          if (e) return  callback(e);
+          happnInstance = instance;
+          callback();
         });
     }catch(e){
       callback(e);
@@ -54,8 +57,7 @@ describe('e2e test', function () {
   });
 
   after(function(done) {
-    done();
-    // happnInstance.stop(done);
+    happnInstance.stop(done);
   });
 
   var publisherclient;

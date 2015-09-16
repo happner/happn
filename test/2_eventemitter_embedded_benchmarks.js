@@ -25,7 +25,7 @@ var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('e2e test', function() {
+describe('2_eventemitter_embedded_benchmarks', function() {
 
   var testport = 8000;
   var test_secret = 'test_secret';

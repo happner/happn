@@ -5,8 +5,9 @@ var happn_client = happn.client;
 var async = require('async');
 var request = require('request');
 
-describe('browser client tests', function() {
+describe('7_browser-client-test', function() {
 	var test_secret = 'test_secret';
+	var happnInstance = null;
 
 	/*
 	This test demonstrates starting up the happn service - 
@@ -55,10 +56,9 @@ describe('browser client tests', function() {
 		}
 	});
 
-  // after(function(done) {
-  //   happnInstance.stop(done);
-  // });
-
+  	after(function(done) {
+    	happnInstance.stop(done);
+  	});
 
 	it('should fetch the browser client', function(callback) {
 		
@@ -73,7 +73,7 @@ describe('browser client tests', function() {
 
 						if (!e){
 							//console.log('got body!!!');
-							console.log(b);
+							//console.log(b);
 							callback();
 						}else
 							callback(e);

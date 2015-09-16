@@ -6,12 +6,12 @@ var happn_client = happn.client;
 var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
 var fs = require('fs');
 
-describe('e2e test', function () {
+describe('13_websockets_embedded_persisted_benchmarks', function () {
 
   var test_secret = 'test_secret';
   var mode = "embedded";
   var default_timeout = 5000;
-
+  var happnInstance = null;
   /*
   This test demonstrates starting up the happn service - 
   the authentication service will use authTokenSecret to encrypt web tokens identifying
@@ -48,9 +48,13 @@ describe('e2e test', function () {
             log_level:'info|error|warning',
             log_component:'prepare'
           }
-        }, 
-        function(e){
-          callback(e);
+        },
+        function(e, happn) {
+          if (e)
+            return callback(e);
+
+          happnInstance = happn;
+          callback();
         });
     }catch(e){
       callback(e);
@@ -62,7 +66,8 @@ describe('e2e test', function () {
     this.timeout(20000);
     
     fs.unlink(tempFile, function(e){
-      callback(e);
+      if (e) return callback(e);
+      happnInstance.stop(callback);
     });
 
   });
