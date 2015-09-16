@@ -129,7 +129,7 @@ To use the browser client, make sure the server is running, and reference the cl
 
 var my_client_instance; 
 
-HappenClient.create({config:{secret:'my secret'}}, function(e, instance) {
+HappnClient.create({config:{secret:'my secret'}}, function(e, instance) {
 	
 	//instance is now connected to the server listening on port 55000
 	my_client_instance = instance;
