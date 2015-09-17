@@ -6,7 +6,7 @@ var async = require('async');
 var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
 var fs = require('fs');
 
-describe('12_eventemitter_embedded_persisted_benchmarks', function() {
+describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -167,7 +167,7 @@ describe('12_eventemitter_embedded_persisted_benchmarks', function() {
 
         if (receivedCount == expected) return;
 
-        //////console.log('putting data: ', count);
+        ////////console.log('putting data: ', count);
         publisherclient.set('/e2e_test1/testsubscribe/sequence3', {
             property1: receivedCount
           }, {
@@ -177,7 +177,7 @@ describe('12_eventemitter_embedded_persisted_benchmarks', function() {
             if (e)
               return callback(e);
 
-            ////console.log('put data: ', result);
+            //////console.log('put data: ', result);
           });
       }
       //path, event_type, count, handler, done

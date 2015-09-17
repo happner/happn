@@ -138,7 +138,7 @@ describe('8_eventemitter_stoppingstarting', function() {
 
         if (e) return callback(e);
 
-        console.log(persistKey);
+        //console.log(persistKey);
 
         testclient.get(persistKey, null, function(e, response){
 

@@ -176,7 +176,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
         if (receivedCount == expected) return;
 
-        //////console.log('putting data: ', count);
+        ////////console.log('putting data: ', count);
         publisherclient.set('/e2e_test1/testsubscribe/sequence3', {
             property1: receivedCount
           }, {
@@ -186,7 +186,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
             if (e)
               return callback(e);
 
-            ////console.log('put data: ', result);
+            //////console.log('put data: ', result);
           });
       }
       //path, event_type, count, handler, done
@@ -300,7 +300,9 @@ describe('2_eventemitter_embedded_benchmarks', function() {
         config: {
           deferSetImmediate: 100
         }
-      }, function(message) {
+      }, function(message, meta) {
+
+        ////console.log(message, meta);
 
         receivedCount++;
        
@@ -436,7 +438,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
       var receivedCount = 0;
 
       var received = {};
-      var sent = [expected];
+      var sent = [];
 
       for (var i = 0; i < expected; i++) {
         sent[i] = require('shortid').generate();
@@ -444,6 +446,9 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
       stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set',count:0}, 
         function(message) {
+
+          ////console.log(message);
+
           receivedCount++;
 
           if (received[message.property1])
@@ -453,6 +458,9 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
           if (receivedCount == sent.length) {
             console.timeEnd(timerName);
+
+            ////console.log(received);
+
             expect(Object.keys(received).length == expected).to.be(true);
             callback();
           }
@@ -466,9 +474,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
           while (count < expected) {
 
-            publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {
-              excludeId: true
-            }, 
+            publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {}, 
             function(e, result) {
               if (e) return callback(e);
             });

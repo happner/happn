@@ -116,16 +116,16 @@ describe('1_eventemitter_embedded_sanity', function () {
 
       }, function (e) {
 
-        ////////////////console.log('ON HAS HAPPENED: ' + e);
+        //////////////////console.log('ON HAS HAPPENED: ' + e);
 
         if (!e) {
 
           expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event/*'].length).to.be(1);
-          ////////////////console.log('on subscribed, about to publish');
+          //////////////////console.log('on subscribed, about to publish');
 
           var stats = happnInstance.stats();
 
-          console.log(stats.pubsub.listeners_wildcard_SET);
+          //console.log(stats.pubsub.listeners_wildcard_SET);
 
           //then make the change
           publisherclient.set('/e2e_test1/testsubscribe/data/event/blah', {
@@ -133,7 +133,7 @@ describe('1_eventemitter_embedded_sanity', function () {
             property2: 'property2',
             property3: 'property3'
           }, null, function (e, result) {
-            console.log('put happened - listening for result');
+            //console.log('put happened - listening for result');
           });
         }
         else
@@ -159,13 +159,13 @@ describe('1_eventemitter_embedded_sanity', function () {
         property3: 'property3'
       }, {noPublish: true}, function (e, result) {
 
-        //////////console.log('set happened');
-        //////////console.log([e, result]);
+        ////////////console.log('set happened');
+        ////////////console.log([e, result]);
 
         if (!e) {
           publisherclient.get('e2e_test1/testsubscribe/data/' + test_path_end, null, function (e, results) {
-            //////////console.log('new data results');
-            //////////console.log([e, results]);
+            ////////////console.log('new data results');
+            ////////////console.log([e, results]);
 
             // expect(results.payload.length == 1).to.be(true);
             expect(results.property1 == 'property1').to.be(true);
@@ -203,24 +203,24 @@ describe('1_eventemitter_embedded_sanity', function () {
         if (e)
           return callback(e);
 
-        ////////////console.log('set results');
-        ////////////console.log(result);
+        //////////////console.log('set results');
+        //////////////console.log(result);
 
         publisherclient.set('e2e_test1/testsubscribe/data/merge/' + test_path_end, {property4: 'property4'}, {merge: true}, function (e, result) {
 
           if (e)
             return callback(e);
 
-          ////////////console.log('merge set results');
-          ////////////console.log(result);
+          //////////////console.log('merge set results');
+          //////////////console.log(result);
 
           publisherclient.get('e2e_test1/testsubscribe/data/merge/' + test_path_end, null, function (e, results) {
 
             if (e)
               return callback(e);
 
-            ////////////console.log('merge get results');
-            ////////////console.log(results);
+            //////////////console.log('merge get results');
+            //////////////console.log(results);
 
             expect(results.property4).to.be('property4');
             expect(results.property1).to.be('property1');
@@ -286,7 +286,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
   it('should search for a complex object', function (callback) {
 
-    ////////////////////////console.log('DOING COMPLEX SEARCH');
+    //////////////////////////console.log('DOING COMPLEX SEARCH');
 
     var test_path_end = require('shortid').generate();
 
@@ -327,13 +327,13 @@ describe('1_eventemitter_embedded_sanity', function () {
       publisherclient.set('/e2e_test1/testsubscribe/data/complex/' + test_path_end + '/1', complex_obj, null, function (e, put_result) {
         expect(e == null).to.be(true);
 
-        //////////console.log('searching');
+        ////////////console.log('searching');
         publisherclient.get('/e2e_test1/testsubscribe/data/complex*', {
           criteria: criteria1,
           options: options1
         }, function (e, search_result) {
 
-          //////////console.log([e, search_result]);
+          ////////////console.log([e, search_result]);
 
           expect(e == null).to.be(true);
           expect(search_result.length == 1).to.be(true);
@@ -377,8 +377,8 @@ describe('1_eventemitter_embedded_sanity', function () {
           expect(e).to.be(null);
           expect(result._meta.status).to.be('ok');
 
-          //////////////////console.log('DELETE RESULT');
-          //////////////////console.log(result);
+          ////////////////////console.log('DELETE RESULT');
+          ////////////////////console.log(result);
 
           callback();
         });
@@ -437,8 +437,8 @@ describe('1_eventemitter_embedded_sanity', function () {
       property3: 'property3'
     }, {noPublish: true}, function (e, result) {
 
-      //////////////////console.log('did set');
-      //////////////////console.log([e, result]);
+      ////////////////////console.log('did set');
+      ////////////////////console.log([e, result]);
 
       if (e) return callback(e);
 
@@ -448,13 +448,13 @@ describe('1_eventemitter_embedded_sanity', function () {
         noPublish: true
       }, function (e, result) {
 
-        console.log(e);
+        //console.log(e);
 
         if (e) return callback(e);
 
-        //////////////////console.log('merge tag results');
-        //////////////////console.log(e);
-        //////////////////console.log(result);
+        ////////////////////console.log('merge tag results');
+        ////////////////////console.log(e);
+        ////////////////////console.log(result);
 
         expect(result.data.property1).to.be('property1');
         expect(result.data.property2).to.be('property2');
@@ -513,12 +513,12 @@ describe('1_eventemitter_embedded_sanity', function () {
 
       }, function (e) {
 
-        ////////////////console.log('ON HAS HAPPENED: ' + e);
+        //////////////////console.log('ON HAS HAPPENED: ' + e);
 
         if (!e) {
 
           expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(1);
-          ////////////////console.log('on subscribed, about to publish');
+          //////////////////console.log('on subscribed, about to publish');
 
           //then make the change
           publisherclient.set('/e2e_test1/testsubscribe/data/event', {
@@ -526,7 +526,7 @@ describe('1_eventemitter_embedded_sanity', function () {
             property2: 'property2',
             property3: 'property3'
           }, null, function (e, result) {
-            //////////////////////////console.log('put happened - listening for result');
+            ////////////////////////////console.log('put happened - listening for result');
           });
         }
         else
@@ -556,8 +556,8 @@ describe('1_eventemitter_embedded_sanity', function () {
 
         if (!e) {
           publisherclient.get('e2e_test1/testsubscribe/data/' + test_path_end, null, function (e, results) {
-            //////////////////////console.log('new data results');
-            //////////////////////console.log(results);
+            ////////////////////////console.log('new data results');
+            ////////////////////////console.log(results);
             expect(results.property1 == 'property1').to.be(true);
 
             if (mode != 'embedded')
@@ -671,7 +671,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
           expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(1);
 
-          //////////////////////////console.log('on subscribed, about to publish');
+          ////////////////////////////console.log('on subscribed, about to publish');
 
           //then make the change
           publisherclient.set('/e2e_test1/testsubscribe/data/event', {
@@ -679,7 +679,7 @@ describe('1_eventemitter_embedded_sanity', function () {
             property2: 'property2',
             property3: 'property3'
           }, null, function (e, result) {
-            //////////////////////////console.log('put happened - listening for result');
+            ////////////////////////////console.log('put happened - listening for result');
           });
         }
         else
@@ -726,43 +726,6 @@ describe('1_eventemitter_embedded_sanity', function () {
     });
   });
 
-
-
-  xit('should save by id, then search and get by id, using bsonid property', function (callback) {
-
-    var randomPath = require('shortid').generate();
-
-    publisherclient.set('e2e_test1/test/bsinid/' + randomPath, {
-      property1: 'property1',
-      property2: 'property2',
-      property3: 'property3'
-    }, {}, function (e, setresult) {
-
-      if (!e) {
-
-        //////////////////////console.log(setresult);
-
-        var searchcriteria = {'_id': {$in: [{bsonid: setresult.payload._id}]}};
-
-        publisherclient.get('e2e_test1/test/bsinid/*', {criteria: searchcriteria}, function (e, results) {
-
-          consoel.log(e, results);
-
-          expect(e).to.be(null);
-          //////////////////////console.log(results);
-          expect(results.payload.length == 1).to.be(true);
-          expect(results.payload[0].data.property1).to.be('property1');
-
-          callback();
-
-        });
-      }
-      else
-        callback(e);
-    });
-
-  });
-
   it('the listener should pick up a single delete event', function (callback) {
 
     this.timeout(default_timeout);
@@ -774,9 +737,7 @@ describe('1_eventemitter_embedded_sanity', function () {
       property3: 'property3'
     }, null, function (e, result) {
 
-      console.log(e);
-
-      ////////////////console.log('did delete set');
+      //////////////////console.log('did delete set');
       //path, event_type, count, handler, done
       //We listen for the DELETE event
       listenerclient.on('/e2e_test1/testsubscribe/data/delete_me', {
@@ -784,48 +745,48 @@ describe('1_eventemitter_embedded_sanity', function () {
         count: 1
       }, function (eventData) {
 
-        //console.log('on count 1 delete ');
-        ////////////////console.log(message);
+        ////console.log('on count 1 delete ');
+        //////////////////console.log(message);
 
         //we are looking at the event internals on the listener to ensure our event management is working - because we are only listening for 1
         //instance of this event - the event listener should have been removed 
-        //console.log('listenerclient.events');
-        //console.log(listenerclient.events);
+        ////console.log('listenerclient.events');
+        ////console.log(listenerclient.events);
         expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me'].length).to.be(0);
 
-        //console.log(eventData);
+        ////console.log(eventData);
 
         //we needed to have removed a single item
         expect(eventData.payload.removed).to.be(1);
 
-        //////////////////////////console.log(message);
+        ////////////////////////////console.log(message);
 
         callback();
 
       }, function (e) {
 
-        console.log(e);
+        //console.log(e);
 
-        //////////console.log('ON HAS HAPPENED: ' + e);
+        ////////////console.log('ON HAS HAPPENED: ' + e);
 
         if (!e) return callback(e);
 
-        //console.log('listenerclient.events, pre');
-        //console.log(listenerclient.events);
+        ////console.log('listenerclient.events, pre');
+        ////console.log(listenerclient.events);
         expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me'].length).to.be(1);
 
-        ////////////////console.log('subscribed, about to delete');
+        //////////////////console.log('subscribed, about to delete');
 
         //We perform the actual delete
         publisherclient.remove('/e2e_test1/testsubscribe/data/delete_me', null, function (e, result) {
 
 
-          ////////////////console.log('REMOVE HAPPENED!!!');
-          ////////////////console.log(e);
-          ////////////////console.log(result);
+          //////////////////console.log('REMOVE HAPPENED!!!');
+          //////////////////console.log(e);
+          //////////////////console.log(result);
 
 
-          //////////////////////////console.log('put happened - listening for result');
+          ////////////////////////////console.log('put happened - listening for result');
         });
 
 
@@ -843,7 +804,7 @@ describe('1_eventemitter_embedded_sanity', function () {
     listenerclient.on('/e2e_test1/testsubscribe/data/on_off_test', {event_type: 'set', count: 0}, function (message) {
 
       //we detach all listeners from the path here
-      //console.log('ABOUT OFF PATH');
+      ////console.log('ABOUT OFF PATH');
       listenerclient.off('/e2e_test1/testsubscribe/data/on_off_test', function (e) {
 
         if (e)
@@ -852,8 +813,8 @@ describe('1_eventemitter_embedded_sanity', function () {
         listenerclient.on('/e2e_test1/testsubscribe/data/on_off_test', {event_type: 'set', count: 0},
           function (message) {
 
-            //console.log('ON RAN');
-            //console.log(message);
+            ////console.log('ON RAN');
+            ////console.log(message);
 
             listenerclient.off(currentListenerId, function (e) {
 
@@ -877,8 +838,8 @@ describe('1_eventemitter_embedded_sanity', function () {
             }, {}, function (e, setresult) {
               if (e) return callback(new Error(e));
 
-              //console.log('DID ON SET');
-              //console.log(setresult);
+              ////console.log('DID ON SET');
+              ////console.log(setresult);
             });
 
           });

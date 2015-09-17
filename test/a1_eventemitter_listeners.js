@@ -4,7 +4,7 @@ var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('10_eventemitter_listeners', function () {
+describe('a1_eventemitter_listeners', function () {
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -126,7 +126,7 @@ describe('10_eventemitter_listeners', function () {
             property2: 'property2',
             property3: 'property3'
           }, null, function (e, result) {
-            console.log('put happened - listening for result');
+            //console.log('put happened - listening for result');
           });
         }
         else
@@ -154,12 +154,12 @@ describe('10_eventemitter_listeners', function () {
 
       }, function (e) {
 
-        ////////////////console.log('ON HAS HAPPENED: ' + e);
+        //////////////////console.log('ON HAS HAPPENED: ' + e);
 
         if (!e) {
 
           expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(1);
-          ////////////////console.log('on subscribed, about to publish');
+          //////////////////console.log('on subscribed, about to publish');
 
           //then make the change
           publisherclient.set('/e2e_test1/testsubscribe/data/event', {
@@ -167,7 +167,7 @@ describe('10_eventemitter_listeners', function () {
             property2: 'property2',
             property3: 'property3'
           }, null, function (e, result) {
-            //////////////////////////console.log('put happened - listening for result');
+            ////////////////////////////console.log('put happened - listening for result');
           });
         }
         else
@@ -199,7 +199,7 @@ describe('10_eventemitter_listeners', function () {
 
           expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(1);
 
-          //////////////////////////console.log('on subscribed, about to publish');
+          ////////////////////////////console.log('on subscribed, about to publish');
 
           //then make the change
           publisherclient.set('/e2e_test1/testsubscribe/data/event', {
@@ -207,7 +207,7 @@ describe('10_eventemitter_listeners', function () {
             property2: 'property2',
             property3: 'property3'
           }, null, function (e, result) {
-            //////////////////////////console.log('put happened - listening for result');
+            ////////////////////////////console.log('put happened - listening for result');
           });
         }
         else
@@ -232,7 +232,7 @@ describe('10_eventemitter_listeners', function () {
         property3: 'property3'
       }, null, function (e, result) {
 
-        ////////////////console.log('did delete set');
+        //////////////////console.log('did delete set');
         //path, event_type, count, handler, done
         //We listen for the DELETE event
         listenerclient.on('/e2e_test1/testsubscribe/data/delete_me', {
@@ -240,45 +240,45 @@ describe('10_eventemitter_listeners', function () {
           count: 1
         }, function (eventData) {
 
-          //console.log('on count 1 delete ');
-          ////////////////console.log(message);
+          ////console.log('on count 1 delete ');
+          //////////////////console.log(message);
 
           //we are looking at the event internals on the listener to ensure our event management is working - because we are only listening for 1
           //instance of this event - the event listener should have been removed 
-          //console.log('listenerclient.events');
-          //console.log(listenerclient.events);
+          ////console.log('listenerclient.events');
+          ////console.log(listenerclient.events);
           expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me'].length).to.be(0);
 
-          //console.log(eventData);
+          ////console.log(eventData);
 
           //we needed to have removed a single item
           expect(eventData.removed).to.be(1);
 
-          //////////////////////////console.log(message);
+          ////////////////////////////console.log(message);
 
           callback();
 
         }, function (e) {
 
-          //////////console.log('ON HAS HAPPENED: ' + e);
+          ////////////console.log('ON HAS HAPPENED: ' + e);
 
           if (!e) {
-            //console.log('listenerclient.events, pre');
-            //console.log(listenerclient.events);
+            ////console.log('listenerclient.events, pre');
+            ////console.log(listenerclient.events);
             expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me'].length).to.be(1);
 
-            ////////////////console.log('subscribed, about to delete');
+            //////////////////console.log('subscribed, about to delete');
 
             //We perform the actual delete
             publisherclient.remove('/e2e_test1/testsubscribe/data/delete_me', null, function (e, result) {
 
 
-              ////////////////console.log('REMOVE HAPPENED!!!');
-              ////////////////console.log(e);
-              ////////////////console.log(result);
+              //////////////////console.log('REMOVE HAPPENED!!!');
+              //////////////////console.log(e);
+              //////////////////console.log(result);
 
 
-              //////////////////////////console.log('put happened - listening for result');
+              ////////////////////////////console.log('put happened - listening for result');
             });
           }
           else
@@ -299,7 +299,7 @@ describe('10_eventemitter_listeners', function () {
     listenerclient.on('/e2e_test1/testsubscribe/data/on_off_test', {event_type: 'set', count: 0}, function (message) {
 
       //we detach all listeners from the path here
-      //console.log('ABOUT OFF PATH');
+      ////console.log('ABOUT OFF PATH');
       listenerclient.off('/e2e_test1/testsubscribe/data/on_off_test', function (e) {
 
         if (e)
@@ -308,8 +308,8 @@ describe('10_eventemitter_listeners', function () {
         listenerclient.on('/e2e_test1/testsubscribe/data/on_off_test', {event_type: 'set', count: 0},
           function (message) {
 
-            //console.log('ON RAN');
-            //console.log(message);
+            ////console.log('ON RAN');
+            ////console.log(message);
 
             listenerclient.off(currentListenerId, function (e) {
 
@@ -333,8 +333,8 @@ describe('10_eventemitter_listeners', function () {
             }, {}, function (e, setresult) {
               if (e) return callback(new Error(e));
 
-              //console.log('DID ON SET');
-              //console.log(setresult);
+              ////console.log('DID ON SET');
+              ////console.log(setresult);
             });
 
           });

@@ -72,8 +72,8 @@ describe('7_browser-client-test', function() {
 					function(e, r, b){
 
 						if (!e){
-							//console.log('got body!!!');
-							//console.log(b);
+							////console.log('got body!!!');
+							////console.log(b);
 							callback();
 						}else
 							callback(e);

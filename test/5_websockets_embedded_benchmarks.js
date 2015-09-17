@@ -147,7 +147,7 @@ describe('5_websockets_embedded_benchmarks', function () {
 
       if (receivedCount == expected) return;
       
-      ////////console.log('putting data: ', count);
+      //////////console.log('putting data: ', count);
       publisherclient.set('/e2e_test1/testsubscribe/sequence3', {
         property1: receivedCount
       }, {noStore: true},  
@@ -155,14 +155,14 @@ describe('5_websockets_embedded_benchmarks', function () {
         if (e)
           return callback(e);
 
-         //////console.log('put data: ', result);
+         ////////console.log('put data: ', result);
       });
     }
 //path, event_type, count, handler, done
     //first listen for the change
     listenerclient.on('/e2e_test1/testsubscribe/sequence3', {event_type:'set', count:0}, function (message) {
  
-      //////console.log('Event happened', message);
+      ////////console.log('Event happened', message);
       receivedCount++;
 
       if (receivedCount == expected) {
@@ -173,11 +173,11 @@ describe('5_websockets_embedded_benchmarks', function () {
 
     }, function (e) {
 
-      //////console.log('ON HAS HAPPENED: ' + e);
+      ////////console.log('ON HAS HAPPENED: ' + e);
 
       if (!e) {
 
-        ////////////////////console.log('on subscribed, about to publish');
+        //////////////////////console.log('on subscribed, about to publish');
         //then make the change
         console.time(timerName);
         writeData();
@@ -207,23 +207,23 @@ describe('5_websockets_embedded_benchmarks', function () {
       stressTestClient.on('/e2e_test1/testsubscribe/sequence1', {event_type:'set', count:0}, function (message) {
 
         receivedCount++;
-        ////////////console.log('RCOUNT');
+        //////////////console.log('RCOUNT');
 
 
-        ////////console.log(receivedCount);
-        ////////console.log(sent.length);
+        //////////console.log(receivedCount);
+        //////////console.log(sent.length);
 
         if (receivedCount == expected) {
           console.timeEnd(timerName);
           //expect(Object.keys(received).length == expected).to.be(true);
-          ////////////console.log(received);
+          //////////////console.log(received);
 
           callback();
         }
 
       }, function (e) {
 
-        ////////////console.log('ON HAS HAPPENED: ' + e);
+        //////////////console.log('ON HAS HAPPENED: ' + e);
 
         if (!e) {
 
@@ -236,7 +236,7 @@ describe('5_websockets_embedded_benchmarks', function () {
               return;
             }
 
-            //////////////console.log('putting data: ', count);
+            ////////////////console.log('putting data: ', count);
             publisherclient.set('/e2e_test1/testsubscribe/sequence1', {
               property1: count++
             }, {noStore: true}, function (e, result) {
@@ -277,13 +277,13 @@ describe('5_websockets_embedded_benchmarks', function () {
           sent[i] = require('shortid').generate();
         }
 
-        ////////////console.log('about to go');
-        ////////////console.log(sent);
+        //////////////console.log('about to go');
+        //////////////console.log(sent);
 
         //first listen for the change
         stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore', {event_type:'set', count:0}, function (message) {
 
-          ////////////console.log('Event happened', message);
+          //////////////console.log('Event happened', message);
 
           if (e)
             return callback(e);
@@ -295,23 +295,23 @@ describe('5_websockets_embedded_benchmarks', function () {
           else
             received[message.property1] = 1;
 
-          ////////////console.log('RCOUNT');
+          //////////////console.log('RCOUNT');
 
 
-          ////////console.log(receivedCount);
-          ////////console.log(sent.length);
+          //////////console.log(receivedCount);
+          //////////console.log(sent.length);
 
           if (receivedCount == sent.length) {
             console.timeEnd('timeTest1');
             expect(Object.keys(received).length == expected).to.be(true);
-            ////////////console.log(received);
+            //////////////console.log(received);
 
             callback();
           }
 
         }, function (e) {
 
-          ////////////console.log('ON HAS HAPPENED: ' + e);
+          //////////////console.log('ON HAS HAPPENED: ' + e);
 
           if (!e) {
 
@@ -320,16 +320,16 @@ describe('5_websockets_embedded_benchmarks', function () {
 
             while (count < expected) {
 
-              ////////////console.log(count);
-              ////////////console.log(expected);
-              ////////////console.log(sent[count]);
+              //////////////console.log(count);
+              //////////////console.log(expected);
+              //////////////console.log(sent[count]);
 
               publisherclient.set('/e2e_test1/testsubscribe/sequence_nostore', {
                 property1: sent[count]
               }, {noStore: true}, function (e, result) {
 
-                ////////////console.log(e);
-                ////////////console.log(result);
+                //////////////console.log(e);
+                //////////////console.log(result);
 
                 if (e)
                   return callback(e);
@@ -370,8 +370,8 @@ describe('5_websockets_embedded_benchmarks', function () {
           sent[i] = require('shortid').generate();
         }
 
-        ////////////console.log('about to go');
-        ////////////console.log(sent);
+        //////////////console.log('about to go');
+        //////////////console.log(sent);
 
         //first listen for the change
         stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore_fireforget', {event_type:'set', count:0}, function (message) {
@@ -383,23 +383,23 @@ describe('5_websockets_embedded_benchmarks', function () {
           else
             received[message.property1] = 1;
 
-          ////////////console.log('RCOUNT');
+          //////////////console.log('RCOUNT');
 
 
-          ////////console.log(receivedCount);
-          ////////console.log(sent.length);
+          //////////console.log(receivedCount);
+          //////////console.log(sent.length);
 
           if (receivedCount == sent.length) {
             console.timeEnd('timeTest1');
             expect(Object.keys(received).length == expected).to.be(true);
-            ////////////console.log(received);
+            //////////////console.log(received);
 
             callback();
           }
 
         }, function (e) {
 
-          ////////////console.log('ON HAS HAPPENED: ' + e);
+          //////////////console.log('ON HAS HAPPENED: ' + e);
 
           if (!e) {
 
@@ -408,9 +408,9 @@ describe('5_websockets_embedded_benchmarks', function () {
 
             while (count < expected) {
 
-              ////////////console.log(count);
-              ////////////console.log(expected);
-              ////////////console.log(sent[count]);
+              //////////////console.log(count);
+              //////////////console.log(expected);
+              //////////////console.log(sent[count]);
 
               publisherclient.set('/e2e_test1/testsubscribe/sequence_nostore_fireforget', {
                 property1: sent[count]
@@ -446,8 +446,8 @@ describe('5_websockets_embedded_benchmarks', function () {
         sent[i] = require('shortid').generate();
       }
 
-      ////////////console.log('about to go');
-      ////////////console.log(sent);
+      //////////////console.log('about to go');
+      //////////////console.log(sent);
 
       //first listen for the change
       stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set', count:0}, function (message) {
@@ -459,23 +459,23 @@ describe('5_websockets_embedded_benchmarks', function () {
         else
           received[message.property1] = 1;
 
-        ////////////console.log('RCOUNT');
+        //////////////console.log('RCOUNT');
 
 
-        ////////console.log(receivedCount);
-        ////////console.log(sent.length);
+        //////////console.log(receivedCount);
+        //////////console.log(sent.length);
 
         if (receivedCount == sent.length) {
           console.timeEnd('timeTest1');
           expect(Object.keys(received).length == expected).to.be(true);
-          ////////////console.log(received);
+          //////////////console.log(received);
 
           callback();
         }
 
       }, function (e) {
 
-        ////////////console.log('ON HAS HAPPENED: ' + e);
+        //////////////console.log('ON HAS HAPPENED: ' + e);
 
         if (!e) {
 
@@ -484,16 +484,16 @@ describe('5_websockets_embedded_benchmarks', function () {
 
           while (count < expected) {
 
-            ////////////console.log(count);
-            ////////////console.log(expected);
-            ////////////console.log(sent[count]);
+            //////////////console.log(count);
+            //////////////console.log(expected);
+            //////////////console.log(sent[count]);
 
             publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {
               property1: sent[count]
             }, {excludeId: true}, function (e, result) {
 
-              ////////////console.log(e);
-              ////////////console.log(result);
+              //////////////console.log(e);
+              //////////////console.log(result);
 
               if (e)
                 return callback(e);

@@ -7,7 +7,7 @@ var serviceDefault = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('11_websockets_embedded_ports', function() {
+describe('a2_websockets_embedded_ports', function() {
 
 	var service1Port = 8000;
 	var service2Port = 8001;
