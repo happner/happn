@@ -104,10 +104,12 @@ describe('a5_eventemitter_meta.js', function () {
 
 
   var test_path = '/test/meta/' + require('shortid').generate();
+  var test_path_remove = '/test/meta/remove' + require('shortid').generate();
+  var test_path_all = '/test/meta/all' + require('shortid').generate();
 
 //	We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 
-  it('tests the set meta data path', function (callback) {
+  it('tests the set meta data', function (callback) {
 
     this.timeout(default_timeout);
 
@@ -165,6 +167,77 @@ describe('a5_eventemitter_meta.js', function () {
 
     });
 
+  });
+
+  it('tests the delete meta data', function (callback) {
+
+    publisherclient.set(test_path_remove, {
+      property1: 'property1',
+      property2: 'property2',
+      property3: 'property3'
+    }, {}, function (e, result) {
+
+      if (e) return callback(e);
+
+      //console.log('SET-DATA: ', result);
+      expect(result._meta.path).to.be(test_path_remove);
+
+      listenerclient.on(test_path_remove, {event_type: 'remove', count: 1}, function (data, meta) {
+      
+        callback();
+
+      }, function(e){
+
+        if (e) return callback(e);
+
+        publisherclient.remove(test_path_remove,  
+          {}, 
+          function (e, result) {
+
+          if (e) return callback(e);
+
+          expect(result._meta.path).to.be('/REMOVE@' + test_path_remove);
+
+        });
+      });
+    });
+  });
+
+   it('tests the all meta data', function (callback) {
+
+    this.timeout(default_timeout);
+
+    try {
+      //first listen for the change
+      listenerclient.onAll(function (data, meta) {
+
+        expect(meta.path).to.be(test_path_all);
+        expect(meta.channel).to.be('/ALL@*');
+
+        callback();
+
+      }, function (e) {
+
+        if (e) return callback(e);
+
+        //then make the change
+        publisherclient.set(test_path_all, {
+          property1: 'property1',
+          property2: 'property2',
+          property3: 'property3'
+        }, null, function (e, result) {
+
+          if (e) return callback(e);
+
+          expect(result._meta.path).to.be(test_path_all);
+
+        });
+       
+      });
+
+    } catch (e) {
+      callback(e);
+    }
   });
 
 });
