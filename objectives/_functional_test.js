@@ -46,17 +46,16 @@ objective('happn', function() {
           
           // _store contains the storage details,
           // it is available but not enumerated in iteration or serialization
-          // 
-          meta.path.should.equal('/some/object');
-          meta.id.length;
+          //
+          meta.created.length;
           meta.modified.length;
+          meta.path.should.equal('/some/object');
 
           // _event contains details of the event,
           // also not enumerable
           //
           meta.action.should.equal('/SET@/some/object'); // possibly unnecessary
           meta.type.should.equal('data');
-          meta.id.length;
           meta.channel.should.equal('/ALL@/some/object'); // possibly unnecessary
 
           received = true;
@@ -87,7 +86,7 @@ objective('happn', function() {
           obj.should.eql( {MY: 'DATA'} );
 
           _meta.path.should.equal('/some/object');
-          _meta.id.length;
+          _meta.created.length;
           _meta.modified.length;
 
           received.should.equal(true);
@@ -108,11 +107,9 @@ objective('happn', function() {
           obj.should.eql( [1,2,3] );
           
           meta.path.should.equal('/some/array');
-          meta.id.length;
           meta.modified.length;
           meta.action.should.equal('/SET@/some/array');
           meta.type.should.equal('data');
-          meta.id.length;
           meta.channel.should.equal('/ALL@/some/array');
           received = true;
         })
@@ -133,7 +130,6 @@ objective('happn', function() {
           obj.should.eql( [1,2,3] );
 
           _meta.path.should.equal('/some/array');
-          _meta.id.length;
           _meta.modified.length;
           received.should.equal(true);
           done();
@@ -156,11 +152,9 @@ objective('happn', function() {
           expect(obj).to.eql( {MY: 'DATA'} );
 
           meta.path.should.equal('/some/remote/object');
-          meta.id.length;
           meta.modified.length;
           meta.action.should.equal('/SET@/some/remote/object');
           meta.type.should.equal('data');
-          meta.id.length;
           meta.channel.should.equal('/ALL@/some/remote/object');
           received = true;
 
@@ -182,7 +176,6 @@ objective('happn', function() {
           expect(obj).to.eql( {MY: 'DATA'} );
 
           _meta.path.should.equal('/some/remote/object');
-          _meta.id.length;
           _meta.modified.length;
           received.should.equal(true);
           done();
@@ -201,11 +194,9 @@ objective('happn', function() {
           expect(obj).to.eql( [1,2,3] );
           
           meta.path.should.equal('/some/remote/array');
-          meta.id.length;
           meta.modified.length;
           meta.action.should.equal('/SET@/some/remote/array');
           meta.type.should.equal('data');
-          meta.id.length;
           meta.channel.should.equal('/ALL@/some/remote/array');
           received = true;
         })
@@ -226,7 +217,6 @@ objective('happn', function() {
           expect(obj).to.eql( [1,2,3] );
 
           _meta.path.should.equal('/some/remote/array');
-          _meta.id.length;
           _meta.modified.length;
           received.should.equal(true);
           done();
@@ -780,13 +770,11 @@ objective('happn', function() {
           delete r._meta;
 
           _meta.path.should.equal('/the/remote/garden/path');
-          _meta.id.length;
           _meta.modified.length;
 
           _meta.type.length;
           _meta.status.length;
           _meta.published.length;
-          _meta.id.length;
 
           r.a.should.equal(1);
           r.b.should.equal(2);
@@ -813,13 +801,11 @@ objective('happn', function() {
           r[1].d.should.eql(1);
 
           _meta.modified.length;
-          _meta.id.length;
           _meta.path.length;
 
           _meta.type.length;
           _meta.status.length;
           _meta.published.length;
-          _meta.id.length;
           done();
 
         })
@@ -827,31 +813,31 @@ objective('happn', function() {
         .catch(done);
       });
 
-      it('ignores the _meta from the inbound re set', function(done, local) {
+      it('has a created date, second save preserves created date', function(done, remote) {
 
-        local.set('/identified/data', {key: 'value'})
+        var created;
+
+        remote.set('/preserve/created/date', {key: 'value'})
 
         .then(function(r) {
+          created = r._meta.created;
+          //second save
+          return remote.set('/preserve/created/date', {key: 'value2'})
+        })
 
-          // re - store with bungled _store
-
-          r._meta.id = 'kjlndfsn';
-          r._meta.path = '/sdf/sdf/sfd'
-          
-          return local.set('/identified/data', r);
+        .then(function() {
+          return remote.get('/preserve/created/date');
         })
 
         .then(function(r) {
-          r._meta.path.should.equal('/identified/data');
-          r._meta.id.should.not.equal('kjlndfsn');
+          created.should.equal(r._meta.created);
+          r._meta.modified.should.not.equal(r._meta.created)
           done();
         })
 
-        .catch(done)
+        .catch(done);
 
       });
-
-      xit('has a created date, second save preserves created date');
 
     });
     
@@ -869,13 +855,11 @@ objective('happn', function() {
           delete r._meta;
 
           _meta.path.should.equal('/the/local/garden/path');
-          _meta.id.length;
           _meta.modified.length;
 
           _meta.type.length;
           _meta.status.length;
           _meta.published.length;
-          _meta.id.length;
 
           r.a.should.equal(1);
           r.b.should.equal(2);
@@ -898,13 +882,11 @@ objective('happn', function() {
           r[1].should.eql({c:1, d:1});
 
           _meta.modified.length;
-          _meta.id.length;
           _meta.path.length;
 
           _meta.type.length;
           _meta.status.length;
           _meta.published.length;
-          _meta.id.length;
           done();
 
         })
@@ -912,31 +894,31 @@ objective('happn', function() {
         .catch(done);
       });
 
-      it('ignores the _meta from the inbound re set', function(done, remote) {
+      it('has a created date, second save preserves created date', function(done, local) {
 
-        remote.set('/identified/data2', {key: 'value'})
+        var created;
+
+        local.set('/reserve/created/date', {key: 'value'})
 
         .then(function(r) {
-
-          // re - store with bungled _store
-
-          r._meta.id = 'kjlndfsn';
-          r._meta.path = '/sdf/sdf/sfd'
-          
-          return remote.set('/identified/data2', r);
+          created = r._meta.created;
+          //second save
+          return local.set('/reserve/created/date', {key: 'value2'})
         })
 
         .then(function(r) {
-          r._meta.path.should.equal('/identified/data2');
-          r._meta.id.should.not.equal('kjlndfsn');
+          return local.get('/reserve/created/date');
+        })
+
+        .then(function(r) {
+          created.should.equal(r._meta.created);
+          r._meta.modified.should.not.equal(r._meta.created)
           done();
         })
 
-        .catch(done)
+        .catch(done);
 
       });
-
-      xit('has a created date, second save preserves created date');
 
     });
 
@@ -967,7 +949,6 @@ objective('happn', function() {
 
         .then(function(r) {
           r.key.should.equal('value');
-          r._meta.id.length // fails if no id
           done();
         })
 
@@ -986,13 +967,11 @@ objective('happn', function() {
           r[0].key1.should.eql('value1');
           r[1].key2.should.eql('value2');
 
-          r._meta.id.length;
           r._meta.path.length;
           r._meta.modified.length;
           r._meta.type.length;
           r._meta.status.length;
           r._meta.published.length;
-          r._meta.id.length;
           done();
         })
 
@@ -1020,11 +999,9 @@ objective('happn', function() {
             r[0].xxx.length
             r[1].xxx.length;
 
-            r[0]._meta.id.length
             r[0]._meta.path.length
             r[0]._meta.modified.length
 
-            r[1]._meta.id.length
             r[1]._meta.path.length
             r[1]._meta.modified.length
 
@@ -1099,7 +1076,6 @@ objective('happn', function() {
         .then(function(r) {
 
           r.key.should.equal('value');
-          r._meta.id.length // fails if no id
           r._meta.path.length
           r._meta.modified.length
           done();
@@ -1119,13 +1095,11 @@ objective('happn', function() {
           r[0].should.eql({key1: 'value1'});
           r[1].should.eql({key2: 'value2'});
 
-          r._meta.id.length;
           r._meta.path.length;
           r._meta.modified.length;
           r._meta.type.length;
           r._meta.status.length;
           r._meta.published.length;
-          r._meta.id.length;
           done();
         })
 
@@ -1153,11 +1127,9 @@ objective('happn', function() {
             r[0].xxx.length
             r[1].xxx.length;
 
-            r[0]._meta.id.length
             r[0]._meta.path.length
             r[0]._meta.modified.length
 
-            r[1]._meta.id.length
             r[1]._meta.path.length
             r[1]._meta.modified.length
 
@@ -1317,11 +1289,9 @@ objective('happn', function() {
           r.the.should.equal('SIBLING');
           r._meta.modified.length;
           r._meta.path.length;
-          r._meta.id.length;
           r._meta.type.length;
           r._meta.status.length;
           r._meta.published.length;
-          r._meta.id.length;
           r._meta.path.split('/').length.should.equal(4);
           done();
         })
@@ -1343,11 +1313,9 @@ objective('happn', function() {
           r.the.should.equal('SIBLING');
           r._meta.modified.length;
           r._meta.path.length;
-          r._meta.id.length;
           r._meta.type.length;
           r._meta.status.length;
           r._meta.published.length;
-          r._meta.id.length;
           r._meta.path.split('/').length.should.equal(4);
           done();
         })
@@ -1553,7 +1521,6 @@ objective('happn', function() {
           _meta.type.length;
           _meta.status.length;
           _meta.published.length;
-          _meta.id.length;
 
           _meta.modified.length;
           _meta.path.length;
@@ -1589,7 +1556,6 @@ objective('happn', function() {
           _meta.type.length;
           _meta.status.length;
           _meta.published.length;
-          _meta.id.length;
 
           _meta.modified.length;
           _meta.path.length;
