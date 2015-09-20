@@ -38,7 +38,7 @@
     "chai": "^3.2.0",
     "expect.js": "*",
     "mocha": "*",
-    "objective": "0.0.34"
+    "objective": "0.0.36"
   },
   "readmeFilename": "README.md"
 }
