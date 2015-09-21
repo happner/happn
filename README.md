@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/happner/happn.svg)](https://travis-ci.org/happner/happn)
+
 HAPPN
 =====================
 
