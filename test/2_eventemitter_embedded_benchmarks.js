@@ -4,7 +4,9 @@
 
 ```bash
 
-mocha test/e2e_eventemitter_embedded_benchmarks.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/.e2e_eventemitter_embedded_benchmarks.csv
+
+mocha test/2_eventemitter_embedded_benchmarks.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/2_eventemitter_embedded_benchmarks.csv
+
 
 ```
 
@@ -23,7 +25,7 @@ var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('e2e test', function() {
+describe('2_eventemitter_embedded_benchmarks', function() {
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -174,7 +176,7 @@ describe('e2e test', function() {
 
         if (receivedCount == expected) return;
 
-        //////console.log('putting data: ', count);
+        ////////console.log('putting data: ', count);
         publisherclient.set('/e2e_test1/testsubscribe/sequence3', {
             property1: receivedCount
           }, {
@@ -184,7 +186,7 @@ describe('e2e test', function() {
             if (e)
               return callback(e);
 
-            ////console.log('put data: ', result);
+            //////console.log('put data: ', result);
           });
       }
       //path, event_type, count, handler, done
@@ -298,7 +300,9 @@ describe('e2e test', function() {
         config: {
           deferSetImmediate: 100
         }
-      }, function(message) {
+      }, function(message, meta) {
+
+        ////console.log(message, meta);
 
         receivedCount++;
        
@@ -372,10 +376,10 @@ describe('e2e test', function() {
 
           receivedCount++;
 
-          if (received[message.payload.data.property1])
-            received[message.payload.data.property1] = received[message.payload.data.property1] + 1;
+          if (received[message.property1])
+            received[message.property1] = received[message.property1] + 1;
           else
-            received[message.payload.data.property1] = 1;
+            received[message.property1] = 1;
 
           if (receivedCount == sent.length) {
             console.timeEnd(timerName);
@@ -434,7 +438,7 @@ describe('e2e test', function() {
       var receivedCount = 0;
 
       var received = {};
-      var sent = [expected];
+      var sent = [];
 
       for (var i = 0; i < expected; i++) {
         sent[i] = require('shortid').generate();
@@ -442,15 +446,21 @@ describe('e2e test', function() {
 
       stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set',count:0}, 
         function(message) {
+
+          ////console.log(message);
+
           receivedCount++;
 
-          if (received[message.payload.data.property1])
-            received[message.payload.data.property1] = received[message.payload.data.property1] + 1;
+          if (received[message.property1])
+            received[message.property1] = received[message.property1] + 1;
           else
-            received[message.payload.data.property1] = 1;
+            received[message.property1] = 1;
 
           if (receivedCount == sent.length) {
             console.timeEnd(timerName);
+
+            ////console.log(received);
+
             expect(Object.keys(received).length == expected).to.be(true);
             callback();
           }
@@ -464,9 +474,7 @@ describe('e2e test', function() {
 
           while (count < expected) {
 
-            publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {
-              excludeId: true
-            }, 
+            publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {}, 
             function(e, result) {
               if (e) return callback(e);
             });

@@ -4,7 +4,7 @@ var async = require('async');
 var fs = require('fs');
 var happn = require('../lib/index');
 
-describe('e2e test', function() {
+describe('8_eventemitter_stoppingstarting', function() {
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -66,7 +66,8 @@ describe('e2e test', function() {
     this.timeout(20000);
     
     fs.unlink(tempFile, function(e){
-      callback(e);
+      if (e) return callback(e);
+      currentService.stop(callback);
     });
 
   });
@@ -111,7 +112,7 @@ describe('e2e test', function() {
 
           if (e) return callback(e);
           
-          expect(response.payload[0].data.property1).to.be("prop1");
+          expect(response.property1).to.be("prop1");
           callback();
         });
 
@@ -131,15 +132,19 @@ describe('e2e test', function() {
 
       if (e) return callback(e);
 
+      currentService = happnService;
+     
       getClient(happnService, function(e, testclient){
 
         if (e) return callback(e);
+
+        //console.log(persistKey);
 
         testclient.get(persistKey, null, function(e, response){
 
           if (e) return callback(e);
 
-          expect(response.payload.length).to.be(0);
+          expect(response).to.eql(undefined);
           callback();
         });
 

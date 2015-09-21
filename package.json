@@ -1,8 +1,11 @@
 {
   "name": "happn",
   "description": "Pub/sub api as a service using primus and mongo & redis or nedb, can work as cluster, single process or embedded using nedb, use in production at your own risk",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "main": "./lib/index",
+  "scripts": {
+    "test": "LOG_LEVEL=off objective --once"
+  },
   "keywords": [
     "faye",
     "mongo",
@@ -12,6 +15,7 @@
   "dependencies": {
     "JSONStream": "^0.10.0",
     "async": "^0.9.0",
+    "bluebird": "^2.10.0",
     "body-parser": "^1.12.2",
     "byline": "^4.2.1",
     "connect": "^3.3.5",
@@ -33,7 +37,8 @@
   "devDependencies": {
     "chai": "^3.2.0",
     "expect.js": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "objective": "0.0.36"
   },
   "readmeFilename": "README.md"
 }

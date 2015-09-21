@@ -7,7 +7,7 @@ var serviceDefault = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('e2e test', function() {
+describe('a2_websockets_embedded_ports', function() {
 
 	var service1Port = 8000;
 	var service2Port = 8001;
@@ -20,9 +20,25 @@ describe('e2e test', function() {
 
 	var default_timeout = 4000;
 
+	var instances = [];
+
+	after('stop all services', function(callback) {
+
+	   async.eachSeries(instances, function(instance, eachCallback){
+	   	instance.stop(eachCallback);
+	   },
+	   callback
+	   );
+
+	});
+	
 	var initializeService = function(instance, port, callback){
 		instance.initialize({port:port},
-			callback
+			function(e, instance){
+				if (e) return callback(e);
+				instances.push(instance);
+				callback();
+			}
 		);
 	}
 

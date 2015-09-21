@@ -6,7 +6,7 @@ var device2 = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('e2e test', function() {
+describe('9_websockets_proxy', function() {
 
 	var gatewayPort = 8000;
 	var device1Port = 8001;
@@ -16,6 +16,17 @@ describe('e2e test', function() {
 	var mode = "embedded";
 
 	var default_timeout = 4000;
+	var instances = [];
+
+	after('stop all services', function(callback) {
+
+	   async.eachSeries(instances, function(instance, eachCallback){
+	   	instance.stop(eachCallback);
+	   },
+	   callback
+	   );
+
+	});
 
 	var initializeService = function(instance, port, callback){
 		instance.initialize({
@@ -39,7 +50,11 @@ describe('e2e test', function() {
 					log_component:'prepare'
 				}
 			},
-			callback
+			function(e, instance){
+				if (e) return callback(e);
+				instances.push(instance);
+				callback();
+			}
 		);
 	}
 
@@ -67,7 +82,7 @@ describe('e2e test', function() {
 		}
 	});
 
-	it('should register the device1 mesh as a proxy to the gateway', function(callback) {
+	xit('should register the device1 mesh as a proxy to the gateway', function(callback) {
 
 		device1.services.proxy.registerWebSocket({
 				host:'127.0.0.1',//will default to local anyhow
@@ -148,7 +163,7 @@ describe('e2e test', function() {
 		}
 	});
 
-	it('should do a proxy round trip from the external client', function(callback) {
+	xit('should do a proxy round trip from the external client', function(callback) {
 		this.timeout(default_timeout);
 
 		try{
@@ -165,7 +180,7 @@ describe('e2e test', function() {
 				if (!e){
 
 					gatewayclient.set('/device1/setValue', {value:testValue}, null, function(e, result){
-						console.log('set happened - listening for result');
+						//console.log('set happened - listening for result');
 					});
 				}else
 					callback(e);
@@ -178,7 +193,7 @@ describe('e2e test', function() {
 	});
 
 	//so the message is proxied to all devices behind the gateway and the responses on each device streamed back
-	it('should do a proxy broadcast', function(callback) {
+	xit('should do a proxy broadcast', function(callback) {
 		this.timeout(default_timeout);
 
 		try{
@@ -202,7 +217,7 @@ describe('e2e test', function() {
 	});
 
 	//any devices listenings for requests on the settings path, return their values - which are streamed as part of the response
-	it('should do a proxy read multiple', function(callback) {
+	xit('should do a proxy read multiple', function(callback) {
 		this.timeout(default_timeout);
 
 		try{
