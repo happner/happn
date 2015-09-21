@@ -8,12 +8,11 @@ Happn is an attempt at getting the same kind of functionality that [firebase](ht
 
 Firebase is fricking awesome - but sometimes priced a little out of the reach of certain projects, but if you have the money to throw at it, it is well worth investigating. 
 
-The aim of this framework however is to create an http/json api that sits on top of a mongo backend as the server, which also has pub/sub baked in - so you can subscribe to changes in the data via the client - which can be used from a browser or from a node program, depending on how it is initialized.
+The aim of this framework however is to create an http/json api that sits on top of a mongo/nedb backend as the server, which also has pub/sub baked in - so you can subscribe to changes in the data via the client - which can be used from a browser or from a node program, depending on how it is initialized.
 
 Technologies used:
 Happn uses [Primus](https://github.com/primus/primus) to power websockets for its pub/sub framework and mongo or nedb depending on the mode it is running in as its data store, the API uses [connect](https://github.com/senchalabs/connect).
 
-The system uses [jwt](https://github.com/hokaccha/node-jwt-simple) to secure session state between calls.
 
 Happn has 3 modes:
 -----------------------
@@ -28,22 +27,19 @@ This is the easiest setup, as the system uses nedb to store data internally, so 
 cluster: 
 --------
 
-You can specify how many worker processes you want the system to use, so we can scale to multicore machines.
-You need a redis instance and a mongo instance for this mode, this is because Faye uses it's redis engine to keep state across clustered instances of the Happn worker process.
-
-CLUSTER AINT WORKING ANYMORE - DUE TO MIGRATION TO MIGRATION AND FULL DUPLEX WEBSOCKETS... Busy fixing.
+CLUSTER AINT WORKING ANYMORE - DUE TO MIGRATION AND FULL DUPLEX WEBSOCKETS... Busy fixing.
 
 single process:
 ---------------
 
 The system runs as a single process, but still needs a mongo db instance running for storing data.
 
-SINGLE PROCESS AINT WORKING ANYMORE - DUE TO MIGRATION TO MIGRATION AND FULL DUPLEX WEBSOCKETS... Busy fixing.
+SINGLE PROCESS AINT WORKING ANYMORE - DUE TO MIGRATION AND FULL DUPLEX WEBSOCKETS... Busy fixing.
 
 additional info
 ---------------
 
-Happn stores its data in a collection called 'happn' by default on your mongodb. The happn system is actually built to be a module, this is because the idea is that you will be able to initialize a server in your own code, and possibly attach your own plugins to various system events. So the requirements and installation instructions show you how to reference happn and write the code that starts the instance up. This won't be a tremendously detailed document - so please do spelunk and get involved.
+Happn stores its data in a collection called 'happn' by default on your mongodb/nedb. The happn system is actually built to be a module, this is because the idea is that you will be able to initialize a server in your own code, and possibly attach your own plugins to various system events. So the requirements and installation instructions show you how to reference happn and write the code that starts the instance up. This won't be a tremendously detailed document - so please do spelunk and get involved.
 
 Requirements & instructions
 ---------------------------
@@ -51,6 +47,8 @@ Requirements & instructions
 You need NodeJS and NPM of course, you also need to know how node works (as my setup instructions are pretty minimal)
 
 You need to install mocha to run the tests, ie: sudo npm install mocha -g --save
+
+then run "npm install happn"
 
 If you want to run in cluster mode, you need to install [Redis](http://redis.io/topics/quickstart) and have it up and running, on its standard port: 6379
 
@@ -62,55 +60,39 @@ But if you want to run your own service do the following:
 
 Create a directory you want to run your happn in, create a node application in it - with some kind of main.js and a package.json
 
-I havent had the time to join npm yet, so add the following dependancy to your package.json:
-
-```javascript
-"dependencies": {
-    "happn": "git+https://github.com/southbite/happn-primus.git"
-  }
-```
-To get the latest happn files run:
-npm install
-
 *In node_modules/happn/test in your folder, the e2e_test.js script demonstrates the server and client interactions shown in the following code snippets*
 
-To start up a happn, add following to your main.js:
+starting service:
 -------------------------------------------------------
 
 ```javascript
 var happn = require('../lib/index')
 var service = happn.service;
 var happn_client = happn.client;
+var happnInstance; //this will be your server instance
 
-//runs off port 8000 by default
-//Embedded mode (no external databases necessary): 
-service.initialize(
-{mode:'embedded', 
-	services:{
-		auth:{
-			path:'./services/auth/service.js',
-			config:{
-				authTokenSecret:'a256a2fd43bf441483c5177fc85fd9d3',
-				systemSecret:'test_secret'
-			}
-		},
-		data:{
-			path:'./services/data_embedded/service.js',
-			config:{}
-		},
-		pubsub:{
-			path:'./services/pubsub/service.js',
-			config:{}
-		}
-	},
-	utils:{
-		logLevel:'info',  // possibles: off, fatal, error, warn, info, debug, trace 
-		logComponents: ['prepare'],
-		logFile: '/absolute/path.log'
-	}
-}, 
-function(e){
-	callback(e);
+//we are using a compact default config here, port defaults to 55000
+
+ service.create({
+  services: {
+    auth: {
+      path: './services/auth/service.js',
+      config: {
+        systemSecret: 'my secret'
+      }
+    }
+  },
+  utils: {
+    log_level: 'info|error|warning',
+    log_component: 'prepare'
+  }
+},
+function (e, happn) {
+  if (e)
+    return callback(e);
+
+  happnInstance = happn; //here it is, your server instance
+
 });
 
 //Cluster mode (needs redis and mongo): 
@@ -126,37 +108,38 @@ Connecting to Happn
 Using node:
 
 ```javascript
- var happn = require('happn'); 
- var happn_client = happn.client; 
- var my_client_instance; 
+var happn = require('happn'); 
+var happn_client = happn.client; 
+var my_client_instance; //this will be your client instance
 
- 	my_client_instance = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
-        callback(e);
-    });
+happn_client.create({config:{secret:'my secret'}}, function(e, instance) {
+	
+	//instance is now connected to the server listening on port 55000
+	my_client_instance = instance;
+
+});
 
 ```
 
 To use the browser client, make sure the server is running, and reference the client javascript with the url pointing to the running server instances port and ip address like so:
 
 ```html
-<script type="text/javascript" src="http://localhost:8000/browser_client"></script>
+<script type="text/javascript" src="http://localhost:55000/browser_client"></script>
 <script>
 
 var my_client_instance; 
 
-my_client_instance = new happn.client({config:{host:'localhost', port:testport, secret:test_secret}}, function(e){
-	if (e) throw e;
-
-	//my_client_instance.get...
-    //my_client_instance.set...
-    //my_client_instance.on...
+HappnClient.create({config:{secret:'my secret'}}, function(e, instance) {
+	
+	//instance is now connected to the server listening on port 55000
+	my_client_instance = instance;
 
 });
 
 </script>
 ```
 
-PUT
+SET
 -------------------------
 
 *Puts the json in the branch e2e_test1/testsubscribe/data, creates the branch if it does not exist*
@@ -168,7 +151,9 @@ PUT
 
 my_client_instance.set('e2e_test1/testsubscribe/data/', {property1:'property1',property2:'property2',property3:'property3'}, {noPublish:true}, function(e, result){
 
-	
+	//your result object has a special _meta property (not enumerable) that contains its actual _id, path, created and modified dates
+	//so you get back {property1:'property1',property2:'property2',property3:'property3', _meta:{path:'e2e_test1/testsubscribe/data/', created:20151011893020}}
+
 
 });
 
@@ -176,53 +161,44 @@ my_client_instance.set('e2e_test1/testsubscribe/data/', {property1:'property1',p
 
 *NB - by setting the option merge:true, the data at the end of the path is not overwritten by your json, it is rather merged with the data in your json, overwriting the fields you specify in your set data, but leaving the fields that are already at that branch.*
 
-PUT CHILD
+SET SIBLING
 -------------------------
 
-*Posts your data to a collection that lives at the end of the specified branch (creates the collection if it doesnt exist), the getChild method will fetch your data back*
-
-```javascript
-my_client_instance.setChild('e2e_test1/testsubscribe/data/collection', {property1:'post_property1',property2:'post_property2'}, function(e, results){
-
-					if (!e){
-						//the child method returns a child in the collection with a specified id
-						my_client_instance.getChild('e2e_test1/testsubscribe/data/collection', results.payload._id, function(e, results){
-```
-
-PUT SIBLING
--------------------------
-
-*Posts your data to a unique path starting with the path you passed in as a parameter*
+* sets your data to a unique path starting with the path you passed in as a parameter, suffixed with a random short id *
 
 ```javascript
 	my_client_instance.setSibling('e2e_test1/siblings', {property1:'sib_post_property1',property2:'sib_post_property2'}, function(e, results){
+		//you get back {property1:'sib_post_property1',property2:'sib_post_property2', _meta:{path:'e2e_test1/siblings/yCZ678__'}}
 		//you would get all siblings by querying the path e2e_test1/siblings*
 ```
 
 GET
 ---------------------------
 
-*Gets the data living at the specified branch, gets the whole collection if the data is a collection, see the child method (above) for getting a specific item from a collection*
+* Gets the data living at the specified branch *
 
 ```javascript
 my_client_instance.get('e2e_test1/testsubscribe/data', 
 	null, //options
 	function(e, results){
-	//results is your data
-	console.log(results.payload.length);//payload is now an array containing all the results for your get, get can also use a wildcard * in the path ie. publisherclient.get('e2e_test1/testsubscribe/data*'...
+	//results is your data, if you used a wildcard in your path, you get back an array
+	//if you used an explicit path, you get back your data as the object on that path
+	
 ```
 
-*You can also use wildcards, gets all items with the path starting e2e_test1/testsubscribe/data *
+* You can also use wildcards, gets all items with the path starting e2e_test1/testsubscribe/data *
 
 ```javascript
 my_client_instance.get('e2e_test1/testsubscribe/data*', 
 	null, 
 	function(e, results){
 	//results is your data
-	console.log(results.payload.length);//payload is now an array containing all the results for your get, get can also use a wildcard * in the path ie. publisherclient.get('e2e_test1/testsubscribe/data*'...
+	results.map(function(item){
+
+	});
 ```
 
-*You can also just get paths and ids, without data *
+*You can also just get paths, without data *
 
 ```javascript
 my_client_instance.getPaths('e2e_test1/testwildcard/*', function(e, results){
@@ -235,26 +211,37 @@ SEARCH
 
 ```javascript
 
-	parameters1 = {
-		criteria:{
-			$or: [ {"data.regions": { $in: ['North','South','East','West'] }}, 
-				   {"data.towns": { $in: ['North.Cape Town', 'South.East London'] }}, 
-				   {"data.categories": { $in: ["Action","History" ] }}],
-			"data.keywords": {$in: ["bass", "Penny Siopis" ]}
-		},
-		fields:{"data":1},
-		sort:{"data.field1":1},
-		limit:1
-	}
+	var options = {
+      fields: {"name": 1},
+      sort: {"name": 1},
+      limit: 1
+    }
 
-	my_client_instance.search('/e2e_test1/testsubscribe/data/complex*', parameters1, function(e, search_result){
+    var criteria = {
+      $or: [{"region": {$in: ['North', 'South', 'East', 'West']}},
+        	{"town": {$in: ['North.Cape Town', 'South.East London']}}],
+      "surname": {$in: ["Bishop", "Emslie"]}
+    }
+
+    publisherclient.get('/users/*', {
+	    criteria: criteria,
+	    options: options
+	  }, 
+	  function (e, search_results) {
+	  	//and your results are here
+	  	search_results.map(function(user){
+	  		if (user.name == 'simon')
+	  			throw new Error('stay away from this chap, he is dodgy');
+	  	});
+	  }
+	);
 
 ```
 
 DELETE
 ---------------------------
 
-*Deletes the data living at the specified branch, if a child_id is specified, the child from the collection at the end of the branch is deleted*
+* deletes the data living at the specified branch *
 
 ```javascript
 	my_client_instance.remove('/e2e_test1/testsubscribe/data/delete_me', null, function(e, result){
@@ -262,43 +249,36 @@ DELETE
 		//your item was deleted, result.payload is an object that lists the amount of objects deleted
 ```
 
-DELETE CHILD
-----------------------------
-
-*Deletes a child from an array living at a branch *
-
-```javascript
-//first we put
-my_client_instance.setChild('/e2e_test1/testsubscribe/data/catch_all_array', {property1:'property1',property2:'property2',property3:'property3'}, function(e, post_result){
-	if (!e){
-		//your item was added to a collection, now remove it
-		my_client_instance.removeChild('/e2e_test1/testsubscribe/data/catch_all_array', post_result.payload._id, function(e, del_ar_result){
-
-								
-```
-
 EVENTS
 ----------------------------
 
-*You can listen to any SET & REMOVE events happeneing in your data - you can specifiy a path you want to listen on or you can listen to all PUT, POST and DELETE using a catch-all listener*
+* you can listen to any SET & REMOVE events happening in your data - you can specifiy a path you want to listen on or you can listen to all SET and DELETE events using a catch-all listener *
 
 Specific listener:
 ```javascript
 my_client_instance.on('/e2e_test1/testsubscribe/data/delete_me', //the path you are listening on
-					  {event_type:'remove', // either set, remove or all - defaults to all
-					   count:0},// how many times you want your handler to handle for before it is removed - default is 0 (infinity)
-					  function(e, message){ //your listener event handler
+					{event_type:'remove', // either set, remove or all - defaults to all
+					 count:0},// how many times you want your handler to handle for before it is removed - default is 0 (infinity)
+					function(//your listener event handler
+						message, //the actual object data being set or removed
+						meta){ //the meta data - path, modified,created _id etc.
+						
+
+					}, 
+					function(e){
+						//passes in an error if you were unable to register your listener
+					});
 ```
 
 Catch all listener:
 ```javascript
-my_client_instance.onAll(function(e, message){
-
-			//message consists of action property - set, remove
-			//and payload property - the actual data that got PUT, POSTED - or the _id of the data that got DELETED
-
-
-		}, function(e){
+my_client_instance.onAll(function(//your listener event handler
+						message, //the actual object data being set or removed
+						meta){ //the meta data - path, modified,created _id, also tells you what type of operation happened - ie. GET, SET etc.
+					}, 
+					function(e){
+						//passes in an error if you were unable to register your listener
+					});
 
 ```
 
@@ -318,7 +298,7 @@ my_client_instance.set('e2e_test1/test/tag', {property1:'property1',property2:'p
 MERGING
 ----------------------------
 
-*You can do a set command and specify that you want to merge the json you are pushing with the existing dataset, this means any existing values that are not in the set json but exist in the database are persisted and not overwritten*
+* you can do a set command and specify that you want to merge the json you are pushing with the existing dataset, this means any existing values that are not in the set json but exist in the database are persisted *
 
 ```javascript
 

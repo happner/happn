@@ -6,7 +6,7 @@ var async = require('async');
 var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
 var fs = require('fs');
 
-describe('e2e test', function() {
+describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -62,10 +62,12 @@ describe('e2e test', function() {
     this.timeout(20000);
     
     fs.unlink(tempFile, function(e){
-      callback(e);
+      if (e) return callback(e);
+      happnInstance.stop(callback);
     });
 
   });
+
 
   var publisherclient;
   var listenerclient;
@@ -165,7 +167,7 @@ describe('e2e test', function() {
 
         if (receivedCount == expected) return;
 
-        //////console.log('putting data: ', count);
+        ////////console.log('putting data: ', count);
         publisherclient.set('/e2e_test1/testsubscribe/sequence3', {
             property1: receivedCount
           }, {
@@ -175,7 +177,7 @@ describe('e2e test', function() {
             if (e)
               return callback(e);
 
-            ////console.log('put data: ', result);
+            //////console.log('put data: ', result);
           });
       }
       //path, event_type, count, handler, done
@@ -363,10 +365,10 @@ describe('e2e test', function() {
 
           receivedCount++;
 
-          if (received[message.payload.data.property1])
-            received[message.payload.data.property1] = received[message.payload.data.property1] + 1;
+          if (received[message.property1])
+            received[message.property1] = received[message.property1] + 1;
           else
-            received[message.payload.data.property1] = 1;
+            received[message.property1] = 1;
 
           if (receivedCount == sent.length) {
             console.timeEnd(timerName);
@@ -435,10 +437,10 @@ describe('e2e test', function() {
         function(message) {
           receivedCount++;
 
-          if (received[message.payload.data.property1])
-            received[message.payload.data.property1] = received[message.payload.data.property1] + 1;
+          if (received[message.property1])
+            received[message.property1] = received[message.property1] + 1;
           else
-            received[message.payload.data.property1] = 1;
+            received[message.property1] = 1;
 
           if (receivedCount == sent.length) {
             console.timeEnd(timerName);
