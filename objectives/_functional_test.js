@@ -813,7 +813,7 @@ objective('happn', function() {
         .catch(done);
       });
 
-      it('has a created date, second save preserves created date', function(done, remote) {
+      it('-----occasionally fails------> has a created date, second save preserves created date', function(done, remote) {
 
         var created;
 
@@ -822,7 +822,14 @@ objective('happn', function() {
         .then(function(r) {
           created = r._meta.created;
           //second save
-          return remote.set('/preserve/created/date', {key: 'value2'})
+
+          return new Promise(function(resolve, reject) {
+            setTimeout(function() {
+              // Explicitly do second set later
+              remote.set('/preserve/created/date', {key: 'value2'})
+              .then(resolve).catch(reject);
+            }, 10)
+          });
         })
 
         .then(function() {
@@ -831,7 +838,8 @@ objective('happn', function() {
 
         .then(function(r) {
           created.should.equal(r._meta.created);
-          r._meta.modified.should.not.equal(r._meta.created)
+          r._meta.modified.should.not.equal(r._meta.created);
+          // modified must not be being set sometimes
           done();
         })
 
