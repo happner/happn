@@ -98,5 +98,102 @@ objective.only('pubsub service', function() {
     });
   });
 
+  context('wildcard subscriptions', function() {
+
+    it('receives events', function(done,       local,          remote,   Promise) {
+                                       /* intera-process */ /* socket */
+
+      var received = {
+        local: false,
+        remote: false
+      }
+
+      Promise.all([
+        local.on('/event2/*', function(data, meta) {
+          if (data.key == 'event2/thing') received.local = true;
+        }),
+        remote.on('/event2/*', function(data, meta) {
+          if (data.key == 'event2/thing') received.remote = true;
+        }),
+      ])
+
+      .then(function() {
+
+        // reset
+
+        received = {
+          local: false,
+          remote: false
+        };
+
+        return new Promise(function(resolve, reject) {
+
+          // set from remote
+
+          remote.set('/event2/thing', {key: 'event2/thing'})
+
+          .then(function() {
+
+            // wait for both received
+
+            var interval = setInterval(function() {
+
+              if (received.local && received.remote) {
+                clearInterval(interval);
+                resolve();
+              }
+
+            }, 10);
+
+          })
+
+          .catch(reject);
+        });
+      })
+
+      .then(function() {
+
+        // reset
+
+        received = {
+          local: false,
+          remote: false
+        };
+
+        return new Promise(function(resolve, reject) {
+
+          // set from local
+
+          local.set('/event2/thing', {key: 'event2/thing'})
+
+          .then(function() {
+
+            // wait for both received
+
+            var interval = setInterval(function() {
+
+              if (received.local && received.remote) {
+                clearInterval(interval);
+                resolve();
+              }
+
+            }, 10);
+
+          })
+
+          .catch(reject);
+        });
+      })
+
+      .then(done).catch(function(e) {
+        if (! e instanceof Error) {
+          console.log('NonError', e);
+          return done(new Error())
+        }
+        done(e);
+      });
+    });
+  });
+
 
 });
