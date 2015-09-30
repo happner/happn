@@ -106,7 +106,7 @@ describe('1_eventemitter_embedded_sanity', function () {
     }
   });
 
-  
+
 
   it('the listener should pick up a single wildcard event', function (callback) {
 
@@ -196,6 +196,8 @@ describe('1_eventemitter_embedded_sanity', function () {
     this.timeout(default_timeout);
     var timesCount = 10;
     
+    var testBasePath = '/1_eventemitter_embedded_sanity/' + test_id + '/set_multiple'
+
     try {
 
       async.times(timesCount, 
@@ -203,7 +205,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
         var test_random_path2 = require('shortid').generate();
 
-        publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/set_multiple/' + test_random_path2, {
+        publisherclient.set(testBasePath + '/' + test_random_path2, {
           property1: 'property1',
           property2: 'property2',
           property3: 'property3'
@@ -214,11 +216,31 @@ describe('1_eventemitter_embedded_sanity', function () {
 
         if (e) return callback(e);
 
-          listenerclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/set_multiple/*', null, function (e, results) {
+          listenerclient.get(testBasePath + '/' + '*', null, function (e, results) {
 
             if (e) return callback(e);
 
             expect(results.length).to.be(timesCount);
+
+            results.every(function(result){
+
+              /*
+              RESULT SHOULD LOOK LIKE THIS
+              { property1: 'property1',
+                property2: 'property2',
+                property3: 'property3',
+                _meta: 
+                 { modified: 1443606046766,
+                   created: 1443606046766,
+                   path: '/1_eventemitter_embedded_sanity/1443606046555_VkyH6cE1l/set_multiple/E17kSpqE1l' } }
+              */
+
+              expect(result._meta.path.indexOf(testBasePath) == 0).to.be(true);
+
+
+              return true;
+            });
+
             callback();
 
           });
