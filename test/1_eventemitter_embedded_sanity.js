@@ -761,8 +761,6 @@ describe('1_eventemitter_embedded_sanity', function () {
   });
 
 
-
-
   it('should get using a wildcard', function (callback) {
 
     var test_path_end = require('shortid').generate();
@@ -782,18 +780,44 @@ describe('1_eventemitter_embedded_sanity', function () {
 
         publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', null, function (e, results) {
 
+          if (e) return callback();
+
           expect(results.length == 2).to.be(true);
-
-          publisherclient.getPaths('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', function (e, results) {
-
-            expect(results.length == 2).to.be(true);
-            callback(e);
-
-          });
+          callback(e);
+          
         });
       });
     });
   });
+
+  it('should get paths', function (callback) {
+
+    var test_path_end = require('shortid').generate();
+
+    publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end, {
+      property1: 'property1',
+      property2: 'property2',
+      property3: 'property3'
+    }, null, function (e, insertResult) {
+      expect(e == null).to.be(true);
+      publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '/1', {
+        property1: 'property1',
+        property2: 'property2',
+        property3: 'property3'
+      }, null, function (e, insertResult) {
+        expect(e == null).to.be(true);
+
+        publisherclient.getPaths('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', function (e, results) {
+
+          expect(results.length == 2).to.be(true);
+          callback(e);
+
+        });
+
+      });
+    });
+  });
+
 
   it('the listener should pick up a single delete event', function (callback) {
 
