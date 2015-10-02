@@ -56,7 +56,7 @@ If you want to run in cluster mode, you need to install [Redis](http://redis.io/
 
 If you want to run in cluster or single process mode, you need to install [Mongo](http://docs.mongodb.org/manual/installation/) and have it up and running on its standard port: 27017
 
-You can just clone this repository, then run "npm install" and then run "mocha test/e2e_test" to see how things work, there are 17 unit tests there that execute against happn service running in embedded mode, they should all pass... 
+You can just clone this repository, then run "npm install" and then run "mocha test" to see how things work, there are over 150 tests there that execute against happn service running in embedded mode. 
 
 But if you want to run your own service do the following:
 
@@ -309,4 +309,8 @@ my_client_instance.set('e2e_test1/testsubscribe/data/', {property1:'property1',p
 });
 
 ```
+
+OTHER PLACES WHERE HAPPN IS USED:
+----------------------------------
+Watch this space :) - we are building an experimental application engined thatuses happn for its nervous system, it is called happner, see: www.github.com/happner/happner
 

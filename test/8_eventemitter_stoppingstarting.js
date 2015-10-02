@@ -144,7 +144,7 @@ describe('8_eventemitter_stoppingstarting', function() {
 
           if (e) return callback(e);
 
-          expect(response).to.eql(undefined);
+          expect(response).to.eql(null);
           callback();
         });
 

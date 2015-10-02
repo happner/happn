@@ -138,6 +138,8 @@ describe('a5_eventemitter_meta.js', function () {
 
             if (e) return callback(e);
 
+            console.log('result:::', result);
+
             expect(result._meta.path).to.be(test_path);
           });
         }
