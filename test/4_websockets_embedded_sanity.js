@@ -153,25 +153,14 @@ describe('4_websockets_embedded_sanity', function() {
         property3: 'property3'
       }, {noPublish: true}, function (e, result) {
 
-        ////////////console.log('set happened');
-        ////////////console.log([e, result]);
+        if (e) return callback(e);
 
-        if (!e) {
-          publisherclient.get('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
-            console.log('new data results');
-            console.log([e, results]);
-
-            // expect(results.payload.length == 1).to.be(true);
-            expect(results.property1 == 'property1').to.be(true);
-
-            if (mode != 'embedded')
-              expect(results.payload[0].created == results.payload[0].modified).to.be(true);
-
-            callback(e);
-          });
-        }
-        else
+        publisherclient.get('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
+          
+          expect(results.property1 == 'property1').to.be(true);
           callback(e);
+        });
+       
       });
 
     } catch (e) {

@@ -181,11 +181,14 @@ describe('a5_eventemitter_meta.js', function () {
 
       if (e) return callback(e);
 
-      //console.log('SET-DATA: ', result);
+     
       expect(result._meta.path).to.be(test_path_remove);
 
       listenerclient.on(test_path_remove, {event_type: 'remove', count: 1}, function (data, meta) {
       
+        console.log('REM-DATA: ', data, meta);
+        expect(meta.path).to.be(test_path_remove);
+
         callback();
 
       }, function(e){
