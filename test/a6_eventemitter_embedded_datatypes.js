@@ -4,7 +4,7 @@ var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
-describe('a7_eventemitter_embedded_datatypes', function () {
+describe('a6_eventemitter_embedded_datatypes', function () {
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -112,7 +112,7 @@ describe('a7_eventemitter_embedded_datatypes', function () {
 
     try {
       var test_string = require('shortid').generate();
-      var test_base_url = '/a7_eventemitter_embedded_datatypes/' + test_id + '/set/string/' + test_string;
+      var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/set/string/' + test_string;
 
       publisherclient.set(test_base_url, test_string, {noPublish: true}, function (e, result) {
 
@@ -147,7 +147,7 @@ describe('a7_eventemitter_embedded_datatypes', function () {
     try {
 
       var test_number = Math.random();
-      var test_base_url = '/a7_eventemitter_embedded_datatypes/' + test_id + '/set/number/' + test_number.toString().replace('.','');
+      var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/set/number/' + test_number.toString().replace('.','');
 
       publisherclient.set(test_base_url, test_number, {noPublish: true}, function (e, result) {
 
@@ -183,7 +183,7 @@ describe('a7_eventemitter_embedded_datatypes', function () {
     try {
 
       var test_bool = true;
-      var test_base_url = '/a7_eventemitter_embedded_datatypes/' + test_id + '/set/boolean/' + test_bool.toString();
+      var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/set/boolean/' + test_bool.toString();
 
       publisherclient.set(test_base_url, test_bool, {noPublish: true}, function (e, result) {
 
@@ -218,7 +218,7 @@ describe('a7_eventemitter_embedded_datatypes', function () {
     try {
 
       var test_date = new Date();
-      var test_base_url = '/a7_eventemitter_embedded_datatypes/' + test_id + '/set/date';
+      var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/set/date';
 
       publisherclient.set(test_base_url, test_date, {noPublish: true}, function (e, result) {
 
@@ -253,7 +253,7 @@ describe('a7_eventemitter_embedded_datatypes', function () {
     try {
 
       var test_null = null;
-      var test_base_url = '/a7_eventemitter_embedded_datatypes/' + test_id + '/set/null';
+      var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/set/null';
 
       publisherclient.set(test_base_url, test_null, {noPublish: true}, function (e, result) {
 
@@ -288,7 +288,7 @@ it('the publisher should set undefined data', function (callback) {
     try {
 
       var test_undefined = undefined;
-      var test_base_url = '/a7_eventemitter_embedded_datatypes/' + test_id + '/set/undefined';
+      var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/set/undefined';
 
       publisherclient.set(test_base_url, test_undefined, {noPublish: true}, function (e, result) {
 
@@ -323,7 +323,7 @@ it('the publisher should set undefined data', function (callback) {
     try {
 
       var test_array = [0,1,2,3,4,5];
-      var test_base_url = '/a7_eventemitter_embedded_datatypes/' + test_id + '/set/array';
+      var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/set/array';
 
       publisherclient.set(test_base_url, test_array, {noPublish: true}, function (e, result) {
 
@@ -358,7 +358,7 @@ it('the publisher should set undefined data', function (callback) {
 
     this.timeout(default_timeout);
 
-    var test_base_url = '/a7_eventemitter_embedded_datatypes/' + test_id + '/wildcard';
+    var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/wildcard';
     var test_path_end = require('shortid').generate();
 
     try {
