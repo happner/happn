@@ -544,4 +544,64 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
   });
 
+   it('check the same event should by raised, regardless of what data source we are pushing to', function (callback) {
+
+    var caught = {};
+
+    this.timeout(10000);
+    var caughtCount = 0;
+
+    var memoryTestPath = '/a8_eventemitter_multiple_datasource/' + test_id + '/memorytest/event';
+    var persistedTestPath = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedtest/event';
+
+    multipleClient.onAll(function (eventData, meta) {
+
+      if (meta.action == '/SET@' + memoryTestPath || meta.action == '/SET@' + persistedTestPath)
+        caughtCount++;
+
+      if (caughtCount == 2){
+
+        findRecordInDataFile(persistedTestPath, tempFile1, function(e, record){
+
+            if (e) return callback(e);
+
+            if (record)
+              callback();
+            else
+              callback(new Error('record not found in persisted file'));
+
+        });
+
+      }
+        
+    }, function (e) {
+
+      if (e) return callback(e);
+
+      multipleClient.set(memoryTestPath, {
+        property1: 'property1',
+        property2: 'property2',
+        property3: 'property3'
+      }, null, function (e, put_result) {
+
+        if (e) return callback(e);
+
+        multipleClient.set(persistedTestPath, {
+          property1: 'property1',
+          property2: 'property2',
+          property3: 'property3'
+        }, null, function (e, put_result) {
+
+          if (e) return callback(e);
+
+          
+
+        });
+
+      });
+
+    });
+
+  });
+
 });
