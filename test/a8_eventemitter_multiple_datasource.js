@@ -4,7 +4,7 @@ var async = require('async');
 var fs = require('fs');
 var happn = require('../lib/index');
 
-describe('8_eventemitter_stoppingstarting', function() {
+describe('a8_eventemitter_multiple_datasource', function() {
 
   var testport = 8000;
   var test_secret = 'test_secret';
