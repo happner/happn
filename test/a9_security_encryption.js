@@ -4,72 +4,112 @@ var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
 
+var bitcore = require('bitcore');
+var ECIES = require('bitcore-ecies');
+
 describe('a9_security_encryption.js', function () {
 
-  var securityService;
+  var testConfigs = {};
+
+  testConfigs.data = {
+
+  }
+
+  testConfigs.security = {
+    
+  }
+
+  var testServices = {};
+
+  testServices.data = require('../lib/services/data_embedded/service');
+  testServices.security = require('../lib/services/security/service');
 
   before('should initialize the service', function (callback) {
 
-    securityService = require('../lib/services/security/service');
-    securityService.initialize({}, callback);
+    var happnMock = {services:{}};
+
+    async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
+
+      testServices[serviceName] = new testServices[serviceName]();
+      testServices[serviceName].happn = happnMock;
+
+      testServices[serviceName].initialize(testConfigs[serviceName], function(e, instance){
+        if (e)  return  eachServiceCB(e);
+
+        happnMock.services[serviceName] = testServices[serviceName];
+      
+        eachServiceCB();
+
+      });
+    }, callback);
 
   });
 
-  var generatedPrivateKey;
-  var generatedPublicKey;
-  var dataToEncrypt;
+  var generatedPrivateKeyBob = new bitcore.PrivateKey();
+  var generatedPublicKeyBob = generatedPrivateKeyBob.publicKey;
+ 
+  var generatedPrivateKeyAlice;
+  var generatedPublicKeyAlice;
+
+  var dataToEncrypt = 'this is a secret';
   var encryptedData;
+
   var badPrivateKey;
   var malformedPublicKey;
 
-  it('should generate a key pair', function (callback) {
+  it('should generate a keypair', function (callback) {
 
-     callback(new Error('not implemented'));
+    var keyPair = testServices.security.generateKeyPair();
 
-  });
+    generatedPrivateKeyAlice = keyPair.privateKey;
+    generatedPublicKeyAlice = keyPair.publicKey;
 
-  it('should encrypt data using the generated public key', function (callback) {
-
-     callback(new Error('not implemented'));
-
-  });
-
-  it('should decrypt data using the generated private key', function (callback) {
-
-     callback(new Error('not implemented'));
+    callback();
 
   });
 
-  it('should fail to encrypt data using a malformed public key', function (callback) {
+  it('should encrypt and decrypt data using the ECIES module directly', function (callback) {
 
-     callback(new Error('not implemented'));
+    var bobSession = ECIES()
+    .privateKey(generatedPrivateKeyBob)
+    .publicKey(generatedPublicKeyAlice);
+
+    var aliceSession = ECIES()
+    .privateKey(generatedPrivateKeyAlice)
+    .publicKey(generatedPublicKeyBob);
+
+    var message = 'this is a secret';
+
+    var encrypted = aliceSession
+    .encrypt(message);
+
+    var decrypted = bobSession
+    .decrypt(encrypted);
+ 
+    if (message == encrypted)
+      throw new Error('ecrypted data matches secret message');
+
+    if (message != decrypted)
+      throw new Error('decrypted data does not match secret message');
+
+    callback();
 
   });
 
-  it('should fail decrypt data using a bad private key', function (callback) {
 
-     callback(new Error('not implemented'));
+  it('should encrypt and decrypt data using the security layer', function (callback) {
+    var message = 'this is a secret';
 
-  });
+    var encrypted = testServices.security.encryptAsymmetrical(generatedPrivateKeyAlice, generatedPublicKeyBob, message);
+    var decrypted = testServices.security.decryptAsymmetrical(generatedPrivateKeyBob, generatedPublicKeyAlice, encrypted);
 
-  var existingPrivateKey;
-  var existingPublicKey;
+    if (message == encrypted)
+      throw new Error('encrypted data matches secret message');
 
-  it('should initialize a service with an existing keypair', function (callback) {
+    if (message != decrypted)
+      throw new Error('decrypted data does not match secret message');
 
-    callback(new Error('not implemented'));
-
-  });
-
-  it('should encrypt data using the existing public key', function (callback) {
-
-     callback(new Error('not implemented'));
-
-  });
-
-  it('should decrypt data using the existing private key', function (callback) {
-
-     callback(new Error('not implemented'));
+    callback();
 
   });
 
