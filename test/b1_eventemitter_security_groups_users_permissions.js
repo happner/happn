@@ -64,14 +64,6 @@ describe('b1_eventemitter_security_groups', function () {
     }
   }
 
-   var groupToRemove = {
-    name:'GROUP TO REMOVE' + test_id,
-    custom_data:{
-      customString:'customSub1',
-      customNumber:0
-    }
-  }
-
   var testUser = {
     username:'TEST USER@blah.com' + test_id,
     password:'TEST PWD',
@@ -87,6 +79,8 @@ describe('b1_eventemitter_security_groups', function () {
     testServices.security.upsertGroup(testGroup, function(e, result){
 
       if (e) return callback(e);
+
+      console.log(e, result, testGroup);
 
       expect(result.name == testGroup.name).to.be(true);
       expect(result.custom_data.customString == testGroup.custom_data.customString).to.be(true);
@@ -107,6 +101,8 @@ describe('b1_eventemitter_security_groups', function () {
       expect(result.custom_data.customString == subGroup.custom_data.customString).to.be(true);
       expect(result.custom_data.customNumber == subGroup.custom_data.customNumber).to.be(true);
       
+      console.log('subgroup:::', result);
+
       addedSubGroup = result;
       callback();
 
@@ -115,9 +111,12 @@ describe('b1_eventemitter_security_groups', function () {
 
   it('should get groups by group name', function (callback) {
     
-    testServices.security.listGroups('TEST*', function(e, result){
+    testServices.security.listGroups('TEST*', function(e, results){
 
       if (e) return callback(e);
+
+      expect(results.length).to.be(2);
+      callback();
 
     });
     
@@ -125,8 +124,10 @@ describe('b1_eventemitter_security_groups', function () {
 
   it('should add set permissions to a group', function (callback) {
     testServices.security.addPermission('/b1_eventemitter_security_groups/' + test_id + '/permission_set', {action:['set']}, addedGroup, function(e, result){
-
       if (e) return callback(e);
+
+      expect(result.action[0] == 'set').to.be(true);
+      callback();
 
     });
   });
@@ -136,6 +137,9 @@ describe('b1_eventemitter_security_groups', function () {
 
       if (e) return callback(e);
 
+      expect(result.action[0] == 'get').to.be(true);
+      callback();
+
     });
   });
 
@@ -143,6 +147,9 @@ describe('b1_eventemitter_security_groups', function () {
     testServices.security.addPermission('/b1_eventemitter_security_groups' + test_id + '/permission_remove', {action:['remove']}, addedGroup, function(e, result){
 
       if (e) return callback(e);
+
+      expect(result.action[0] == 'remove').to.be(true);
+      callback();
 
     });
   });
@@ -152,6 +159,9 @@ describe('b1_eventemitter_security_groups', function () {
 
       if (e) return callback(e);
 
+      expect(result.action[0] == 'on').to.be(true);
+      callback();
+
     });
   });
 
@@ -160,26 +170,86 @@ describe('b1_eventemitter_security_groups', function () {
 
       if (e) return callback(e);
 
+      expect(result.action[0] == '*').to.be(true);
+      callback();
+
+    });
+  });
+
+  it('should add all permissions to a group, including subkeys', function (callback) {
+    testServices.security.addPermission('/b1_eventemitter_security_groups' + test_id + '/permission_all', {action:['*'], includeSubKeys:true}, addedGroup, function(e, result){
+
+      if (e) return callback(e);
+
+      expect(result.action[0] == '*').to.be(true);
+      expect(result.includeSubKeys).to.be(true);
+
+      callback();
+
     });
   });
 
   it('should ensure that if permission action is not specified, defaults to all', function (callback) {
     testServices.security.addPermission('/b1_eventemitter_security_groups' + test_id + '/permission_default', addedGroup, function(e, result){
 
-      if (e) return callback(e);
+       if (e) return callback(e);
+
+      expect(result.action[0] == '*').to.be(true);
+      callback();
 
     });
+  });
+
+  it('should list permissions for a group', function (callback) {
+    
+    testServices.security.listPermissions(addedGroup, function(e, results){
+
+      if (e) return callback(e);
+
+      expect(results.length).to.be(7);
+      callback();
+
+    });
+    
+  });
+
+  it('should list permissions for a group, by action', function (callback) {
+    
+    testServices.security.listPermissions(addedGroup, {action:['get']}, function(e, results){
+
+      if (e) return callback(e);
+
+      expect(results.length).to.be(1);
+      callback();
+
+    });
+    
   });
 
   it('should get groups by permission path and action', function (callback) {
     
-    testServices.security.listGroups('*', {permission:{path:'/b1_eventemitter_security_groups*', action:['get']}}, function(e, result){
+    testServices.security.listGroups('*', {permission:{path:'/b1_eventemitter_security_groups*', action:['get']}}, function(e, results){
 
       if (e) return callback(e);
+
+      expect(results.length).to.be(1);
+      callback();
 
     });
     
   });
+
+  it('should get groups that have permission to a path', function (callback) {
+
+  });
+
+  var groupToRemove = {
+    name:'GROUP TO REMOVE' + test_id,
+    custom_data:{
+      customString:'customSub1',
+      customNumber:0
+    }
+  }
 
   it('should remove a group', function (callback) {
 
@@ -190,7 +260,6 @@ describe('b1_eventemitter_security_groups', function () {
       testServices.security.removeGroup(result, function(e, result){
 
         if (e) return callback(e);
-
 
 
       });
@@ -207,16 +276,27 @@ describe('b1_eventemitter_security_groups', function () {
        if (e) return callback(e);
        addedUser = result;
     });
-    
+
   });
 
   it('the users password should be hashed in the database', function (callback) {
     
   });
 
-  it('should assign a group to a user', function (callback) {
+  it('should add a user group', function (callback) {
+
+    testServices.security.addUserGroup(testGroup, testUser, function(e, result){
+
+    });
     
   });
 
+  it('should remove a user group', function (callback) {
+
+    testServices.security.removeUserGroup(testGroup, testUser, function(e, result){
+
+    });
+    
+  });
  
 });
