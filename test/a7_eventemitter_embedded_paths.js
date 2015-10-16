@@ -190,6 +190,39 @@ describe('a7_eventemitter_embedded_paths', function () {
     }
   });
 
+  it('should search for data with more than one wildcard', function (callback) {
+
+    this.timeout(default_timeout);
+
+    try {
+      var test_path_end = require('shortid').generate();
+
+      publisherclient.set('a7_eventemitter_embedded_paths/' + test_id + '/testsubscribe/wildcards/' + test_path_end, {
+        property1: 'property1',
+        property2: 'property2',
+        property3: 'property3'
+      }, {noPublish: true}, function (e, result) {
+
+        if (!e) {
+          publisherclient.get('*/' + test_id + '/testsubscribe/wildcards/*', null, function (e, results) {
+            
+            if (e) return callback(e);
+
+            expect(results.length > 0).to.be(true);
+            //expect(results[0].property1 == 'property1').to.be(true);
+
+            callback(e);
+          });
+        }
+        else
+          callback(e);
+      });
+
+    } catch (e) {
+      callback(e);
+    }
+  });
+
   it('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
 
     this.timeout(default_timeout);
