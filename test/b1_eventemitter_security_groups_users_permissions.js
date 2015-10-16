@@ -68,7 +68,7 @@ describe('b1_eventemitter_security_groups', function () {
     username:'TEST USER@blah.com' + test_id,
     password:'TEST PWD',
     custom_data:{
-
+      something: 'usefull'
     }
   }
 
@@ -268,13 +268,107 @@ describe('b1_eventemitter_security_groups', function () {
 
   });
 
-  var addedUser;
+  context('manage users', function() {
 
-  it('should add a user', function (callback) {
+    it('should add a user', function (callback) {
 
-    testServices.security.addUser(testUser, function(e, result){
-       if (e) return callback(e);
-       addedUser = result;
+      testServices.security.upsertUser(testUser, {overwrite: false}, function(e, result){
+        if (e) return callback(e);
+
+        expect(result).to.eql({
+          custom_data: {
+            something: 'usefull',
+          },
+          password: testUser.password,
+          // systemPath: '/_SYSTEM/_SECURITY/_USER/' + testUser.username,
+          username: testUser.username,
+        });
+
+        testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + testUser.username, {},
+          function(e, result){
+            expect(result.data).to.eql({
+              custom_data: {
+                something: 'usefull',
+              },
+              username: testUser.username,
+              password: testUser.password,
+            });
+
+            callback();
+
+          }
+        );
+      });
+    });
+
+
+    it('should not add another user with the same name', function (callback) {
+
+      testUser.username += '.org';
+
+      testServices.security.upsertUser(testUser, {overwrite: false}, function(e, result){
+        if (e) return callback(e);
+
+        var user = result;
+
+        testServices.security.upsertUser(user, {overwrite: false}, function(e, result){
+
+          expect(e.toString()).to.equal('Error: User already exists');
+          callback();
+
+        });
+
+      });
+
+    });
+
+    it('should update a user', function (callback) {
+
+      testUser.username += '.net';
+
+      testServices.security.upsertUser(testUser, function(e, result){
+        if (e) return callback(e);
+
+        var user = result;
+
+        user.custom_data = {};
+        user.password = 'XXX';
+
+        testServices.security.upsertUser(testUser, function(e, result) {
+          if (e) return callback(e);
+
+          expect(result.password).to.equal('XXX');
+          expect(result.custom_data).to.eql({});
+
+          var user = result;
+
+          testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + user.username, {},
+            function(e, result){
+              expect(result.data).to.eql({
+                custom_data: {},
+                username: user.username,
+                // systemPath: '/_SYSTEM/_SECURITY/_USER/' + user.username,
+                password: user.password,
+              });
+
+              callback();
+
+            }
+          );
+
+        });
+
+      });
+
+    });
+
+    it('should delete a user', function (callback) {
+
+      // testServices.security.deleteUser(testUser, function(e, result){
+      //    if (e) return callback(e);
+      //    addedUser = result;
+      // });
+
     });
 
   });
