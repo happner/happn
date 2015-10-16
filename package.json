@@ -4,7 +4,7 @@
   "version": "0.1.38",
   "main": "./lib/index",
   "scripts": {
-    "test": "./mocha && LOG_LEVEL=off objective --once"
+    "test": "mocha test && LOG_LEVEL=off objective --once"
   },
   "keywords": [
     "faye",
