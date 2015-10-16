@@ -366,7 +366,7 @@ describe('b1_eventemitter_security_groups', function () {
 
     });
 
-    it.only('can delete a user', function (callback) {
+    it('can delete a user', function (callback) {
 
       testUser.username += '.xx';
 
