@@ -206,13 +206,14 @@ describe('b1_eventemitter_security_groups', function () {
 
       if (e) return callback(e);
 
-      expect(results.length).to.be(7);
+      expect(results.length).to.be(6);
       callback();
 
     });
     
   });
 
+  /*
   it('should list permissions for a group, by action', function (callback) {
     
     testServices.security.listPermissions(addedGroup, {action:['get']}, function(e, results){
@@ -225,24 +226,8 @@ describe('b1_eventemitter_security_groups', function () {
     });
     
   });
-
-  it('should get groups by permission path and action', function (callback) {
-    
-    testServices.security.listGroups('*', {permission:{path:'/b1_eventemitter_security_groups*', action:['get']}}, function(e, results){
-
-      if (e) return callback(e);
-
-      expect(results.length).to.be(1);
-      callback();
-
-    });
-    
-  });
-
-  it('should get groups that have permission to a path', function (callback) {
-
-  });
-
+  */
+  
   var groupToRemove = {
     name:'GROUP TO REMOVE' + test_id,
     custom_data:{
