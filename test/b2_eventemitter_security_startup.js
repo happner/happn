@@ -53,39 +53,49 @@ describe('b2_eventemitter_security_groups', function () {
   });
 
    it('the default keypair in memory must exist in the system security leaf', function (callback) {
-     expect(testServices.security.keyPair != undefined).to.be(true);
-
-      testServices.data.get('/_SYSTEM/_SECURITY/SETTINGS/KEYPAIR', {}, function(e, response){
+     
+      testServices.data.get('/_SYSTEM/_SECURITY/_SETTINGS/KEYPAIR', {}, function(e, response){
 
         if (e) return callback(e);
 
         if (!response) return callback(new Error('keypair doesnt exist in database'));
 
+        expect(testServices.security.serializeKeyPair(testServices.security.keyPair)).to.be(response.data.value);
+        expect(testServices.security.deserializeKeyPair(response.data.value).privateKey.toString()).to.be(testServices.security.keyPair.privateKey.toString());
+        expect(testServices.security.deserializeKeyPair(response.data.value).publicKey.toString()).to.be(testServices.security.keyPair.publicKey.toString());
 
+        callback();
 
       });
 
-     callback();
   });
 
   it('should have a default admin group', function (callback) {
-    testServices.data.get('/_SYSTEM/_SECURITY/GROUP/ADMIN', {}, function(e, response){
+    testServices.data.get('/_SYSTEM/_SECURITY/_GROUP/_ADMIN', {}, function(e, response){
 
-      if (e) return callback(e);
+        if (e) return callback(e);
 
-      if (!response) return callback(new Error('admin group doesnt exist in database'));
+        if (!response) return callback(new Error('admin group doesnt exist in database'));
 
+        expect(response._meta.path).to.be('/_SYSTEM/_SECURITY/_GROUP/_ADMIN');
+        expect(response.data.permissions['/*'].actions[0]).to.be('*');
 
+        callback();
 
     });
   });
 
   it('should have a default admin user', function (callback) {
-    testServices.data.get('/_SYSTEM/_SECURITY/USER/ADMIN', {}, function(e, response){
+    testServices.data.get('/_SYSTEM/_SECURITY/_USER/_ADMIN*', {}, function(e, response){
 
-       if (e) return callback(e);
+        if (e) return callback(e);
 
-       if (!response) return callback(new Error('admin user doesnt exist in database'));
+        if (!response) return callback(new Error('admin user doesnt exist in database'));
+
+        expect(response[0]._meta.path).to.be('/_SYSTEM/_SECURITY/_USER/_ADMIN');
+        expect(response[1]._meta.path).to.be('/_SYSTEM/_SECURITY/_USER/_ADMIN/_USER_GROUP/_ADMIN');
+
+        callback();
 
     });
   });

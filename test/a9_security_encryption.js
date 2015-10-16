@@ -68,6 +68,25 @@ describe('a9_security_encryption.js', function () {
 
   });
 
+  it('should serialize and deserialize a keypair', function (callback) {
+
+    var keyPair = testServices.security.generateKeyPair();
+    var keyPairSerialized = testServices.security.serializeKeyPair(keyPair);
+    var keyPairDeserialized = testServices.security.deserializeKeyPair(keyPairSerialized);
+
+    expect(typeof keyPairSerialized).to.be('string');
+    expect(keyPairDeserialized.publicKey.toString()).to.be(keyPair.publicKey.toString());
+
+    console.log('-------');
+    console.log(keyPairDeserialized.toString());
+    console.log(keyPair.toString());
+
+    expect(keyPairDeserialized.privateKey.toString()).to.be(keyPair.privateKey.toString());
+
+    callback();
+
+  });
+
   it('should encrypt and decrypt data using the ECIES module directly', function (callback) {
 
     var bobSession = ECIES()
@@ -95,7 +114,6 @@ describe('a9_security_encryption.js', function () {
     callback();
 
   });
-
 
   it('should encrypt and decrypt data using the security layer', function (callback) {
     var message = 'this is a secret';
@@ -130,5 +148,6 @@ describe('a9_security_encryption.js', function () {
     });
 
   });
+
 
 });
