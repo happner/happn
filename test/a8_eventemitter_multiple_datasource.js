@@ -240,33 +240,35 @@ describe('a8_eventemitter_multiple_datasource', function() {
 
     try{
 
-      //console.log('looking in: '+ filepath);
+        setTimeout(function(){
 
-       var fs = require('fs'), byline = require('byline');
-       var stream = byline(fs.createReadStream(filepath, { encoding: 'utf8' }));
-       var found = false;
+           var fs = require('fs'), byline = require('byline');
+           var stream = byline(fs.createReadStream(filepath, { encoding: 'utf8' }));
+           var found = false;
 
-       stream.on('data', function(line) {
+           stream.on('data', function(line) {
 
-        if (found)
-          return;
+            if (found)
+              return;
 
-         var record = JSON.parse(line);
+             var record = JSON.parse(line);
 
-         if (record._id == path){
-          found = true;
-          stream.end();
-          return callback(null, record);
-         }
-          
-        });
+             if (record._id == path){
+              found = true;
+              stream.end();
+              return callback(null, record);
+             }
+              
+            });
 
-       stream.on('end', function(){
+           stream.on('end', function(){
 
-          if (!found)
-            callback(null, null);
+              if (!found)
+                callback(null, null);
 
-       });
+           });
+
+        }, 2000)
 
     }catch(e){
       callback(e);

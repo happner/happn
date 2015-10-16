@@ -81,8 +81,6 @@ describe('b1_eventemitter_security_groups', function () {
 
       if (e) return callback(e);
 
-      console.log(e, result, testGroup);
-
       expect(result.name == testGroup.name).to.be(true);
       expect(result.custom_data.customString == testGroup.custom_data.customString).to.be(true);
       expect(result.custom_data.customNumber == testGroup.custom_data.customNumber).to.be(true);
@@ -183,107 +181,6 @@ describe('b1_eventemitter_security_groups', function () {
 
   });
 
-    /*
-
-  it('should add get permissions to a group', function (callback) {
-    testServices.security.addPermission('/b1_eventemitter_security_groups' + test_id + '/permission_get', {action:['get']}, addedGroup, function(e, result){
-
-      if (e) return callback(e);
-
-      expect(result.action[0] == 'get').to.be(true);
-      callback();
-
-    });
-  });
-
-
-
-  it('should add a remove permission to a group', function (callback) {
-    testServices.security.addPermission('/b1_eventemitter_security_groups' + test_id + '/permission_remove', {action:['remove']}, addedGroup, function(e, result){
-
-      if (e) return callback(e);
-
-      expect(result.action[0] == 'remove').to.be(true);
-      callback();
-
-    });
-  });
-
-  it('should add on permissions to a group', function (callback) {
-    testServices.security.addPermission('/b1_eventemitter_security_groups' + test_id + '/permission_on', {action:['on']}, addedGroup, function(e, result){
-
-      if (e) return callback(e);
-
-      expect(result.action[0] == 'on').to.be(true);
-      callback();
-
-    });
-  });
-
-  it('should add all permissions to a group', function (callback) {
-    testServices.security.addPermission('/b1_eventemitter_security_groups' + test_id + '/permission_all', {action:['*']}, addedGroup, function(e, result){
-
-      if (e) return callback(e);
-
-      expect(result.action[0] == '*').to.be(true);
-      callback();
-
-    });
-
-  it('should add all permissions to a group, including subkeys', function (callback) {
-    testServices.security.addPermission('/b1_eventemitter_security_groups' + test_id + '/permission_all', {action:['*']}, addedGroup, function(e, result){
-
-      if (e) return callback(e);
-
-      expect(result.action[0] == '*').to.be(true);
-      expect(result.includeSubKeys).to.be(true);
-
-      callback();
-
-    });
-  });
-
-  it('should ensure that if permission action is not specified, defaults to all', function (callback) {
-    testServices.security.addPermission('/b1_eventemitter_security_groups' + test_id + '/permission_default', addedGroup, function(e, result){
-
-       if (e) return callback(e);
-
-      expect(result.action[0] == '*').to.be(true);
-      callback();
-
-    });
-  });
-
-  it('should list permissions for a group', function (callback) {
-    
-    testServices.security.listPermissions(addedGroup, function(e, results){
-
-      if (e) return callback(e);
-
-      expect(results.length).to.be(6);
-      callback();
-
-    });
-    
-  });
-
-  */
-
-  /*
-  it('should list permissions for a group, by action', function (callback) {
-    
-    testServices.security.listPermissions(addedGroup, {action:['get']}, function(e, results){
-
-      if (e) return callback(e);
-
-      expect(results.length).to.be(1);
-      callback();
-
-    });
-    
-  });
-  */
-
   var groupToRemove = {
     name:'GROUP TO REMOVE' + test_id,
     custom_data:{
@@ -295,8 +192,6 @@ describe('b1_eventemitter_security_groups', function () {
   it('should delete a group', function (callback) {
 
     testServices.security.upsertGroup(groupToRemove, function(e, result){
-
-      console.log('upserted group to remove:::', result);
 
       if (e) return callback(e);
 
@@ -371,11 +266,9 @@ describe('b1_eventemitter_security_groups', function () {
         var user = result;
         user.password = 'TSTPWD';
 
-        console.log('not add same name:::', testUser, user);
-
         testServices.security.upsertUser(user, {overwrite: false}, function(e, result){
 
-          expect(e.toString()).to.equal('Error: User already exists');
+          expect(e.toString()).to.equal('Error: validation failure: user by the name ' + user.username + ' already exists');
           callback();
 
         });
