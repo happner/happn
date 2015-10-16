@@ -30,6 +30,7 @@
     "log4js": "^0.6.22",
     "moment": "^2.9.0",
     "nedb": "^1.1.1",
+    "password-hash-and-salt": "^0.1.2",
     "primus": "^3.0.2",
     "request": "^2.53.0",
     "serve-static": "^1.9.2",

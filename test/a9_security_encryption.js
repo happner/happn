@@ -113,4 +113,22 @@ describe('a9_security_encryption.js', function () {
 
   });
 
+  it('should encrypt and decrypt data using symmetric hashing in the security layer', function (callback) {
+
+    var message = 'this is a secret';
+    var hashed = testServices.security.generateHash(message, function(e, hash){
+      if (e)  return  callback(e);
+
+      var verified = testServices.security.verifyHash(message, hash, function(e, verified){
+
+        if (e)  return  callback(e);
+        expect(verified).to.be(true);
+        callback();
+
+      });
+
+    });
+
+  });
+
 });
