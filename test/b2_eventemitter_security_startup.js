@@ -55,7 +55,7 @@ describe('b2_eventemitter_security_groups', function () {
    it('the default keypair in memory must exist in the system security leaf', function (callback) {
      expect(testServices.security.keyPair != undefined).to.be(true);
 
-      testServices.data.get('/_SECURITY/SETTINGS/KEYPAIR', {}, function(e, response){
+      testServices.data.get('/_SYSTEM/_SECURITY/SETTINGS/KEYPAIR', {}, function(e, response){
 
         if (e) return callback(e);
 
@@ -69,7 +69,7 @@ describe('b2_eventemitter_security_groups', function () {
   });
 
   it('should have a default admin group', function (callback) {
-    testServices.data.get('/_SECURITY/GROUP/ADMIN', {}, function(e, response){
+    testServices.data.get('/_SYSTEM/_SECURITY/GROUP/ADMIN', {}, function(e, response){
 
       if (e) return callback(e);
 
@@ -81,7 +81,7 @@ describe('b2_eventemitter_security_groups', function () {
   });
 
   it('should have a default admin user', function (callback) {
-    testServices.data.get('/_SECURITY/USER/ADMIN', {}, function(e, response){
+    testServices.data.get('/_SYSTEM/_SECURITY/USER/ADMIN', {}, function(e, response){
 
        if (e) return callback(e);
 
@@ -89,6 +89,8 @@ describe('b2_eventemitter_security_groups', function () {
 
     });
   });
+
+  /*
 
   it('reinitializes services - with persisted db, should have same admin user & keypair', function (callback) {
 
@@ -119,6 +121,7 @@ describe('b2_eventemitter_security_groups', function () {
     });
 
   });
-
+  
+  */
  
 });
