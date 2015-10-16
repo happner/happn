@@ -247,7 +247,9 @@ describe('b1_eventemitter_security_groups', function () {
 
   it('should delete a group', function (callback) {
 
-    testServices.security.createGroup(groupToRemove, function(e, result){
+    testServices.security.upsertGroup(groupToRemove, function(e, result){
+
+      console.log('upserted group to remove:::', result);
 
       if (e) return callback(e);
 
@@ -255,11 +257,18 @@ describe('b1_eventemitter_security_groups', function () {
 
         if (e) return callback(e);
 
-        console.log(result);
-        expect(result.group.deleted == 1);
+        expect(result.obj.data.removed).to.be(1);
 
-        callback();
+        testServices.security.listGroups(groupToRemove.name, function(e, results){
 
+          if (e) return callback(e);
+
+          expect(results.length).to.be(0);
+
+          callback();
+        });
+
+      
       });
 
     });
