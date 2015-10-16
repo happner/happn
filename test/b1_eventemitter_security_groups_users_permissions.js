@@ -378,6 +378,76 @@ describe('b1_eventemitter_security_groups', function () {
 
   });
 
+  context('manage users and groups', function() {
+
+    var linkGroup = {
+      name:'LINK GROUP' + test_id,
+      custom_data:{
+        customString:'custom1',
+        customNumber:0
+      }
+    }
+
+    var linkUser = {
+      username:'LINK USER@blah.com' + test_id,
+      password:'LINK PWD',
+      custom_data:{
+        something: 'usefull'
+      }
+    }
+
+    var nonExistantGroup = {
+        name:'BAD LINK GROUP' + test_id,
+        _meta:{
+          path:'/SOME/DODGE/PATH'
+        }
+    }
+
+    before('should create link users and groups', function(done){
+      testServices.security.upsertGroup(linkGroup, function(e, result){
+        if (e) return callback(e);
+        linkGroup = result;
+
+        testServices.security.upsertUser(linkUser, function(e, result){
+          if (e) return callback(e);
+          linkUser = result;
+
+          callback();
+
+        });
+
+      });
+    });
+
+    it('links a group to a user', function(callback) {
+
+      testServices.security.link
+
+      callback();
+
+    });
+
+    it('unlinks a group from a user', function(callback) {
+
+      callback();
+
+    });
+
+    it('fails to link a non-existant group to a user', function(callback) {
+
+      testServices.security.linkGroup(nonExistantGroup, linkUser, function(e){
+
+        if (!e) return callback(new Error('user linked to non existant group'));
+
+        expect(e.toString()).to.be('');
+        callback();
+
+      });
+
+    });
+
+  });
+
   /*
 
   it('should add a user group', function (callback) {
