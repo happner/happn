@@ -7,6 +7,7 @@ var async = require('async');
 var bitcore = require('bitcore');
 var ECIES = require('bitcore-ecies');
 var test_id = Date.now() + '_' + require('shortid').generate();
+var Promise = require('bluebird');
 
 describe('b1_eventemitter_security_groups', function () {
 
@@ -356,8 +357,6 @@ describe('b1_eventemitter_security_groups', function () {
           testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + user.username, {},
             function(e, result){
 
-
-
               expect(result.data).to.eql({
                 custom_data: {},
                 username: user.username,
@@ -376,12 +375,59 @@ describe('b1_eventemitter_security_groups', function () {
 
     });
 
-    it('should delete a user', function (callback) {
+    it('can delete a user', function (callback) {
+
+      testUser.username += '.xx';
+
+      testServices.security.upsertUser(testUser, function(e, user){
+        if (e) return callback(e);
+
+        testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + user.username, {},
+          function(e, result){
+            if (e) return callback(e);
+
+            testServices.security.deleteUser(user, function(e, result) {
+              if (e) return callback(e);
+
+              expect(result.obj.data).to.eql({removed: 1});
+              expect(result.tree.data).to.eql({removed: 0});
+
+              testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + user.username, {},
+                function(e, result){
+
+                  expect(result).to.equal(null);
+                  expect(result).to.equal(null);
+                  callback();
+
+                }
+              );
+            });
+          }
+        );
+      });
+
+
 
       // testServices.security.deleteUser(testUser, function(e, result){
       //    if (e) return callback(e);
       //    addedUser = result;
       // });
+
+    });
+
+    context('delete a user that has groups', function () {
+
+      it('removes the user', function(callback) {
+
+        callback();
+
+      });
+
+      it('removes the group membership', function(callback) {
+
+        callback();
+
+      });
 
     });
 
