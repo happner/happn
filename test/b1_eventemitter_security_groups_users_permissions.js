@@ -273,6 +273,8 @@ describe('b1_eventemitter_security_groups', function () {
       testServices.security.upsertUser(testUser, {overwrite: false}, function(e, result){
         if (e) return callback(e);
 
+        delete result._meta;
+
         expect(result).to.eql({
           custom_data: {
             something: 'usefull',
@@ -340,8 +342,13 @@ describe('b1_eventemitter_security_groups', function () {
 
           var user = result;
 
+          delete user._meta;
+
           testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + user.username, {},
             function(e, result){
+
+
+
               expect(result.data).to.eql({
                 custom_data: {},
                 username: user.username,
