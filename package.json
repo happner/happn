@@ -1,7 +1,7 @@
 {
   "name": "happn",
   "description": "Pub/sub api as a service using primus and mongo & redis or nedb, can work as cluster, single process or embedded using nedb, use in production at your own risk",
-  "version": "0.1.38",
+  "version": "0.0.41-auth",
   "main": "./lib/index",
   "scripts": {
     "test": "mocha test && LOG_LEVEL=off objective --once"
