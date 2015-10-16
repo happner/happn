@@ -100,11 +100,20 @@ describe('b1_eventemitter_security_groups', function () {
       expect(result.name == subGroup.name).to.be(true);
       expect(result.custom_data.customString == subGroup.custom_data.customString).to.be(true);
       expect(result.custom_data.customNumber == subGroup.custom_data.customNumber).to.be(true);
-      
-      console.log('subgroup:::', result);
 
       addedSubGroup = result;
       callback();
+
+    });
+  });
+
+  it('should fail to create a group as it already exists', function (callback) {
+    testServices.security.upsertGroup(testGroup, {overwrite:false}, function(e, result){
+
+      if (e && e.toString() == 'Error: validation failure: group by the name ' + testGroup.name + ' already exists')
+        return callback();
+
+      callback(new Error('group was created or lookup failed', e));
 
     });
   });
@@ -227,7 +236,7 @@ describe('b1_eventemitter_security_groups', function () {
     
   });
   */
-  
+
   var groupToRemove = {
     name:'GROUP TO REMOVE' + test_id,
     custom_data:{
@@ -236,16 +245,20 @@ describe('b1_eventemitter_security_groups', function () {
     }
   }
 
-  it('should remove a group', function (callback) {
+  it('should delete a group', function (callback) {
 
-    testServices.security.upsertGroup(groupToRemove, function(e, result){
+    testServices.security.createGroup(groupToRemove, function(e, result){
 
       if (e) return callback(e);
 
-      testServices.security.removeGroup(result, function(e, result){
+      testServices.security.deleteGroup(result, function(e, result){
 
         if (e) return callback(e);
 
+        console.log(result);
+        expect(result.group.deleted == 1);
+
+        callback();
 
       });
 
