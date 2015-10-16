@@ -405,31 +405,52 @@ describe('b1_eventemitter_security_groups', function () {
 
     before('should create link users and groups', function(done){
       testServices.security.upsertGroup(linkGroup, function(e, result){
-        if (e) return callback(e);
+        if (e) return done(e);
         linkGroup = result;
 
         testServices.security.upsertUser(linkUser, function(e, result){
-          if (e) return callback(e);
+          if (e) return done(e);
           linkUser = result;
-
-          callback();
-
+          done();
         });
-
       });
     });
 
     it('links a group to a user', function(callback) {
 
-      testServices.security.link
+      testServices.security.linkGroup(linkGroup, linkUser, function(e){
 
-      callback();
+        if (e) return callback(e);
+
+        testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + linkUser.username + '/_USER_GROUP/' + linkGroup.name, {},
+          function(e, result){
+
+            if (e) return callback(e);
+
+            expect(result != null).to.be(true);
+            callback();
+          }
+        );
+
+      });
 
     });
 
     it('unlinks a group from a user', function(callback) {
 
-      callback();
+      testServices.security.unlinkGroup(linkGroup, linkUser, function(e){
+
+        testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + linkUser.username + '/_USER_GROUP/' + linkGroup.name, {},
+          function(e, result){
+
+            if (e) return callback(e);
+
+            expect(result).to.be(null);
+            callback();
+          }
+        );
+
+      });
 
     });
 
@@ -439,7 +460,6 @@ describe('b1_eventemitter_security_groups', function () {
 
         if (!e) return callback(new Error('user linked to non existant group'));
 
-        expect(e.toString()).to.be('');
         callback();
 
       });
