@@ -239,6 +239,7 @@ describe('b1_eventemitter_security_groups', function () {
             expect(result.data.password != testUser.password).to.be(true);
 
             delete result.data['password'];
+            delete result._meta;
 
             expect(result.data).to.eql({
               custom_data: {
@@ -311,6 +312,28 @@ describe('b1_eventemitter_security_groups', function () {
 
             }
           );
+
+        });
+
+      });
+
+    });
+
+    it('should list users', function (callback) {
+
+      testServices.security.listUsers(testUser.username, function(e, users){
+
+        if (e) return callback(e);
+
+        expect(users.length).to.be(1);
+
+        testServices.security.listUsers('*', function(e, users){
+
+          if (e) return callback(e);
+
+          expect(users.length).to.be(4);
+
+          callback();
 
         });
 
@@ -403,7 +426,7 @@ describe('b1_eventemitter_security_groups', function () {
         }
     }
 
-    before('should create link users and groups', function(done){
+    before('should create link between users and groups', function(done){
       testServices.security.upsertGroup(linkGroup, function(e, result){
         if (e) return done(e);
         linkGroup = result;
@@ -431,6 +454,18 @@ describe('b1_eventemitter_security_groups', function () {
             callback();
           }
         );
+
+      });
+
+    });
+
+    it('gets a specific user - ensuring the group is now part of the return object', function(callback) {
+
+      testServices.security.getUser(linkUser.username, function(e, user){
+
+        if (e) return callback(e);
+        expect(user.groups[linkGroup.name] != null).to.be(true);
+        callback();
 
       });
 
