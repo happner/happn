@@ -30,6 +30,9 @@ describe('b1_eventemitter_security_groups', function () {
     testServices.data = require('../lib/services/data_embedded/service');
     testServices.security = require('../lib/services/security/service');
 
+    var checkpoint = require('../lib/services/security/checkpoint');
+    testServices.checkpoint = new checkpoint();
+
     async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
 
       testServices[serviceName] = new testServices[serviceName]();
@@ -48,6 +51,18 @@ describe('b1_eventemitter_security_groups', function () {
   }
 
   before('should initialize the service', initializeMockServices);
+
+  context('checkpoint utility functions', function() {
+
+    it('should get a permission-set key', function(callback){
+
+      var permissionSetKey = testServices.checkpoint.__getPermissionSetKey({data:{groups:{'test1':'test1', 'test2':'test2'}}});
+      expect(permissionSetKey).to.be('/test1//test2/');
+      callback();
+
+    });
+
+  });
 
   var testGroup = {
     name:'TEST GROUP' + test_id,
