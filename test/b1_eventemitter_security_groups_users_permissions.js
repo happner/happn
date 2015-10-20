@@ -199,7 +199,7 @@ describe('b1_eventemitter_security_groups', function () {
 
         if (e) return callback(e);
 
-        expect(result.obj.data.removed).to.be(1);
+        expect(result.group.data.removed).to.be(1);
 
         testServices.security.listGroups(groupToRemove.name, function(e, results){
 
