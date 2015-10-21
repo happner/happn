@@ -59,7 +59,7 @@ describe('b1_eventemitter_security_groups', function () {
 
     it('should get a permission-set key', function(callback){
 
-      var permissionSetKey = testServices.security.generatePermissionSetKey({data:{groups:{'test1':'test1', 'test2':'test2'}}});
+      var permissionSetKey = testServices.security.generatePermissionSetKey({groups:{'test1':'test1', 'test2':'test2'}});
       expect(permissionSetKey).to.be('/test1//test2/');
       callback();
 
@@ -293,7 +293,8 @@ describe('b1_eventemitter_security_groups', function () {
       testServices.security.upsertUser(testUser, {overwrite: false}, function(e, result){
         if (e) return callback(e);
 
-        delete result._meta;
+        delete result['_meta'];
+        delete result['password'];
 
         expect(result).to.eql({
           custom_data: {
@@ -305,11 +306,13 @@ describe('b1_eventemitter_security_groups', function () {
         testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + testUser.username, {},
           function(e, result){
 
-            expect(result.data.password != testUser.password).to.be(true);
+            console.log('got user result:::', result);
+            console.log(result.password, testUser.password);
+
+            expect(result.data.password != 'TEST PWD').to.be(true);
 
             delete result.data['password'];
-            delete result._meta;
-
+           
             expect(result.data).to.eql({
               custom_data: {
                 something: 'usefull',
@@ -371,6 +374,8 @@ describe('b1_eventemitter_security_groups', function () {
 
           testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + user.username, {},
             function(e, result){
+
+              delete result.data['password'];
 
               expect(result.data).to.eql({
                 custom_data: {},
