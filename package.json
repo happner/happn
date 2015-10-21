@@ -28,6 +28,7 @@
     "debug": "^2.2.0",
     "jwt-simple": "^0.2.0",
     "log4js": "^0.6.22",
+    "lru-cache": "^2.7.0",
     "moment": "^2.9.0",
     "nedb": "^1.1.1",
     "password-hash-and-salt": "^0.1.2",
@@ -38,7 +39,6 @@
     "traverse": "^0.6.6",
     "underscore": "^1.8.2",
     "underscore.string": "^3.0.3",
-    "wildcard": "^1.1.0",
     "ws": "^0.7.1"
   },
   "devDependencies": {

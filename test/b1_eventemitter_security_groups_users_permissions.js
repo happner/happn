@@ -26,6 +26,9 @@ describe('b1_eventemitter_security_groups', function () {
   var initializeMockServices = function (callback) {
 
     var happnMock = {services:{}};
+
+    happnMock.utils = require('../lib/utils');
+
     testServices = {};
     testServices.data = require('../lib/services/data_embedded/service');
     testServices.security = require('../lib/services/security/service');
@@ -56,8 +59,47 @@ describe('b1_eventemitter_security_groups', function () {
 
     it('should get a permission-set key', function(callback){
 
-      var permissionSetKey = testServices.checkpoint.__getPermissionSetKey({data:{groups:{'test1':'test1', 'test2':'test2'}}});
+      var permissionSetKey = testServices.security.generatePermissionSetKey({data:{groups:{'test1':'test1', 'test2':'test2'}}});
       expect(permissionSetKey).to.be('/test1//test2/');
+      callback();
+
+    });
+
+     it(' should compare wildcards', function(callback){
+
+      expect(testServices.security.happn.utils.wildcardMatch('/test/compare1*', '/test/compare1/blah/*')).to.be(true);
+      expect(testServices.security.happn.utils.wildcardMatch('/test/compare1/*', '/test/compare1/blah/*')).to.be(true);
+      expect(testServices.security.happn.utils.wildcardMatch('/test/compare2/compare3/*', '/test/compare2/compare3/blah')).to.be(true);
+      expect(testServices.security.happn.utils.wildcardMatch('/test/compare3/compare4/*', '/test/compare3/compare4/blah/blah')).to.be(true);
+      expect(testServices.security.happn.utils.wildcardMatch('/test/compare4/*/compare5/*', '/test/compare4/blah/compare5/blah')).to.be(true);
+
+      expect(testServices.security.happn.utils.wildcardMatch('/test/compare1/*', '/dodge/*')).to.be(false);
+      expect(testServices.security.happn.utils.wildcardMatch('/test/compare2/*', '/dodge/explicit')).to.be(false);
+
+      callback();
+
+    });
+
+     it(' should aggregate wildcards', function(callback){
+
+      var testWildcardDict = {
+        '/test/1deep/*':"1deep",
+        '/test/1deep/2deep*':"2deep",
+        '/test/2deep/3deep/*':"3deep",
+        '/test/2deep/3deep/4deep/*':"4deep",
+        '/test/3deep/*/5deep/*':"5deep",
+        '/test/3deep/4deep/5deep/*':"5deep",
+      }
+
+      var aggregated = testServices.security.happn.utils.wildcardAggregate(testWildcardDict);
+
+      expect(aggregated['/test/1deep/*']).to.be("1deep");
+      expect(aggregated['/test/1deep/2deep*']).to.be(undefined);
+      expect(aggregated['/test/2deep/3deep/*']).to.be("3deep");
+      expect(aggregated['/test/2deep/3deep/4deep/*']).to.be(undefined);
+      expect(aggregated['/test/3deep/*/5deep/*']).to.be("5deep");
+      expect(aggregated['/test/3deep/4deep/5deep/*']).to.be(undefined);
+
       callback();
 
     });
@@ -143,6 +185,18 @@ describe('b1_eventemitter_security_groups', function () {
 
     });
     
+  });
+
+  it('gets a specific group', function(callback) {
+
+      testServices.security.getGroup(testGroup.name, function(e, group){
+        if (e) return callback(e);
+
+        expect(group.name).to.be(testGroup.name);
+        callback();
+
+      });
+
   });
 
   it('should add permissions to a group', function (callback) {

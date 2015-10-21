@@ -60,7 +60,8 @@ describe('b3_eventemitter_security_access', function() {
       })
 
       .catch(function(e){
-        expect(e._meta.error.name).to.be('AccessDenied');
+        console.log('login error:::', e);
+        expect(e.toString()).to.be('AccessDenied');
         done();
       });
 
@@ -201,24 +202,28 @@ describe('b3_eventemitter_security_access', function() {
 
     it('checks allowed get, and prevented from get', function(done) {
 
-      testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/get', {}, function(e, result){
+      adminClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/get', {'test-set':'test-set-val'}, {}, function(e, setResult){
 
         if (e) return done(e);
-        expect(result._meta.path).to.be('/TEST/b3_eventemitter_security_access/' + test_id + '/get');
 
-        testClient.get('/TEST/b3_eventemitter_security_access/dodge/' + test_id + '/get', {}, function(e, result){
+        testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/get', {}, function(e, result){
 
-          if (!e) return done(new Error('you managed to get data which you do not have permissions for'));
-          expect(e.toString()).to.be('AccessDenied');
-          done();
-          
+          if (e) return done(e);
+          expect(result._meta.path).to.be('/TEST/b3_eventemitter_security_access/' + test_id + '/get');
+
+          testClient.get('/TEST/b3_eventemitter_security_access/dodge/' + test_id + '/get', {}, function(e, result){
+
+            if (!e) return done(new Error('you managed to get data which you do not have permissions for'));
+            expect(e.toString()).to.be('AccessDenied');
+            done();
+            
+          });
         });
-
       });
 
     });
 
-    it('checks allowed get but not set', function() {
+    xit('checks allowed get but not set', function(done) {
 
       testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/get', {}, function(e, result){
 
@@ -235,7 +240,7 @@ describe('b3_eventemitter_security_access', function() {
 
     });
 
-    it('checks allowed get and on but not set', function() {
+    xit('checks allowed get and on but not set', function(done) {
 
        testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_on', {}, function(e, result){
 
@@ -254,13 +259,13 @@ describe('b3_eventemitter_security_access', function() {
         });
     });
 
-    xit('checks allowed get but not on', function() {
+    xit('checks allowed get but not on', function(done) {
 
      
 
     });
 
-    xit('checks allowed on but not get', function() {
+    xit('checks allowed on but not get', function(done) {
 
      
 
@@ -272,13 +277,13 @@ describe('b3_eventemitter_security_access', function() {
 
     });
 
-    xit('checks allowed set but not on', function() {
+    xit('checks allowed set but not on', function(done) {
 
 
 
     });
 
-    xit('checks allowed set but not get', function() {
+    xit('checks allowed set but not get', function(done) {
 
 
 
