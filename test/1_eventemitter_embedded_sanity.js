@@ -32,8 +32,7 @@ describe('1_eventemitter_embedded_sanity', function () {
             auth: {
               path: './services/auth/service.js',
               config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
+                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3'
               }
             },
             data: {

@@ -31,9 +31,7 @@ describe('b3_eventemitter_security_access', function() {
     it('authenticates with the _ADMIN user, using the default password', function(done) {
 
       happn.client.create({
-        config:{username:'_ADMIN', password:'happn'},
-        plugin: happn.client_plugins.intra_process,
-        context: serviceInstance
+        config:{username:'_ADMIN', password:'happn'}
       })
 
       .then(function(clientInstance){
@@ -50,9 +48,7 @@ describe('b3_eventemitter_security_access', function() {
     it('fails to authenticate with the _ADMIN user, using a bad password', function(done) {
 
       happn.client.create({
-        config:{username:'_ADMIN', password:'bad'},
-        plugin: happn.client_plugins.intra_process,
-        context: serviceInstance
+        config:{username:'_ADMIN', password:'bad'}
       })
 
       .then(function(clientInstance){
