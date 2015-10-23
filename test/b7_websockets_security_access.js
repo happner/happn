@@ -360,6 +360,54 @@ describe('b3_eventemitter_security_access', function() {
       });
     });
 
+    it('unlinks the test group from the user, checks that the user no longer has access', function(done) {
+      serviceInstance.services.security.unlinkGroup(addedTestGroup, addedTestuser, function(e){
+
+        if (e) return done(e);
+
+        testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
+
+          if (!e) return done(new Error('this should not have been allowed...'));
+          expect(e.toString()).to.be('AccessDenied');
+          done();
+
+        });
+
+      });
+    });
+
+    it('re-links the test group to the test user, tests we have access again', function(){
+       serviceInstance.services.security.linkGroup(addedTestGroup, addedTestuser, function(e){
+
+        if (e) return done(e);
+
+        testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, done);
+
+       });
+    });
+
+    it('deletes the test user, tests we are notified about the session closure, then have no access', function(){
+       
+      testClient.onSystemMessage('server-side-disconnect', function(data){
+
+        expect(data).to.be('security directory update: user deleted');
+
+        testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
+
+          if (!e) return done(new Error('this should not have been allowed...'));
+
+          expect(e.toString()).to.be('AccessDenied');
+          done();
+
+        });
+      });
+
+      serviceInstance.services.security.deleteUser(addedTestuser, function(e){
+        if (e) return done(e);
+      });
+
+    });
+
   });
 
 });
