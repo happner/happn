@@ -41,7 +41,9 @@ describe('1_eventemitter_embedded_sanity', function () {
             },
             pubsub: {
               path: './services/pubsub/service.js',
-              config: {}
+              config: {
+                "security-mode":'unsecure'
+              }
             }
           },
           utils: {
@@ -80,7 +82,10 @@ describe('1_eventemitter_embedded_sanity', function () {
      
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
-        context: happnInstance
+        context: happnInstance,
+        config:{
+          "security-mode":'unsecure'
+        }
       }, function (e, instance) {
 
         if (e) return callback(e);
@@ -89,7 +94,10 @@ describe('1_eventemitter_embedded_sanity', function () {
 
         happn_client.create({
           plugin: happn.client_plugins.intra_process,
-          context: happnInstance
+          context: happnInstance,
+          config:{
+            "security-mode":'unsecure'
+          }
         }, function (e, instance) {
 
           if (e) return callback(e);
@@ -121,24 +129,17 @@ describe('1_eventemitter_embedded_sanity', function () {
 
       }, function (e) {
 
-        //////////////////console.log('ON HAS HAPPENED: ' + e);
-
         if (!e) {
 
           expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(1);
-          //////////////////console.log('on subscribed, about to publish');
-
-          var stats = happnInstance.stats();
-
-          //console.log(stats.pubsub.listeners_wildcard_SET);
-
+       
           //then make the change
           publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/blah', {
             property1: 'property1',
             property2: 'property2',
             property3: 'property3'
           }, null, function (e, result) {
-            //console.log('put happened - listening for result');
+            
           });
         }
         else
