@@ -5,7 +5,7 @@ var adminClient;
 var expect = require('expect.js');
 var test_id = Date.now() + '_' + require('shortid').generate();
 
-describe('b3_eventemitter_security_access', function() {
+describe('b7_websockets_security_access', function() {
 
   var getService = function(config, callback){
    happn.service.create(config,
@@ -104,9 +104,7 @@ describe('b3_eventemitter_security_access', function() {
             if (e) return done(e);
 
             happn.client.create({
-              config:{username:testUser.username, password:'TEST PWD'},
-              plugin: happn.client_plugins.intra_process,
-              context: serviceInstance
+              config:{username:testUser.username, password:'TEST PWD'}
             })
 
             .then(function(clientInstance){
@@ -127,34 +125,34 @@ describe('b3_eventemitter_security_access', function() {
 
       testGroup.permissions = {
         /*
-        '/TEST/b3_eventemitter_security_access/' + test_id + '/all_access':{actions:['*']},
-        '/TEST/b3_eventemitter_security_access/' + test_id + '/get_access':{actions:[]},
-        '/TEST/b3_eventemitter_security_access/' + test_id + '/on_access':{actions:[]},
-        '/TEST/b3_eventemitter_security_access/' + test_id + '/remove_access':{actions:[]},
-        '/TEST/b3_eventemitter_security_access/' + test_id + '/event':{actions:[]},
-        '/TEST/b3_eventemitter_security_access/' + test_id + '/event/other':{actions:[]}
+        '/TEST/b7_websockets_security_access/' + test_id + '/all_access':{actions:['*']},
+        '/TEST/b7_websockets_security_access/' + test_id + '/get_access':{actions:[]},
+        '/TEST/b7_websockets_security_access/' + test_id + '/on_access':{actions:[]},
+        '/TEST/b7_websockets_security_access/' + test_id + '/remove_access':{actions:[]},
+        '/TEST/b7_websockets_security_access/' + test_id + '/event':{actions:[]},
+        '/TEST/b7_websockets_security_access/' + test_id + '/event/other':{actions:[]}
         */
       };
 
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/all_access'] = {actions:['*']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/on'] = {actions:['on']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/on_all/*'] = {actions:['on']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/remove'] = {actions:['remove']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/remove_all/*'] = {actions:['remove']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/get'] = {actions:['get']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/get_all/*'] = {actions:['get']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/set'] = {actions:['set']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/set_all/*'] = {actions:['set']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/all/*'] = {actions:['*']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_on'] = {actions:['get','on']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_not_on'] = {actions:['get']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/comp/on_not_get'] = {actions:['on']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/comp/set_not_get'] = {actions:['set']};
-      testGroup.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/comp/set_not_on'] = {actions:['set']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/all_access'] = {actions:['*']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/on'] = {actions:['on']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/on_all/*'] = {actions:['on']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/remove'] = {actions:['remove']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/remove_all/*'] = {actions:['remove']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/get'] = {actions:['get']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/get_all/*'] = {actions:['get']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/set'] = {actions:['set']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/set_all/*'] = {actions:['set']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/all/*'] = {actions:['*']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/comp/get_on'] = {actions:['get','on']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/comp/get_not_on'] = {actions:['get']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/comp/on_not_get'] = {actions:['on']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/comp/set_not_get'] = {actions:['set']};
+      testGroup.permissions['/TEST/b7_websockets_security_access/' + test_id + '/comp/set_not_on'] = {actions:['set']};
 
       serviceInstance.services.security.upsertGroup(testGroup, {}, function(e, group){
         if (e) return done(e);
-        expect(group.permissions['/TEST/b3_eventemitter_security_access/' + test_id + '/all_access']).to.eql({actions:['*']});
+        expect(group.permissions['/TEST/b7_websockets_security_access/' + test_id + '/all_access']).to.eql({actions:['*']});
         return done();
       });
 
@@ -162,11 +160,11 @@ describe('b3_eventemitter_security_access', function() {
 
     it('checks allowed on, and prevented from on', function(done) {
 
-      testClient.on('/TEST/b3_eventemitter_security_access/' + test_id + '/on', {}, function(message){}, function(e){
+      testClient.on('/TEST/b7_websockets_security_access/' + test_id + '/on', {}, function(message){}, function(e){
 
         if (e) return done(e);
 
-        testClient.on('/TEST/b3_eventemitter_security_access/dodge/' + test_id + '/on', {}, function(message){}, function(e){
+        testClient.on('/TEST/b7_websockets_security_access/dodge/' + test_id + '/on', {}, function(message){}, function(e){
 
           if (!e) return done(new Error('you managed to subscribe, which should be impossible based on your permissions'));
 
@@ -181,13 +179,13 @@ describe('b3_eventemitter_security_access', function() {
 
     it('checks allowed set, and prevented from set', function(done) {
 
-      testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {}, function(e, result){
+      testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/set', {}, function(e, result){
 
         if (e) return done(e);
 
-        expect(result._meta.path).to.be('/TEST/b3_eventemitter_security_access/' + test_id + '/set');
+        expect(result._meta.path).to.be('/TEST/b7_websockets_security_access/' + test_id + '/set');
 
-         testClient.set('/TEST/b3_eventemitter_security_access/dodge/' + test_id + '/set', {test:'test'}, {}, function(e, result){
+         testClient.set('/TEST/b7_websockets_security_access/dodge/' + test_id + '/set', {test:'test'}, {}, function(e, result){
 
           if (!e) return done(new Error('you just set data that you shouldnt have permissions to set'));
           expect(e.toString()).to.be('AccessDenied');
@@ -201,16 +199,16 @@ describe('b3_eventemitter_security_access', function() {
 
     it('checks allowed get, and prevented from get', function(done) {
 
-      adminClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/get', {'test-set':'test-set-val'}, {}, function(e, setResult){
+      adminClient.set('/TEST/b7_websockets_security_access/' + test_id + '/get', {'test-set':'test-set-val'}, {}, function(e, setResult){
 
         if (e) return done(e);
 
-        testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/get', {}, function(e, result){
+        testClient.get('/TEST/b7_websockets_security_access/' + test_id + '/get', {}, function(e, result){
 
           if (e) return done(e);
-          expect(result._meta.path).to.be('/TEST/b3_eventemitter_security_access/' + test_id + '/get');
+          expect(result._meta.path).to.be('/TEST/b7_websockets_security_access/' + test_id + '/get');
 
-          testClient.get('/TEST/b3_eventemitter_security_access/dodge/' + test_id + '/get', {}, function(e, result){
+          testClient.get('/TEST/b7_websockets_security_access/dodge/' + test_id + '/get', {}, function(e, result){
 
             if (!e) return done(new Error('you managed to get data which you do not have permissions for'));
             expect(e.toString()).to.be('AccessDenied');
@@ -224,12 +222,12 @@ describe('b3_eventemitter_security_access', function() {
 
     it('checks allowed get but not set', function(done) {
 
-      testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/get', {}, function(e, result){
+      testClient.get('/TEST/b7_websockets_security_access/' + test_id + '/get', {}, function(e, result){
 
         if (e) return done(e);
-        expect(result._meta.path).to.be('/TEST/b3_eventemitter_security_access/' + test_id + '/get');
+        expect(result._meta.path).to.be('/TEST/b7_websockets_security_access/' + test_id + '/get');
         
-        testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/get', {test:'test'}, {}, function(e, result){
+        testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/get', {test:'test'}, {}, function(e, result){
           if (!e) return done(new Error('you just set data that you shouldnt have permissions to set'));
           expect(e.toString()).to.be('AccessDenied');
           done();
@@ -241,19 +239,19 @@ describe('b3_eventemitter_security_access', function() {
 
     it('checks allowed get and on but not set', function(done) {
 
-      adminClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_on', {'test-set':'test-set-val'}, {}, function(e, setResult){
+      adminClient.set('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_on', {'test-set':'test-set-val'}, {}, function(e, setResult){
 
       if (e) return done(e);
-       testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_on', {}, function(e, result){
+       testClient.get('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_on', {}, function(e, result){
 
         if (e) return done(e);
-        expect(result._meta.path).to.be('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_on');
+        expect(result._meta.path).to.be('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_on');
 
-          testClient.on('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_on', {}, function(message){}, function(e){
+          testClient.on('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_on', {}, function(message){}, function(e){
             
             if (e) return done(e);
 
-            testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_on', {test:'test'}, {}, function(e, result){
+            testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_on', {test:'test'}, {}, function(e, result){
               
               if (!e) return done(new Error('you just set data that you shouldnt have permissions to set'));
               expect(e.toString()).to.be('AccessDenied');
@@ -268,15 +266,15 @@ describe('b3_eventemitter_security_access', function() {
 
     it('checks allowed get but not on', function(done) {
 
-     adminClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_not_on', {'test-set':'test-set-val'}, {}, function(e, setResult){
+     adminClient.set('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_not_on', {'test-set':'test-set-val'}, {}, function(e, setResult){
 
       if (e) return done(e);
-      testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_not_on', {}, function(e, result){
+      testClient.get('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_not_on', {}, function(e, result){
 
         if (e) return done(e);
-        expect(result._meta.path).to.be('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_not_on');
+        expect(result._meta.path).to.be('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_not_on');
 
-          testClient.on('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/get_not_on', {}, function(message){}, function(e){
+          testClient.on('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_not_on', {}, function(message){}, function(e){
             
             if (!e) return done(new Error('this should not have been allowed...'));
             expect(e.toString()).to.be('AccessDenied');
@@ -290,15 +288,15 @@ describe('b3_eventemitter_security_access', function() {
 
     it('checks allowed on but not get', function(done) {
 
-      adminClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/on_not_get', {'test-set':'test-set-val'}, {}, function(e, setResult){
+      adminClient.set('/TEST/b7_websockets_security_access/' + test_id + '/comp/on_not_get', {'test-set':'test-set-val'}, {}, function(e, setResult){
 
         if (e) return done(e);
-        testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/on_not_get', {}, function(e, result){
+        testClient.get('/TEST/b7_websockets_security_access/' + test_id + '/comp/on_not_get', {}, function(e, result){
 
           if (!e) return done(new Error('this should not have been allowed...'));
           expect(e.toString()).to.be('AccessDenied');
 
-          testClient.on('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/on_not_get', {}, function(message){}, done);
+          testClient.on('/TEST/b7_websockets_security_access/' + test_id + '/comp/on_not_get', {}, function(message){}, done);
 
         });
       });
@@ -306,10 +304,10 @@ describe('b3_eventemitter_security_access', function() {
 
     it('checks allowed set but not get', function(done) {
 
-       testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/set_not_get', {'test-set':'test-set-val'}, {}, function(e, setResult){
+       testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/comp/set_not_get', {'test-set':'test-set-val'}, {}, function(e, setResult){
 
          if (e) return done(e);
-         testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/set_not_get', {}, function(e, result){
+         testClient.get('/TEST/b7_websockets_security_access/' + test_id + '/comp/set_not_get', {}, function(e, result){
 
           if (!e) return done(new Error('this should not have been allowed...'));
           expect(e.toString()).to.be('AccessDenied');
@@ -322,12 +320,12 @@ describe('b3_eventemitter_security_access', function() {
 
     it('checks allowed set but not on', function(done) {
 
-      testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/set_not_on', {'test-set':'test-set-val'}, {}, function(e, setResult){
+      testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/comp/set_not_on', {'test-set':'test-set-val'}, {}, function(e, setResult){
 
        
 
          if (e) return done(e);
-         testClient.on('/TEST/b3_eventemitter_security_access/' + test_id + '/comp/set_not_on', {}, function(message){}, function(e){
+         testClient.on('/TEST/b7_websockets_security_access/' + test_id + '/comp/set_not_on', {}, function(message){}, function(e){
             
             if (!e) return done(new Error('this should not have been allowed...'));
             expect(e.toString()).to.be('AccessDenied');
@@ -339,19 +337,21 @@ describe('b3_eventemitter_security_access', function() {
     });
 
     it('checks allowed get all', function(done) {
-      testClient.get('/TEST/b3_eventemitter_security_access/' + test_id + '/get_all/' + test_id, {}, done);
+      testClient.get('/TEST/b7_websockets_security_access/' + test_id + '/get_all/' + test_id, {}, function(e){
+        done(e);
+      });
     });
 
     it('checks allowed on all', function(done) {
-      testClient.on('/TEST/b3_eventemitter_security_access/' + test_id + '/on_all/' + test_id, {}, function(message){}, done);
+      testClient.on('/TEST/b7_websockets_security_access/' + test_id + '/on_all/' + test_id, {}, function(message){}, done);
     });
 
     it('checks allowed set all', function(done) {
-      testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set_all/' + test_id, {'test-set':'test-set-val'}, {}, done);
+      testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/set_all/' + test_id, {'test-set':'test-set-val'}, {}, done);
     });
 
     it('checks against a permission that doesnt exist', function(done) {
-      testClient.get('/TEST/b3_eventemitter_security_access/whatevs' + test_id + '/get_all/' + test_id, {}, function(e, getResult){
+      testClient.get('/TEST/b7_websockets_security_access/whatevs' + test_id + '/get_all/' + test_id, {}, function(e, getResult){
 
          if (!e) return done(new Error('this should not have been allowed...'));
          expect(e.toString()).to.be('AccessDenied');
@@ -365,7 +365,7 @@ describe('b3_eventemitter_security_access', function() {
 
         if (e) return done(e);
 
-        testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
+        testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
 
           if (!e) return done(new Error('this should not have been allowed...'));
           expect(e.toString()).to.be('AccessDenied');
@@ -381,25 +381,28 @@ describe('b3_eventemitter_security_access', function() {
 
         if (e) return done(e);
 
-        testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, done);
+        testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/set', {test:'data'}, {}, done);
 
        });
     });
 
-    it('deletes the test user, tests we are notified about the session closure, then have no access', function(){
+    it('deletes the test user, tests we are notified about the session closure, then have no access', function(done){
        
-      testClient.onSystemMessage('server-side-disconnect', function(data){
+      this.timeout(10000);
 
-        expect(data).to.be('security directory update: user deleted');
+      testClient.onSystemMessage(function(eventType, data){
 
-        testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
+        if (eventType == 'server-side-disconnect'){
 
-          if (!e) return done(new Error('this should not have been allowed...'));
+          expect(data).to.be('security directory update: user deleted');
+          var timeout = setTimeout(done, 5000);
 
-          expect(e.toString()).to.be('AccessDenied');
-          done();
+          testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
+            clearTimeout(timeout);
+            return done(new Error('this should not have been allowed...'));
+          });
+        }
 
-        });
       });
 
       serviceInstance.services.security.deleteUser(addedTestuser, function(e){

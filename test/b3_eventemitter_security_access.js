@@ -390,18 +390,21 @@ describe('b3_eventemitter_security_access', function() {
 
     it('deletes the test user, tests we are notified about the session closure, then have no access', function(done){
        
-      testClient.onSystemMessage('server-side-disconnect', function(data){
+      testClient.onSystemMessage(function(eventType, data){
 
-        expect(data).to.be('security directory update: user deleted');
+        if (eventType == 'server-side-disconnect'){
+          expect(data).to.be('security directory update: user deleted');
 
-        testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
+          testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
 
-          if (!e) return done(new Error('this should not have been allowed...'));
+            if (!e) return done(new Error('this should not have been allowed...'));
 
-          expect(e.toString()).to.be('AccessDenied');
-          done();
+            expect(e.toString()).to.be('AccessDenied');
+            done();
 
-        });
+          });
+        }
+
       });
 
       serviceInstance.services.security.deleteUser(addedTestuser, function(e){
