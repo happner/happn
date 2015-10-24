@@ -36,7 +36,7 @@ describe('7_browser-client-test', function() {
 						},
 						pubsub:{
 							path:'./services/pubsub/service.js',
-							config:{}
+							config:{"security-mode":'unsecure'}
 						}
 					},
 					utils:{

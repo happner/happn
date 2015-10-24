@@ -37,8 +37,7 @@ describe('6_eventemitter_websockets_embedded_sanity', function() {
 							config:{}
 						},
 						pubsub:{
-							path:'./services/pubsub/service.js',
-							config:{}
+							path:'./services/pubsub/service.js'
 						}
 					},
 					utils:{
@@ -73,14 +72,13 @@ describe('6_eventemitter_websockets_embedded_sanity', function() {
 	    this.timeout(default_timeout);
 
 	    try {
-	      happn_client.create({config:{secret:test_secret}}, function(e, instance) {
+	      happn_client.create(function(e, instance) {
 
 	        if (e) return callback(e);
 
 	        publisherclient = instance;
 
-	        happn_client.create({plugin:happn.client_plugins.intra_process,
-	        					 context: happnInstance},
+	        happn_client.create({plugin:happn.client_plugins.intra_process, context: happnInstance},
 	        function(e, instance) {
 
 	          if (e) return callback(e);
@@ -496,36 +494,6 @@ describe('6_eventemitter_websockets_embedded_sanity', function() {
 			});
 		});
 	});
-
-	
-
-	xit('should save by id, then search and get by id, using bsonid property', function(callback) {
-
-		var randomPath = require('shortid').generate();
-
-		publisherclient.set('e2e_test1/test/bsinid/' + randomPath, {property1:'property1',property2:'property2',property3:'property3'}, {}, function(e, setresult){
-
-			if (!e){
-
-				////////////////////////console.log(setresult);
-
-				var searchcriteria = {'_id': {$in: [{bsonid:setresult.payload._id}]}};
-
-				publisherclient.get('e2e_test1/test/bsinid/*' , {criteria:searchcriteria}, function(e, results){
-
-					expect(e).to.be(null);
-					////////////////////////console.log(results);
-					expect(results.payload.length == 1).to.be(true);
-					expect(results.payload[0].data.property1).to.be('property1');
-
-					callback();
-
-				});
-			}else
-				callback(e);
-		});
-
-	});	
 
 	it('the listener should pick up a single delete event', function(callback) {
 		

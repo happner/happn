@@ -37,8 +37,7 @@ describe('5_websockets_embedded_benchmarks', function () {
               config:{}
             },
             pubsub:{
-              path:'./services/pubsub/service.js',
-              config:{}
+              path:'./services/pubsub/service.js'
             }
           },
           utils:{
@@ -70,12 +69,12 @@ describe('5_websockets_embedded_benchmarks', function () {
       this.timeout(default_timeout);
 
       try {
-        happn_client.create({config:{secret:test_secret}}, function(e, instance) {
+        happn_client.create(function(e, instance) {
 
           if (e) return callback(e);
 
           publisherclient = instance;
-          happn_client.create({config:{secret:test_secret}}, function(e, instance) {
+          happn_client.create(function(e, instance) {
 
             if (e) return callback(e);
             listenerclient = instance;
@@ -96,7 +95,7 @@ describe('5_websockets_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create(function(e, stressTestClient) {
     if (e) return callback(e);
 
     var count = 0;
@@ -194,7 +193,7 @@ describe('5_websockets_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create(function(e, stressTestClient) {
 
       if (e) return callback(e);
 
@@ -260,7 +259,7 @@ describe('5_websockets_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create(function(e, stressTestClient) {
       
       if (e) return callback(e);
       setTimeout(function () {
@@ -353,7 +352,7 @@ describe('5_websockets_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create(function(e, stressTestClient) {
       
       if (e) return callback(e);
       setTimeout(function () {
@@ -432,7 +431,7 @@ describe('5_websockets_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create(function(e, stressTestClient) {
     if (e) return callback(e);
 
       var count = 0;
@@ -515,7 +514,7 @@ describe('5_websockets_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create(function(e, stressTestClient) {
       
       if (e) return callback(e);
       var count = 0;
@@ -601,7 +600,7 @@ describe('5_websockets_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-      happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+      happn_client.create(function(e, stressTestClient) {
       if (e) return callback(e);
 
       var count = 0;
@@ -686,7 +685,7 @@ it('should handle sequences of events by when the previous one is done', functio
 
     this.timeout(default_timeout);
 
-      happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+      happn_client.create(function(e, stressTestClient) {
       if (e) return callback(e);
 
       var count = 0;

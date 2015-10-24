@@ -40,8 +40,7 @@ describe('4_websockets_embedded_sanity', function() {
 							config:{}
 						},
 						pubsub:{
-							path:'./services/pubsub/service.js',
-							config:{}
+							path:'./services/pubsub/service.js'
 						}
 					},
 					utils:{
@@ -75,12 +74,12 @@ describe('4_websockets_embedded_sanity', function() {
 	    this.timeout(default_timeout);
 
 	    try {
-	      happn_client.create({config:{secret:test_secret}}, function(e, instance) {
+	      happn_client.create(function(e, instance) {
 
 	        if (e) return callback(e);
 
 	        publisherclient = instance;
-	        happn_client.create({config:{secret:test_secret}}, function(e, instance) {
+	        happn_client.create(function(e, instance) {
 
 	          if (e) return callback(e);
 	          listenerclient = instance;

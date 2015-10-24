@@ -15,7 +15,7 @@ describe('b7_websockets_security_access', function() {
 
   before('it starts completely defaulted service', function(done){
 
-    getService({}, function(e, service){
+    getService({secure:true}, function(e, service){
 
       if (e) return done(e);
 
@@ -31,7 +31,8 @@ describe('b7_websockets_security_access', function() {
     it('authenticates with the _ADMIN user, using the default password', function(done) {
 
       happn.client.create({
-        config:{username:'_ADMIN', password:'happn'}
+        config:{username:'_ADMIN', password:'happn'},
+        secure:true
       })
 
       .then(function(clientInstance){
@@ -48,7 +49,8 @@ describe('b7_websockets_security_access', function() {
     it('fails to authenticate with the _ADMIN user, using a bad password', function(done) {
 
       happn.client.create({
-        config:{username:'_ADMIN', password:'bad'}
+        config:{username:'_ADMIN', password:'bad'},
+        secure:true
       })
 
       .then(function(clientInstance){
@@ -56,7 +58,7 @@ describe('b7_websockets_security_access', function() {
       })
 
       .catch(function(e){
-        expect(e.toString()).to.be('AccessDenied');
+        expect(e.toString()).to.be('AccessDenied: login failed');
         done();
       });
 
@@ -104,7 +106,8 @@ describe('b7_websockets_security_access', function() {
             if (e) return done(e);
 
             happn.client.create({
-              config:{username:testUser.username, password:'TEST PWD'}
+              config:{username:testUser.username, password:'TEST PWD'},
+              secure:true
             })
 
             .then(function(clientInstance){
@@ -168,7 +171,7 @@ describe('b7_websockets_security_access', function() {
 
           if (!e) return done(new Error('you managed to subscribe, which should be impossible based on your permissions'));
 
-          expect(e.toString()).to.be('AccessDenied');
+          expect(e.toString()).to.be('AccessDenied: unauthorized');
           done();
 
         });
@@ -188,7 +191,7 @@ describe('b7_websockets_security_access', function() {
          testClient.set('/TEST/b7_websockets_security_access/dodge/' + test_id + '/set', {test:'test'}, {}, function(e, result){
 
           if (!e) return done(new Error('you just set data that you shouldnt have permissions to set'));
-          expect(e.toString()).to.be('AccessDenied');
+          expect(e.toString()).to.be('AccessDenied: unauthorized');
           done();
 
         });
@@ -211,7 +214,7 @@ describe('b7_websockets_security_access', function() {
           testClient.get('/TEST/b7_websockets_security_access/dodge/' + test_id + '/get', {}, function(e, result){
 
             if (!e) return done(new Error('you managed to get data which you do not have permissions for'));
-            expect(e.toString()).to.be('AccessDenied');
+            expect(e.toString()).to.be('AccessDenied: unauthorized');
             done();
             
           });
@@ -229,7 +232,7 @@ describe('b7_websockets_security_access', function() {
         
         testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/get', {test:'test'}, {}, function(e, result){
           if (!e) return done(new Error('you just set data that you shouldnt have permissions to set'));
-          expect(e.toString()).to.be('AccessDenied');
+          expect(e.toString()).to.be('AccessDenied: unauthorized');
           done();
         });
 
@@ -254,7 +257,7 @@ describe('b7_websockets_security_access', function() {
             testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_on', {test:'test'}, {}, function(e, result){
               
               if (!e) return done(new Error('you just set data that you shouldnt have permissions to set'));
-              expect(e.toString()).to.be('AccessDenied');
+              expect(e.toString()).to.be('AccessDenied: unauthorized');
               done();
             });
 
@@ -277,7 +280,7 @@ describe('b7_websockets_security_access', function() {
           testClient.on('/TEST/b7_websockets_security_access/' + test_id + '/comp/get_not_on', {}, function(message){}, function(e){
             
             if (!e) return done(new Error('this should not have been allowed...'));
-            expect(e.toString()).to.be('AccessDenied');
+            expect(e.toString()).to.be('AccessDenied: unauthorized');
             done();
 
           });
@@ -294,7 +297,7 @@ describe('b7_websockets_security_access', function() {
         testClient.get('/TEST/b7_websockets_security_access/' + test_id + '/comp/on_not_get', {}, function(e, result){
 
           if (!e) return done(new Error('this should not have been allowed...'));
-          expect(e.toString()).to.be('AccessDenied');
+          expect(e.toString()).to.be('AccessDenied: unauthorized');
 
           testClient.on('/TEST/b7_websockets_security_access/' + test_id + '/comp/on_not_get', {}, function(message){}, done);
 
@@ -310,7 +313,7 @@ describe('b7_websockets_security_access', function() {
          testClient.get('/TEST/b7_websockets_security_access/' + test_id + '/comp/set_not_get', {}, function(e, result){
 
           if (!e) return done(new Error('this should not have been allowed...'));
-          expect(e.toString()).to.be('AccessDenied');
+          expect(e.toString()).to.be('AccessDenied: unauthorized');
           done();
 
         });
@@ -328,7 +331,7 @@ describe('b7_websockets_security_access', function() {
          testClient.on('/TEST/b7_websockets_security_access/' + test_id + '/comp/set_not_on', {}, function(message){}, function(e){
             
             if (!e) return done(new Error('this should not have been allowed...'));
-            expect(e.toString()).to.be('AccessDenied');
+            expect(e.toString()).to.be('AccessDenied: unauthorized');
             done();
 
           });
@@ -354,7 +357,7 @@ describe('b7_websockets_security_access', function() {
       testClient.get('/TEST/b7_websockets_security_access/whatevs' + test_id + '/get_all/' + test_id, {}, function(e, getResult){
 
          if (!e) return done(new Error('this should not have been allowed...'));
-         expect(e.toString()).to.be('AccessDenied');
+         expect(e.toString()).to.be('AccessDenied: unauthorized');
          done();
 
       });
@@ -368,7 +371,7 @@ describe('b7_websockets_security_access', function() {
         testClient.set('/TEST/b7_websockets_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
 
           if (!e) return done(new Error('this should not have been allowed...'));
-          expect(e.toString()).to.be('AccessDenied');
+          expect(e.toString()).to.be('AccessDenied: unauthorized');
           done();
 
         });

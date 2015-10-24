@@ -48,7 +48,7 @@ describe('b2_eventemitter_security_groups', function () {
   before('should initialize the service', initializeMockServices);
 
   it('should have a default keypair in memory', function (callback) {
-     expect(testServices.security.keyPair != undefined).to.be(true);
+     expect(testServices.security._keyPair != undefined).to.be(true);
      callback();
   });
 
@@ -60,9 +60,9 @@ describe('b2_eventemitter_security_groups', function () {
 
         if (!response) return callback(new Error('keypair doesnt exist in database'));
 
-        expect(testServices.security.serializeKeyPair(testServices.security.keyPair)).to.be(response.data.value);
-        expect(testServices.security.deserializeKeyPair(response.data.value).privateKey.toString()).to.be(testServices.security.keyPair.privateKey.toString());
-        expect(testServices.security.deserializeKeyPair(response.data.value).publicKey.toString()).to.be(testServices.security.keyPair.publicKey.toString());
+        expect(testServices.security.serializeKeyPair(testServices.security._keyPair)).to.be(response.data.value);
+        expect(testServices.security.deserializeKeyPair(response.data.value).privateKey.toString()).to.be(testServices.security._keyPair.privateKey.toString());
+        expect(testServices.security.deserializeKeyPair(response.data.value).publicKey.toString()).to.be(testServices.security._keyPair.publicKey.toString());
 
         callback();
 

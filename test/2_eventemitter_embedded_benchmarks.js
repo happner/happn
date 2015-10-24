@@ -53,10 +53,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
               config: {}
             },
             pubsub: {
-              path: './services/pubsub/service.js',
-              config: {
-                "security-mode":'unsecure'
-              }
+              path: './services/pubsub/service.js'
             }
           },
           utils: {
@@ -90,10 +87,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
-        context: happnInstance,
-        config:{
-          "security-mode":'unsecure'
-        }
+        context: happnInstance
       }, function(e, instance) {
 
         if (e) return callback(e);
@@ -102,10 +96,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
         happn_client.create({
           plugin: happn.client_plugins.intra_process,
-          context: happnInstance,
-          config:{
-            "security-mode":'unsecure'
-          }
+          context: happnInstance
         }, function(e, instance) {
 
           if (e) return callback(e);
@@ -127,10 +118,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
     happn_client.create({
         plugin: happn.client_plugins.intra_process,
-        context: happnInstance,
-        config:{
-          "security-mode":'unsecure'
-        }
+        context: happnInstance
       },
       function(e, stressTestClient) {
 
@@ -234,10 +222,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
     happn_client.create({
         plugin: happn.client_plugins.intra_process,
-        context: happnInstance,
-        config:{
-          "security-mode":'unsecure'
-        }
+        context: happnInstance
       },
       function(e, stressTestClient) {
 
@@ -297,10 +282,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
     happn_client.create({
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance,
-      config:{
-          "security-mode":'unsecure'
-        }
+      context: happnInstance
     },
     function(e, stressTestClient) {
 
@@ -365,10 +347,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
     happn_client.create({
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance,
-      config:{
-        "security-mode":'unsecure'
-      }
+      context: happnInstance
     },
     function(e, stressTestClient) {
 
@@ -446,10 +425,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
    happn_client.create({
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance,
-      config:{
-        "security-mode":'unsecure'
-      }
+      context: happnInstance
     },
     function(e, stressTestClient) {
 
@@ -514,10 +490,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
     happn_client.create({
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance,
-      config:{
-        "security-mode":'unsecure'
-      }
+      context: happnInstance
     },
     function(e, stressTestClient) {
 
@@ -617,10 +590,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
     happn_client.create({
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance,
-      config:{
-        "security-mode":'unsecure'
-      }
+      context: happnInstance
     },
     function(e, stressTestClient) {
       if (e) return callback(e);
@@ -719,10 +689,7 @@ describe('2_eventemitter_embedded_benchmarks', function() {
 
     happn_client.create({
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance,
-      config:{
-        "security-mode":'unsecure'
-      }
+      context: happnInstance
     },
     function(e, stressTestClient) {
       if (e) return callback(e);
