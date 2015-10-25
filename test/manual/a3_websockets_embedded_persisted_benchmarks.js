@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var happn = require('../lib/index');
+var happn = require('../../lib/index');
 var service = happn.service;
 var async = require('async');
 var happn_client = happn.client;

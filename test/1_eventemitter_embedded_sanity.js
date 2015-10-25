@@ -143,6 +143,22 @@ describe('1_eventemitter_embedded_sanity', function () {
     }
   });
 
+  it('the publisher should get null for unfound data, exact path', function (callback) {
+
+    this.timeout(default_timeout);
+
+    var test_path_end = require('shortid').generate();
+    publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/unfound/exact/' + test_path_end, null, function (e, results) {
+      ////////////console.log('new data results');
+    
+      expect(e).to.be(null);
+      expect(results).to.be(null);
+
+      callback(e);
+
+    });
+        
+  });
 
   it('the publisher should set new data', function (callback) {
 

@@ -1,5 +1,5 @@
 
-var happn = require('../lib/index');
+var happn = require('../../lib/index');
 var serviceInstance;
 var adminClient;
 var expect = require('expect.js');
@@ -24,6 +24,13 @@ describe('b7_websockets_security_access', function() {
 
     });
 
+  });
+
+  after('should delete the temp data file', function(callback) {
+
+    this.timeout(20000);
+    serviceInstance.stop(callback);
+    
   });
 
   context('login', function() {

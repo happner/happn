@@ -1,10 +1,11 @@
+
 var expect = require('expect.js');
-var happn = require('../lib/index');
+var happn = require('../../lib/index');
 var service = happn.service;
 var async = require('async');
 var happn_client = happn.client;
 
-describe('5_websockets_embedded_benchmarks', function () {
+describe('c2_websockets_security_benchmarks', function () {
 
   var test_secret = 'test_secret';
   var mode = "embedded";

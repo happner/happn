@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var happn = require('../lib/index');
+var happn = require('../../lib/index');
 var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
@@ -27,13 +27,13 @@ describe('b1_eventemitter_security_groups', function () {
 
     var happnMock = {services:{}};
 
-    happnMock.utils = require('../lib/utils');
+    happnMock.utils = require('../../lib/utils');
 
     testServices = {};
-    testServices.data = require('../lib/services/data_embedded/service');
-    testServices.security = require('../lib/services/security/service');
+    testServices.data = require('../../lib/services/data_embedded/service');
+    testServices.security = require('../../lib/services/security/service');
 
-    var checkpoint = require('../lib/services/security/checkpoint');
+    var checkpoint = require('../../lib/services/security/checkpoint');
     testServices.checkpoint = new checkpoint();
 
     async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){

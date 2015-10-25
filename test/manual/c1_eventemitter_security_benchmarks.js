@@ -1,12 +1,31 @@
+/*
+
+## To write to the benchmark csv
+
+```bash
+
+
+mocha test/c1_eventemitter_security_benchmarks.js.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/c1_eventemitter_security_benchmarks.js.csv
+
+
+```
+
+To also see it.
+
+nother console
+
+```
+tail -f test/.e2e_eventemitter_embedded_benchmarks.csv
+```
+
+*/
 var expect = require('expect.js');
-var happn = require('../lib/index');
+var happn = require('../../lib/index');
 var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
-var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
-var fs = require('fs');
 
-describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
+describe('c1_eventemitter_security_benchmarks.js', function() {
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -20,6 +39,7 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
 
     try {
       service.create({
+          secure:true,
           mode: 'embedded',
           services: {
             auth: {
@@ -31,13 +51,10 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
             },
             data: {
               path: './services/data_embedded/service.js',
-              config: {
-                dbfile:tempFile
-              }
+              config: {}
             },
             pubsub: {
-              path: './services/pubsub/service.js',
-              config: {}
+              path: './services/pubsub/service.js'
             }
           },
           utils: {
@@ -57,17 +74,9 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
     }
   });
 
-  after('should delete the temp data file', function(callback) {
-
-    this.timeout(20000);
-    
-    fs.unlink(tempFile, function(e){
-      if (e) return callback(e);
-      happnInstance.stop(callback);
-    });
-
+  after(function(done) {
+    happnInstance.stop(done);
   });
-
 
   var publisherclient;
   var listenerclient;
@@ -78,6 +87,8 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
     try {
 
       happn_client.create({
+        config:{username:'_ADMIN', password:'happn'},
+        secure:true,
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
       }, function(e, instance) {
@@ -87,6 +98,8 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
         publisherclient = instance;
 
         happn_client.create({
+          config:{username:'_ADMIN', password:'happn'},
+          secure:true,
           plugin: happn.client_plugins.intra_process,
           context: happnInstance
         }, function(e, instance) {
@@ -109,8 +122,10 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
     this.timeout(default_timeout);
 
     happn_client.create({
+        config:{username:'_ADMIN', password:'happn'},
         plugin: happn.client_plugins.intra_process,
-        context: happnInstance
+        context: happnInstance,
+        secure:true,
       },
       function(e, stressTestClient) {
 
@@ -213,8 +228,10 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
     this.timeout(default_timeout);
 
     happn_client.create({
+        config:{username:'_ADMIN', password:'happn'},
         plugin: happn.client_plugins.intra_process,
-        context: happnInstance
+        context: happnInstance,
+        secure:true,
       },
       function(e, stressTestClient) {
 
@@ -273,8 +290,10 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
     this.timeout(default_timeout);
 
     happn_client.create({
+      config:{username:'_ADMIN', password:'happn'},
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance
+      context: happnInstance,
+      secure:true,
     },
     function(e, stressTestClient) {
 
@@ -291,7 +310,9 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
         config: {
           deferSetImmediate: 100
         }
-      }, function(message) {
+      }, function(message, meta) {
+
+        ////console.log(message, meta);
 
         receivedCount++;
        
@@ -336,8 +357,10 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
     this.timeout(default_timeout);
 
     happn_client.create({
+      config:{username:'_ADMIN', password:'happn'},
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance
+      context: happnInstance,
+      secure:true,
     },
     function(e, stressTestClient) {
 
@@ -414,8 +437,10 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
     this.timeout(default_timeout);
 
    happn_client.create({
+      config:{username:'_ADMIN', password:'happn'},
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance
+      context: happnInstance,
+      secure:true,
     },
     function(e, stressTestClient) {
 
@@ -427,7 +452,7 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
       var receivedCount = 0;
 
       var received = {};
-      var sent = [expected];
+      var sent = [];
 
       for (var i = 0; i < expected; i++) {
         sent[i] = require('shortid').generate();
@@ -435,6 +460,9 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
 
       stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set',count:0}, 
         function(message) {
+
+          ////console.log(message);
+
           receivedCount++;
 
           if (received[message.property1])
@@ -444,6 +472,9 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
 
           if (receivedCount == sent.length) {
             console.timeEnd(timerName);
+
+            ////console.log(received);
+
             expect(Object.keys(received).length == expected).to.be(true);
             callback();
           }
@@ -457,9 +488,7 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
 
           while (count < expected) {
 
-            publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {
-              excludeId: true
-            }, 
+            publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {}, 
             function(e, result) {
               if (e) return callback(e);
             });
@@ -475,8 +504,10 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
     this.timeout(default_timeout);
 
     happn_client.create({
+      config:{username:'_ADMIN', password:'happn'},
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance
+      context: happnInstance,
+      secure:true,
     },
     function(e, stressTestClient) {
 
@@ -575,8 +606,10 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
     this.timeout(default_timeout);
 
     happn_client.create({
+      config:{username:'_ADMIN', password:'happn'},
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance
+      context: happnInstance,
+      secure:true,
     },
     function(e, stressTestClient) {
       if (e) return callback(e);
@@ -674,8 +707,10 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
     this.timeout(default_timeout);
 
     happn_client.create({
+      config:{username:'_ADMIN', password:'happn'},
       plugin: happn.client_plugins.intra_process,
-      context: happnInstance
+      context: happnInstance,
+      secure:true,
     },
     function(e, stressTestClient) {
       if (e) return callback(e);

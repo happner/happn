@@ -1,5 +1,5 @@
 
-var happn = require('../lib/index');
+var happn = require('../../lib/index');
 var serviceInstance;
 var expect = require('expect.js');
 var test_id = Date.now() + '_' + require('shortid').generate();
@@ -30,6 +30,35 @@ describe('b8_check_for_holes', function() {
     });
 
   });
+
+  after('should delete the temp data file', function(callback) {
+
+    this.timeout(20000);
+    serviceInstance.stop(callback);
+    
+  });
+
+  /*
+
+  before('creates a ws client', function(done){
+
+    happn.client.create({
+      config:{username:'_ADMIN', password:'happn'},
+      secure:true
+    })
+
+    .then(function(clientInstance){
+      websocketsClient = clientInstance;
+
+      console.log('ws client up:::');
+
+      done();
+
+    })
+
+  });
+
+  */
 
   before('creates an event emitter client', function(done){
 
@@ -75,6 +104,29 @@ describe('b8_check_for_holes', function() {
 
       done();
 
-  }); 
+  });
+
+   xit('traverses the websockets clients object model to look for forbidden method signatures', function(done) {
+
+    var adam = require('traverse');
+
+    var forbidden = ['_remoteOff'];
+    var apples = [];
+
+      adam(eventEmitterClient).map(function(){
+
+        if (forbidden.indexOf(this.key) >= 0)
+          apples.push(this.path);
+
+      });
+
+      if (apples.length > 0)
+        return done(new Error('found adams apple...'));
+
+      done();
+
+  });
+
+    
 
 });

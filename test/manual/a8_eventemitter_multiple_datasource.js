@@ -2,7 +2,7 @@
 var expect = require('expect.js');
 var async = require('async');
 var fs = require('fs');
-var happn = require('../lib/index');
+var happn = require('../../lib/index');
 
 describe('a8_eventemitter_multiple_datasource', function() {
 
@@ -119,7 +119,7 @@ describe('a8_eventemitter_multiple_datasource', function() {
       }
     ];
 
-  async.each(serviceConfigs,
+  async.eachSeries(serviceConfigs,
     function(serviceConfig, serviceConfigCallback){
        getService(serviceConfig, function(e, happnService){
 
@@ -487,6 +487,8 @@ it('should push some data into the multiple datastore, memory datastore, exact p
   });
 
   it('should tag some persisted data for the multiple datastore', function (callback) {
+
+    this.timeout(10000);
 
     var randomTag = require('shortid').generate();
 
