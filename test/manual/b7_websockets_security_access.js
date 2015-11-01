@@ -4,6 +4,7 @@ var serviceInstance;
 var adminClient;
 var expect = require('expect.js');
 var test_id = Date.now() + '_' + require('shortid').generate();
+var HAPPNER_STOP_DELAY = 5000;
 
 describe('b7_websockets_security_access', function() {
 
@@ -28,8 +29,13 @@ describe('b7_websockets_security_access', function() {
 
   after('should delete the temp data file', function(callback) {
 
-    this.timeout(20000);
-    serviceInstance.stop(callback);
+    this.timeout(HAPPNER_STOP_DELAY + 5000);
+
+    serviceInstance.stop(function(e){
+       setTimeout(function(){
+          callback(e);
+        }, HAPPNER_STOP_DELAY)
+    });
     
   });
 
@@ -409,6 +415,7 @@ describe('b7_websockets_security_access', function() {
 
           testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
             clearTimeout(timeout);
+            console.log('someone did something forbidden:::');
             return done(new Error('this should not have been allowed...'));
           });
         }

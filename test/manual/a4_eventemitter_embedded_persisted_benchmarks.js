@@ -5,6 +5,7 @@ var happn_client = happn.client;
 var async = require('async');
 var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
 var fs = require('fs');
+var HAPPNER_STOP_DELAY = 5000;
 
 describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
 
@@ -59,11 +60,16 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
 
   after('should delete the temp data file', function(callback) {
 
-    this.timeout(20000);
+    this.timeout(HAPPNER_STOP_DELAY + 5000);
     
     fs.unlink(tempFile, function(e){
       if (e) return callback(e);
-      happnInstance.stop(callback);
+
+      happnInstance.stop(function(e){
+        setTimeout(function(){
+          callback(e);
+        }, HAPPNER_STOP_DELAY)
+      });
     });
 
   });

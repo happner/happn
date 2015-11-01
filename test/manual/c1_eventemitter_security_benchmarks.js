@@ -24,6 +24,7 @@ var happn = require('../../lib/index');
 var service = happn.service;
 var happn_client = happn.client;
 var async = require('async');
+var HAPPNER_STOP_DELAY = 5000;
 
 describe('c1_eventemitter_security_benchmarks.js', function() {
 
@@ -75,7 +76,14 @@ describe('c1_eventemitter_security_benchmarks.js', function() {
   });
 
   after(function(done) {
-    happnInstance.stop(done);
+
+    this.timeout(HAPPNER_STOP_DELAY + 5000);
+
+    happnInstance.stop(function(e){
+       setTimeout(function(){
+          done(e);
+        }, HAPPNER_STOP_DELAY)
+    });
   });
 
   var publisherclient;

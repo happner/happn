@@ -3,6 +3,7 @@ var expect = require('expect.js');
 var async = require('async');
 var fs = require('fs');
 var happn = require('../../lib/index');
+var HAPPNER_STOP_DELAY = 5000;
 
 describe('a8_eventemitter_multiple_datasource', function() {
 
@@ -158,7 +159,7 @@ describe('a8_eventemitter_multiple_datasource', function() {
 
   after('should delete the temp data files', function(callback) {
 
-    this.timeout(20000);
+    this.timeout(HAPPNER_STOP_DELAY + 5000);
     
     fs.unlink(tempFile, function(e){
       if (e) return callback(e);
@@ -166,8 +167,14 @@ describe('a8_eventemitter_multiple_datasource', function() {
         if (e) return callback(e);
 
         async.each(services, function(currentService, eachServiceCB){
-           currentService.stop(eachServiceCB);
-        }, callback)
+
+          currentService.stop(function(e){
+            setTimeout(function(){
+              eachServiceCB(e);
+            }, HAPPNER_STOP_DELAY)
+          });
+
+        }, callback);
 
       });
     });

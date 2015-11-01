@@ -1,0 +1,4 @@
+{"_id":"/a8_eventemitter_multiple_datasource/1446118201358_NkQ9LMxibl/persistedtest/EJdYMgsbl","data":{"property1":"property1","property2":"property2","property3":"property3"},"_meta":{"modified":1446118248089}}
+{"_id":"/a8_eventemitter_multiple_datasource/1446118201358_NkQ9LMxibl/persistedtest/EJdYMgsbl","data":{"property1":"property1","property2":"property2","property3":"property3"},"_meta":{"modified":1446118248089,"created":1446118248089}}
+{"_id":"/a8_eventemitter_multiple_datasource/1446118201358_NkQ9LMxibl/persistednonwildcard","data":{"property1":"property1","property2":"property2","property3":"property3"},"_meta":{"modified":1446118252110}}
+{"_id":"/a8_eventemitter_multiple_datasource/1446118201358_NkQ9LMxibl/persistednonwildcard","data":{"property1":"property1","property2":"property2","property3":"property3"},"_meta":{"modified":1446118252110,"created":1446118252110}}

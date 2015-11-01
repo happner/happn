@@ -4,6 +4,7 @@ var happn = require('../../lib/index');
 var service = happn.service;
 var async = require('async');
 var happn_client = happn.client;
+var HAPPNER_STOP_DELAY = 5000;
 
 describe('c2_websockets_security_benchmarks', function () {
 
@@ -58,7 +59,14 @@ describe('c2_websockets_security_benchmarks', function () {
   });
 
   after(function(done) {
-    happnInstance.stop(done);
+
+    this.timeout(HAPPNER_STOP_DELAY + 5000);
+
+     happnInstance.stop(function(e){
+       setTimeout(function(){
+          done(e);
+        }, HAPPNER_STOP_DELAY)
+    });
   });
 
   var publisherclient;
@@ -624,7 +632,7 @@ describe('c2_websockets_security_benchmarks', function () {
 
   it('should handle sequences of events by writing as soon as possible -slow?', function (callback) {
 
-    this.timeout(default_timeout);
+    this.timeout(10000);
 
       happn_client.create({
          config:{username:'_ADMIN', password:'happn'},
