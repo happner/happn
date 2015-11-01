@@ -1,6 +1,0 @@
-{"_id":"/_SYSTEM/_SECURITY/_SETTINGS/KEYPAIR","data":{"value":"KwEErKycnhEpVuFFMNP3AqQeCm8i6hn197Vpeg7xEiDbhtkpLBxS"},"_meta":{"modified":1446392378289}}
-{"_id":"/_SYSTEM/_SECURITY/_SETTINGS/KEYPAIR","data":{"value":"KwEErKycnhEpVuFFMNP3AqQeCm8i6hn197Vpeg7xEiDbhtkpLBxS"},"_meta":{"modified":1446392378289,"created":1446392378289}}
-{"_id":"/_SYSTEM/_SECURITY/_GROUP/_ADMIN","data":{"custom_data":{"description":"the default administration group for happn"},"name":"_ADMIN","permissions":{"/*":{"actions":["*"]}}},"_meta":{"modified":1446392387473}}
-{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN","data":{"custom_data":{},"username":"_ADMIN","password":"pbkdf2$10000$348f133fcbdb964c3740e34a67e246e1d29639f797dc5cfe0e68710502abd8ce14073e5b38fbd86610e2a8aa29de954326ce3feaf1d66a0cac0e656222143fdf$72a4756a24c13ef294ec3cb2336a79998e1566f4a6e2b159ab72652980a80f6535924e6f3bcf891a9ab781086a4ae82f92d951758474b2118fdffbbdda1f3121"},"_meta":{"modified":1446392393918}}
-{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN/_USER_GROUP/_ADMIN","data":{},"_meta":{"modified":1446392398704}}
-{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN/_USER_GROUP/_ADMIN","data":{},"_meta":{"modified":1446392398704,"created":1446392398704}}

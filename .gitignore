@@ -7,7 +7,9 @@ lib-cov
 *.pid
 *.gz
 *.log.*
+*.nedb
 *test/tmp*
+*.db
 
 pids
 logs
