@@ -71,7 +71,7 @@ describe('b7_websockets_security_access', function() {
       })
 
       .catch(function(e){
-        expect(e.toString()).to.be('AccessDenied: login failed');
+        expect(e.toString()).to.be('AccessDenied: Invalid credentials');
         done();
       });
 
