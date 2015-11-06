@@ -75,7 +75,7 @@ describe('b3_eventemitter_security_access', function() {
       })
 
       .catch(function(e){
-        expect(e.toString()).to.be('AccessDenied: login failed');
+        expect(e.toString()).to.be('AccessDenied: Invalid credentials');
         done();
       });
 
@@ -408,16 +408,12 @@ describe('b3_eventemitter_security_access', function() {
        
       testClient.onSystemMessage(function(eventType, data){
 
-        console.log('added test user system message:::', eventType, data);
-
         if (eventType == 'server-side-disconnect'){
           expect(data).to.be('security directory update: user deleted');
 
           testClient.set('/TEST/b3_eventemitter_security_access/' + test_id + '/set', {test:'data'}, {}, function(e, result){
 
             if (!e) return done(new Error('this should not have been allowed...'));
-
-            console.log('added test user set:::', e);
 
             expect(e.toString()).to.be('AccessDenied: unauthorized');
             done();
@@ -428,8 +424,6 @@ describe('b3_eventemitter_security_access', function() {
       });
 
       serviceInstance.services.security.deleteUser(addedTestuser, function(e){
-
-        console.log('added test user:::', e);
 
         if (e) return done(e);
       });
