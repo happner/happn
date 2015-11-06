@@ -77,6 +77,24 @@ describe('b7_websockets_security_access', function() {
 
     });
 
+    it('fails to authenticate with the user and password unspecified', function(done) {
+
+      happn.client.create({
+        config:{},
+        secure:true
+      })
+
+      .then(function(clientInstance){
+        done(new Error('this was not meant to happn...'));
+      })
+
+      .catch(function(e){
+        expect(e.toString()).to.be('AccessDenied: Invalid credentials');
+        done();
+      });
+
+    });
+
   });
 
   context('resources access testing', function() {
