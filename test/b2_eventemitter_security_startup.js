@@ -23,7 +23,7 @@ describe('b2_eventemitter_security_groups', function () {
 
   var initializeMockServices = function (callback) {
 
-    var happnMock = {services:{}};
+    var happnMock = {services:{},utils:require('../lib/utils')};
     testServices = {};
     testServices.data = require('../lib/services/data_embedded/service');
     testServices.security = require('../lib/services/security/service');
