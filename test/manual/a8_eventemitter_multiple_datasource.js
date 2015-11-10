@@ -555,7 +555,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
   });
 
-   it('check the same event should by raised, regardless of what data source we are pushing to', function (callback) {
+   it('check the same event should be raised, regardless of what data source we are pushing to', function (callback) {
 
     var caught = {};
 
@@ -567,23 +567,23 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
     multipleClient.onAll(function (eventData, meta) {
 
-      if (meta.action == '/SET@' + memoryTestPath || meta.action == '/SET@' + persistedTestPath)
+      if (meta.action == '/SET@' + memoryTestPath || meta.action == '/SET@' + persistedTestPath){
         caughtCount++;
+        if (caughtCount == 2){
 
-      if (caughtCount == 2){
+          findRecordInDataFile(persistedTestPath, tempFile1, function(e, record){
 
-        findRecordInDataFile(persistedTestPath, tempFile1, function(e, record){
+              if (e) return callback(e);
 
-            if (e) return callback(e);
+              if (record)
+                callback();
+              else
+                callback(new Error('record not found in persisted file'));
 
-            if (record)
-              callback();
-            else
-              callback(new Error('record not found in persisted file'));
-
-        });
-
+          });
+        }
       }
+        
         
     }, function (e) {
 
@@ -612,6 +612,126 @@ it('should push some data into the multiple datastore, memory datastore, exact p
       });
 
     });
+
+  });
+
+   it('should not find the pattern to be added in the persisted datastore', function(callback) {
+
+     this.timeout(4000);
+
+    try {
+      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
+
+      multipleClient.set(test_path, {
+        property1: 'property1',
+        property2: 'property2',
+        property3: 'property3'
+      }, {}, function (e, result) {
+
+        if (!e) {
+          multipleClient.get(test_path, null, function (e, results) {
+
+            expect(results.property1 == 'property1').to.be(true);
+
+            findRecordInDataFile(test_path, tempFile1, function(e, record){
+
+              if (e) return callback(e);
+
+              if (record)
+                callback(new Error('record found in persisted file, meant to be in memory'));
+              else
+                callback();
+
+            });
+
+          });
+        }
+        else
+          callback(e);
+      });
+
+    } catch (e) {
+      callback(e);
+    }
+
+  });
+
+  it('should add a pattern to the persisted datastore, and check it works', function(callback) {
+
+     this.timeout(4000);
+
+    try {
+      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
+      
+      services[1].services.data.addDataStoreFilter(test_path, 'persisted');
+
+      multipleClient.set(test_path, {
+        property1: 'property1',
+        property2: 'property2',
+        property3: 'property3'
+      }, {}, function (e, result) {
+
+        if (!e) {
+          multipleClient.get(test_path, null, function (e, results) {
+
+            expect(results.property1 == 'property1').to.be(true);
+
+            findRecordInDataFile(test_path, tempFile1, function(e, record){
+
+              if (e) return callback(e);
+
+              //console.log('rec: ', record);
+
+              if (record)
+                callback();
+              else
+                callback(new Error('record not found in persisted file'));
+
+            });
+
+          });
+        }
+        else
+          callback(e);
+      });
+
+    } catch (e) {
+      callback(e);
+    }
+
+  });
+
+  it('should remove a pattern from the persisted datastore', function(callback) {
+
+     this.timeout(4000);
+
+    try {
+
+      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
+      var patternExists = false;
+
+      services[1].services.data.datastores.persisted.config.patterns.map(function(pattern){
+        if (pattern == test_path)
+          patternExists = true;
+      });
+
+      expect(patternExists).to.be(true);
+      patternExists = false;
+
+      services[1].services.data.removeDataStoreFilter(test_path, 'persisted');
+
+      services[1].services.data.datastores.persisted.config.patterns.map(function(pattern){
+        if (pattern == test_path)
+          patternExists = true;
+      });
+
+      expect(patternExists).to.be(false);
+
+      callback();
+
+    } catch (e) {
+      callback(e);
+    }
 
   });
 

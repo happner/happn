@@ -23,26 +23,32 @@ describe('b2_eventemitter_security_groups', function () {
 
   var initializeMockServices = function (callback) {
 
-    var happnMock = {services:{},utils:require('../lib/utils')};
-    testServices = {};
-    testServices.data = require('../lib/services/data_embedded/service');
-    testServices.security = require('../lib/services/security/service');
+    this.timeout(10000);
 
-    async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
+    setTimeout(function(){
 
-      testServices[serviceName] = new testServices[serviceName]();
-      testServices[serviceName].happn = happnMock;
+      var happnMock = {services:{},utils:require('../lib/utils')};
+      testServices = {};
+      testServices.data = require('../lib/services/data_embedded/service');
+      testServices.security = require('../lib/services/security/service');
 
-      testServices[serviceName].initialize(testConfigs[serviceName], function(e, instance){
-        if (e)  return  eachServiceCB(e);
+      async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
 
-        happnMock.services[serviceName] = testServices[serviceName];
-      
-        eachServiceCB();
+        testServices[serviceName] = new testServices[serviceName]();
+        testServices[serviceName].happn = happnMock;
 
-      });
-    }, callback);
+        testServices[serviceName].initialize(testConfigs[serviceName], function(e, instance){
+          if (e)  return  eachServiceCB(e);
 
+          happnMock.services[serviceName] = testServices[serviceName];
+        
+          eachServiceCB();
+
+        });
+      }, callback);
+
+    }, 5000)
+    
   }
 
   before('should initialize the service', initializeMockServices);
