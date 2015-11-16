@@ -307,9 +307,6 @@ describe('b1_eventemitter_security_groups', function () {
         testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + testUser.username, {},
           function(e, result){
 
-            console.log('got user result:::', result);
-            console.log(result.password, testUser.password);
-
             expect(result.data.password != 'TEST PWD').to.be(true);
 
             delete result.data['password'];

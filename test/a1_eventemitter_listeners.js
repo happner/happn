@@ -18,7 +18,9 @@ describe('a1_eventemitter_listeners', function () {
    */
 
   after(function(done) {
-      happnInstance.stop(done);
+      setTimeout(function(){
+        happnInstance.stop(done);
+      }, 5000)
   });
 
   it('should initialize the service', function (callback) {
