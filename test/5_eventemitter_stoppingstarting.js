@@ -19,7 +19,6 @@ describe('5_eventemitter_stoppingstarting', function() {
     var stopService = function(callback){
        if (currentService){
         currentService.stop(function(e){
-          console.log('stopped 5_eventemitter service:::', e);
           if (e && e.toString() != 'Error: Not running') return callback(e);
           callback();
         });
@@ -81,17 +80,10 @@ describe('5_eventemitter_stoppingstarting', function() {
 
       this.timeout(20000);
       
-      currentService.services.data.get('/*', {}, function(e, resp){
-        console.log('resp:::', resp);
-       
-        stopService(function(e){
-          console.log('stopping 5_eventemitter service:::', e);
-          fs.unlink(tmpFile, function(e){
-              console.log('unlinking 5_eventemitter service file:::', e);
-              callback();
-          });  
-
-        });
+      stopService(function(e){
+        fs.unlink(tmpFile, function(e){
+            callback();
+        });  
       });
       
     });
@@ -149,8 +141,6 @@ describe('5_eventemitter_stoppingstarting', function() {
       getClient(currentService, function(e, testclient){
 
         if (e) return callback(e);
-
-        //console.log(persistKey);
 
         testclient.get(persistKey, null, function(e, response){
 

@@ -1,13 +1,15 @@
-var expect = require('expect.js');
-var happn = require('../../lib/index');
-var service = happn.service;
-var happn_client = happn.client;
-var async = require('async');
-var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
-var fs = require('fs');
-var HAPPNER_STOP_DELAY = 5000;
 
-describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
+
+describe('5_eventemitter_embedded_persisted_benchmarks', function() {
+
+  var expect = require('expect.js');
+  var happn = require('../../lib/index');
+  var service = happn.service;
+  var happn_client = happn.client;
+  var async = require('async');
+  var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
+  var fs = require('fs');
+  var HAPPNER_STOP_DELAY = 5000;
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -46,11 +48,11 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
             log_component: 'prepare'
           }
         },
-        function(e, happn) {
+        function(e, happnInst) {
           if (e)
             return callback(e);
 
-          happnInstance = happn;
+          happnInstance = happnInst;
           callback();
         });
     } catch (e) {
@@ -60,16 +62,9 @@ describe('a4_eventemitter_embedded_persisted_benchmarks', function() {
 
   after('should delete the temp data file', function(callback) {
 
-    this.timeout(HAPPNER_STOP_DELAY + 5000);
-    
     fs.unlink(tempFile, function(e){
       if (e) return callback(e);
-
-      happnInstance.stop(function(e){
-        setTimeout(function(){
-          callback(e);
-        }, HAPPNER_STOP_DELAY)
-      });
+      happnInstance.stop(callback);
     });
 
   });

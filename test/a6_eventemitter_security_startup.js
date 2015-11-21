@@ -46,7 +46,6 @@ describe('a6_eventemitter_security_groups', function () {
     }, function(e){
 
       testServices.data.get('/*', {}, function(e, resp){
-        console.log('resp:::', resp);
         callback();
       });
 

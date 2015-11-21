@@ -1,12 +1,12 @@
-var expect = require('expect.js');
-var happn = require('../../lib/index');
-var service = happn.service;
-var async = require('async');
-var happn_client = happn.client;
-var fs = require('fs');
-var HAPPNER_STOP_DELAY = 5000;
+describe('4_websockets_embedded_persisted_benchmarks', function () {
 
-describe('a3_websockets_embedded_persisted_benchmarks', function () {
+  var expect = require('expect.js');
+  var happn = require('../../lib/index');
+  var service = happn.service;
+  var async = require('async');
+  var happn_client = happn.client;
+  var fs = require('fs');
+  var HAPPNER_STOP_DELAY = 5000;
 
   var test_secret = 'test_secret';
   var mode = "embedded";
@@ -60,11 +60,11 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
             log_component:'prepare'
           }
         },
-        function(e, happn) {
+        function(e, happnInst) {
           if (e)
             return callback(e);
 
-          happnInstance = happn;
+          happnInstance = happnInst;
           callback();
         });
     }catch(e){
@@ -73,16 +73,10 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
   });
 
   after('should delete the temp data file', function(callback) {
-
-    this.timeout(HAPPNER_STOP_DELAY + 5000);
-    
+ 
     fs.unlink(tempFile, function(e){
       if (e) return callback(e);
-      happnInstance.stop(function(e){
-        setTimeout(function(){
-          callback(e);
-        }, HAPPNER_STOP_DELAY)
-      });
+      happnInstance.stop(callback);
     });
 
   });
@@ -232,7 +226,7 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
       var timerName = expected + 'Events - no wait - no store';
       //console.log('FILENAME: ', tempFile);
       //first listen for the change
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence1a3', {event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence14', {event_type:'set', count:0}, function (message) {
 
         receivedCount++;
 
@@ -263,7 +257,7 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
             }
 
             ////////////////console.log('putting data: ', count);
-            publisherclient.set('/e2e_test1/testsubscribe/sequence1a3', {
+            publisherclient.set('/e2e_test1/testsubscribe/sequence14', {
               property1: count++
             }, {noStore: true}, function (e, result) {
               writeData();

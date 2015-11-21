@@ -5,7 +5,7 @@
 ```bash
 
 
-mocha test/c1_eventemitter_security_benchmarks.js.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/c1_eventemitter_security_benchmarks.js.csv
+mocha test/6_eventemitter_security_benchmarks.js.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/6_eventemitter_security_benchmarks.js.csv
 
 
 ```
@@ -20,13 +20,15 @@ tail -f test/.e2e_eventemitter_embedded_benchmarks.csv
 
 */
 var expect = require('expect.js');
-var happn = require('../../lib/index');
-var service = happn.service;
-var happn_client = happn.client;
-var async = require('async');
-var HAPPNER_STOP_DELAY = 5000;
 
-describe('c1_eventemitter_security_benchmarks.js', function() {
+
+describe('6_eventemitter_security_benchmarks.js', function() {
+
+  var happn = require('../../lib/index');
+  var service = happn.service;
+  var happn_client = happn.client;
+  var async = require('async');
+  var HAPPNER_STOP_DELAY = 5000;
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -63,11 +65,11 @@ describe('c1_eventemitter_security_benchmarks.js', function() {
             log_component: 'prepare'
           }
         },
-        function(e, happn) {
+        function(e, happnInst) {
           if (e)
             return callback(e);
 
-          happnInstance = happn;
+          happnInstance = happnInst;
           callback();
         });
     } catch (e) {
@@ -76,14 +78,7 @@ describe('c1_eventemitter_security_benchmarks.js', function() {
   });
 
   after(function(done) {
-
-    this.timeout(HAPPNER_STOP_DELAY + 5000);
-
-    happnInstance.stop(function(e){
-       setTimeout(function(){
-          done(e);
-        }, HAPPNER_STOP_DELAY)
-    });
+    happnInstance.stop(done);
   });
 
   var publisherclient;

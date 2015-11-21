@@ -5,7 +5,7 @@
 ```bash
 
 
-mocha test/2_eventemitter_embedded_benchmarks.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/2_eventemitter_embedded_benchmarks.csv
+mocha test/1_eventemitter_embedded_benchmarks.js | grep ^CSV | awk 'END {print ""} {printf "%i %s,", $2, $NF}' >> test/1_eventemitter_embedded_benchmarks.csv
 
 
 ```
@@ -19,13 +19,15 @@ tail -f test/.e2e_eventemitter_embedded_benchmarks.csv
 ```
 
 */
-var expect = require('expect.js');
-var happn = require('../lib/index');
-var service = happn.service;
-var happn_client = happn.client;
-var async = require('async');
 
-describe('2_eventemitter_embedded_benchmarks', function() {
+
+describe('1_eventemitter_embedded_benchmarks', function() {
+
+  var expect = require('expect.js');
+  var happn = require('../../lib/index');
+  var service = happn.service;
+  var happn_client = happn.client;
+  var async = require('async');
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -61,11 +63,11 @@ describe('2_eventemitter_embedded_benchmarks', function() {
             log_component: 'prepare'
           }
         },
-        function(e, happn) {
+        function(e, happnInst) {
           if (e)
             return callback(e);
 
-          happnInstance = happn;
+          happnInstance = happnInst;
           callback();
         });
     } catch (e) {

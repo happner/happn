@@ -52,13 +52,10 @@ describe('a1_eventemitter_embedded_datatypes', function () {
         },
         function (e, happnInst) {
 
-          console.log('before ran:::', e, happnInst);
-
           if (e)
             return callback(e);
 
           happnInstance = happnInst;
-          console.log('set happn instance:::', happnInstance);
           callback();
         });
 
@@ -69,7 +66,6 @@ describe('a1_eventemitter_embedded_datatypes', function () {
 
   after(function(done) {
     this.timeout(10000);
-    console.log('trying to stop:::',happnInstance);
     happnInstance.stop(done);
   });
 
@@ -125,8 +121,6 @@ describe('a1_eventemitter_embedded_datatypes', function () {
 
         if (!e) {
 
-          console.log(result);
-
           expect(result.value).to.be(test_string);
 
           publisherclient.get(test_base_url, null, function (e, result) {
@@ -159,8 +153,6 @@ describe('a1_eventemitter_embedded_datatypes', function () {
       publisherclient.set(test_base_url, test_number, {noPublish: true}, function (e, result) {
 
         if (!e) {
-
-          console.log(result);
 
           expect(result.value).to.be(test_number);
 
@@ -196,8 +188,6 @@ describe('a1_eventemitter_embedded_datatypes', function () {
 
         if (!e) {
 
-          console.log(result);
-
           expect(result.value).to.be(test_bool);
 
           publisherclient.get(test_base_url, null, function (e, result) {
@@ -230,8 +220,6 @@ describe('a1_eventemitter_embedded_datatypes', function () {
       publisherclient.set(test_base_url, test_date, {noPublish: true}, function (e, result) {
 
         if (!e) {
-
-          console.log(result);
 
           expect(result.value).to.be(test_date);
 
@@ -266,8 +254,6 @@ describe('a1_eventemitter_embedded_datatypes', function () {
 
         if (!e) {
 
-          console.log('null, result', result);
-
           expect(result.value).to.be(test_null);
 
           publisherclient.get(test_base_url, null, function (e, result) {
@@ -301,8 +287,6 @@ it('the publisher should set undefined data', function (callback) {
 
         if (!e) {
 
-          console.log(result);
-
           expect(result.value).to.be(test_undefined);
 
           publisherclient.get(test_base_url, null, function (e, result) {
@@ -335,8 +319,6 @@ it('the publisher should set undefined data', function (callback) {
       publisherclient.set(test_base_url, test_array, {noPublish: true}, function (e, result) {
 
         if (!e) {
-
-          console.log('array result', result);
 
           expect(result.value.length).to.be(6);
 
@@ -380,8 +362,6 @@ it('the publisher should set undefined data', function (callback) {
         callback();
 
       }, function (e) {
-
-        //////////////////console.log('ON HAS HAPPENED: ' + e);
 
         if (!e) {
 

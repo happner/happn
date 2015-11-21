@@ -1,12 +1,11 @@
+describe('7_websockets_security_benchmarks', function () {
 
-var expect = require('expect.js');
-var happn = require('../../lib/index');
-var service = happn.service;
-var async = require('async');
-var happn_client = happn.client;
-var HAPPNER_STOP_DELAY = 5000;
-
-describe('c2_websockets_security_benchmarks', function () {
+  var expect = require('expect.js');
+  var happn = require('../../lib/index');
+  var service = happn.service;
+  var async = require('async');
+  var happn_client = happn.client;
+  var HAPPNER_STOP_DELAY = 5000;
 
   var test_secret = 'test_secret';
   var mode = "embedded";
@@ -59,14 +58,7 @@ describe('c2_websockets_security_benchmarks', function () {
   });
 
   after(function(done) {
-
-    this.timeout(HAPPNER_STOP_DELAY + 5000);
-
-     happnInstance.stop(function(e){
-       setTimeout(function(){
-          done(e);
-        }, HAPPNER_STOP_DELAY)
-    });
+     happnInstance.stop(done);
   });
 
   var publisherclient;
