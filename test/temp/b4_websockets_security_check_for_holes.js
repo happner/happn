@@ -1,10 +1,10 @@
+describe('b4_check_for_holes', function() {
 
-var happn = require('../lib/index');
-var serviceInstance;
-var expect = require('expect.js');
-var test_id = Date.now() + '_' + require('shortid').generate();
 
-describe('b8_check_for_holes', function() {
+  var happn = require('../lib/index');
+  var serviceInstance;
+  var expect = require('expect.js');
+  var test_id = Date.now() + '_' + require('shortid').generate();
 
   var getService = function(config, callback){
    happn.service.create(config,
@@ -25,27 +25,31 @@ describe('b8_check_for_holes', function() {
 
       serviceInstance = service;
      
-      done();
+      happn.client.create({
+        config:{username:'_ADMIN', password:'happn'},
+        secure:true
+      })
+
+      .then(function(clientInstance){
+        websocketsClient = clientInstance;
+
+        console.log('ws client up:::');
+
+        done();
+
+      })
 
     });
 
   });
 
-  before('creates a ws client', function(done){
+  after('should stop the service', function(callback) {
 
-    happn.client.create({
-      config:{username:'_ADMIN', password:'happn'},
-      secure:true
-    })
-
-    .then(function(clientInstance){
-      websocketsClient = clientInstance;
-
-      console.log('ws client up:::');
-
-      done();
-
-    })
+    this.timeout(20000);
+    serviceInstance.stop(function(e){
+      console.log('stopped service:::', e);
+      return callback(e);
+    });
 
   });
 

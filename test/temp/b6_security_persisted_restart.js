@@ -1,10 +1,10 @@
+describe('b6_security_persisted_restart', function() {
 
-var expect = require('expect.js');
-var async = require('async');
-var fs = require('fs');
-var happn = require('../../lib/index');
 
-describe('c4_security_persisted_restart', function() {
+  var expect = require('expect.js');
+  var async = require('async');
+  var fs = require('fs');
+  var happn = require('../lib/index');
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -132,7 +132,7 @@ describe('c4_security_persisted_restart', function() {
 
  });
 
- it.only('modifies the config with new admin credentials, restarts the service - logs in with new admin credentials', function(callback) {
+ it('modifies the config with new admin credentials, restarts the service - logs in with new admin credentials', function(callback) {
 
   this.timeout(default_timeout);
 

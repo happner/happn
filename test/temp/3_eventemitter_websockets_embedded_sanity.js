@@ -1,10 +1,12 @@
-var expect = require('expect.js');
-var happn = require('../lib/index')
-var service = happn.service;
-var happn_client = happn.client;
-var async = require('async');
 
-describe('6_eventemitter_websockets_embedded_sanity', function() {
+
+describe('3_eventemitter_websockets_embedded_sanity', function() {
+
+	var expect = require('expect.js');
+	var happn = require('../lib/index')
+	var service = happn.service;
+	var happn_client = happn.client;
+	var async = require('async');
 
 	var test_secret = 'test_secret';
 	var mode = "embedded";
@@ -45,11 +47,11 @@ describe('6_eventemitter_websockets_embedded_sanity', function() {
 						log_component:'prepare'
 					}
 				}, 
-				function(e, happn){
+				function(e, happnInst){
 					if (e)
 						return callback(e);
 
-					happnInstance = happn;
+					happnInstance = happnInst;
 					callback();
 				});
 		}catch(e){

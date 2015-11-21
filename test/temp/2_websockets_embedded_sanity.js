@@ -1,11 +1,10 @@
-var expect = require('expect.js');
-var happn = require('../lib/index');
-var service = happn.service;
-var happn_client = happn.client;
-var async = require('async');
+describe('2_websockets_embedded_sanity', function() {
 
-
-describe('4_websockets_embedded_sanity', function() {
+  var expect = require('expect.js');
+  var happn = require('../lib/index');
+  var service = happn.service;
+  var happn_client = happn.client;
+  var async = require('async');
 
 	var test_secret = 'test_secret';
 	var mode = "embedded";
@@ -47,11 +46,11 @@ describe('4_websockets_embedded_sanity', function() {
 						log_level:'info|error|warning',
 						log_component:'prepare'
 					}
-				},function (e, happn) {
+				},function (e, happnInst) {
 		          if (e)
 		            return callback(e);
 
-		          happnInstance = happn;
+		          happnInstance = happnInst;
 		          callback();
 		        });
 		}catch(e){
@@ -102,9 +101,9 @@ describe('4_websockets_embedded_sanity', function() {
     try {
 
       //first listen for the change
-      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(0);
+        expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(0);
         callback();
 
       }, function (e) {
@@ -113,7 +112,7 @@ describe('4_websockets_embedded_sanity', function() {
 
         if (!e) {
 
-          expect(listenerclient.events['/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(1);
+          expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(1);
           //////////////////console.log('on subscribed, about to publish');
 
           var stats = happnInstance.stats();
@@ -121,7 +120,7 @@ describe('4_websockets_embedded_sanity', function() {
           //console.log(stats.pubsub.listeners_wildcard_SET);
 
           //then make the change
-          publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/blah', {
+          publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/blah', {
             property1: 'property1',
             property2: 'property2',
             property3: 'property3'
@@ -146,7 +145,7 @@ describe('4_websockets_embedded_sanity', function() {
     try {
       var test_path_end = require('shortid').generate();
 
-      publisherclient.set('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
+      publisherclient.set('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
@@ -154,7 +153,7 @@ describe('4_websockets_embedded_sanity', function() {
 
         if (e) return callback(e);
 
-        publisherclient.get('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
+        publisherclient.get('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
           
           expect(results.property1 == 'property1').to.be(true);
           callback(e);
@@ -179,7 +178,7 @@ describe('4_websockets_embedded_sanity', function() {
 
         var test_random_path2 = require('shortid').generate();
 
-        publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/set_multiple/' + test_random_path2, {
+        publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/set_multiple/' + test_random_path2, {
           property1: 'property1',
           property2: 'property2',
           property3: 'property3'
@@ -190,7 +189,7 @@ describe('4_websockets_embedded_sanity', function() {
 
         if (e) return callback(e);
 
-          listenerclient.get('/4_websockets_embedded_sanity/' + test_id + '/set_multiple/*', null, function (e, results) {
+          listenerclient.get('/2_websockets_embedded_sanity/' + test_id + '/set_multiple/*', null, function (e, results) {
 
             if (e) return callback(e);
 
@@ -217,7 +216,7 @@ describe('4_websockets_embedded_sanity', function() {
 
       var test_path_end = require('shortid').generate();
 
-      publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, {
+      publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
@@ -229,7 +228,7 @@ describe('4_websockets_embedded_sanity', function() {
         //////////////console.log('set results');
         //////////////console.log(result);
 
-        publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, {property4: 'property4'}, {merge: true}, function (e, result) {
+        publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, {property4: 'property4'}, {merge: true}, function (e, result) {
 
           if (e)
             return callback(e);
@@ -237,7 +236,7 @@ describe('4_websockets_embedded_sanity', function() {
           //////////////console.log('merge set results');
           //////////////console.log(result);
 
-          publisherclient.get('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, null, function (e, results) {
+          publisherclient.get('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, null, function (e, results) {
 
             if (e)
               return callback(e);
@@ -344,14 +343,14 @@ describe('4_websockets_embedded_sanity', function() {
       limit: 2
     }
 
-    publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function (e, put_result) {
+    publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function (e, put_result) {
 
       expect(e == null).to.be(true);
-      publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end + '/1', complex_obj, null, function (e, put_result) {
+      publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end + '/1', complex_obj, null, function (e, put_result) {
         expect(e == null).to.be(true);
 
         ////////////console.log('searching');
-        publisherclient.get('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
+        publisherclient.get('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
           criteria: criteria1,
           options: options1
         }, function (e, search_result) {
@@ -361,7 +360,7 @@ describe('4_websockets_embedded_sanity', function() {
           expect(e == null).to.be(true);
           expect(search_result.length == 1).to.be(true);
 
-          publisherclient.get('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
+          publisherclient.get('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
             criteria: criteria2,
             options: options2
           }, function (e, search_result) {
@@ -388,14 +387,14 @@ describe('4_websockets_embedded_sanity', function() {
     try {
 
       //We put the data we want to delete into the database
-      publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
+      publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
       }, {noPublish: true}, function (e, result) {
 
         //We perform the actual delete
-        publisherclient.remove('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {noPublish: true}, function (e, result) {
+        publisherclient.remove('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {noPublish: true}, function (e, result) {
 
           expect(e).to.be(null);
           expect(result._meta.status).to.be('ok');
@@ -421,7 +420,7 @@ describe('4_websockets_embedded_sanity', function() {
     try {
       var test_path_end = require('shortid').generate();
 
-      publisherclient.set('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
+      publisherclient.set('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
@@ -429,7 +428,7 @@ describe('4_websockets_embedded_sanity', function() {
 
         expect(e).to.be(null);
 
-        publisherclient.set('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
+        publisherclient.set('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
           property1: 'property1',
           property2: 'property2',
           property3: 'property3',
@@ -454,7 +453,7 @@ describe('4_websockets_embedded_sanity', function() {
 
     var randomTag = require('shortid').generate();
 
-    publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/test/tag', {
+    publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/test/tag', {
       property1: 'property1',
       property2: 'property2',
       property3: 'property3'
@@ -465,7 +464,7 @@ describe('4_websockets_embedded_sanity', function() {
 
       if (e) return callback(e);
 
-      publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/test/tag', null, {
+      publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/test/tag', null, {
         tag: randomTag,
         merge: true,
         noPublish: true
@@ -483,7 +482,7 @@ describe('4_websockets_embedded_sanity', function() {
         expect(result.data.property2).to.be('property2');
         expect(result.data.property3).to.be('property3');
 
-        publisherclient.get('/_TAGS/4_websockets_embedded_sanity/' + test_id + '/test/tag/*', null, function (e, results) {
+        publisherclient.get('/_TAGS/2_websockets_embedded_sanity/' + test_id + '/test/tag/*', null, function (e, results) {
 
           expect(e).to.be(null);
           
@@ -529,9 +528,9 @@ describe('4_websockets_embedded_sanity', function() {
     try {
 
       //first listen for the change
-      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
+        expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
 
       }, function (e) {
@@ -540,11 +539,11 @@ describe('4_websockets_embedded_sanity', function() {
 
         if (!e) {
 
-          expect(listenerclient.events['/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(1);
+          expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(1);
           //////////////////console.log('on subscribed, about to publish');
 
           //then make the change
-          publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
+          publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
             property1: 'property1',
             property2: 'property2',
             property3: 'property3'
@@ -571,14 +570,14 @@ describe('4_websockets_embedded_sanity', function() {
     try {
       var test_path_end = require('shortid').generate();
 
-      publisherclient.set('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
+      publisherclient.set('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
       }, null, function (e, result) {
 
         if (!e) {
-          publisherclient.get('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
+          publisherclient.get('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
             ////////////////////////console.log('new data results');
             ////////////////////////console.log(results);
             expect(results.property1 == 'property1').to.be(true);
@@ -606,7 +605,7 @@ describe('4_websockets_embedded_sanity', function() {
     try {
       var test_path_end = require('shortid').generate();
 
-      publisherclient.set('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
+      publisherclient.set('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
@@ -614,7 +613,7 @@ describe('4_websockets_embedded_sanity', function() {
 
         expect(e == null).to.be(true);
 
-        publisherclient.set('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
+        publisherclient.set('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
           property1: 'property1',
           property2: 'property2',
           property3: 'property3',
@@ -645,14 +644,14 @@ describe('4_websockets_embedded_sanity', function() {
 
       var test_path_end = require('shortid').generate();
 
-      publisherclient.setSibling('4_websockets_embedded_sanity/' + test_id + '/siblings/' + test_path_end, {
+      publisherclient.setSibling('2_websockets_embedded_sanity/' + test_id + '/siblings/' + test_path_end, {
         property1: 'sib_post_property1',
         property2: 'sib_post_property2'
       }, function (e, results) {
 
         expect(e == null).to.be(true);
 
-        publisherclient.setSibling('4_websockets_embedded_sanity/' + test_id + '/siblings/' + test_path_end, {
+        publisherclient.setSibling('2_websockets_embedded_sanity/' + test_id + '/siblings/' + test_path_end, {
           property1: 'sib_post_property1',
           property2: 'sib_post_property2'
         }, function (e, results) {
@@ -660,7 +659,7 @@ describe('4_websockets_embedded_sanity', function() {
           expect(e == null).to.be(true);
 
           //the child method returns a child in the collection with a specified id
-          publisherclient.get('4_websockets_embedded_sanity/' + test_id + '/siblings/' + test_path_end + '/*', null, function (e, getresults) {
+          publisherclient.get('2_websockets_embedded_sanity/' + test_id + '/siblings/' + test_path_end + '/*', null, function (e, getresults) {
             expect(e == null).to.be(true);
             expect(getresults.length == 2).to.be(true);
             callback(e);
@@ -683,21 +682,21 @@ describe('4_websockets_embedded_sanity', function() {
     try {
 
       //first listen for the change
-      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
+        expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
 
       }, function (e) {
 
         if (!e) {
 
-          expect(listenerclient.events['/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(1);
+          expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(1);
 
           ////////////////////////////console.log('on subscribed, about to publish');
 
           //then make the change
-          publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
+          publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
             property1: 'property1',
             property2: 'property2',
             property3: 'property3'
@@ -719,20 +718,20 @@ describe('4_websockets_embedded_sanity', function() {
 
     var test_path_end = require('shortid').generate();
 
-    publisherclient.set('4_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end, {
+    publisherclient.set('2_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end, {
       property1: 'property1',
       property2: 'property2',
       property3: 'property3'
     }, null, function (e, insertResult) {
       expect(e == null).to.be(true);
-      publisherclient.set('4_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '/1', {
+      publisherclient.set('2_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '/1', {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
       }, null, function (e, insertResult) {
         expect(e == null).to.be(true);
 
-        publisherclient.get('4_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', null, function (e, results) {
+        publisherclient.get('2_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', null, function (e, results) {
 
           if (e) return callback();
 
@@ -748,20 +747,20 @@ describe('4_websockets_embedded_sanity', function() {
 
     var test_path_end = require('shortid').generate();
 
-    publisherclient.set('4_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end, {
+    publisherclient.set('2_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end, {
       property1: 'property1',
       property2: 'property2',
       property3: 'property3'
     }, null, function (e, insertResult) {
       expect(e == null).to.be(true);
-      publisherclient.set('4_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '/1', {
+      publisherclient.set('2_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '/1', {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
       }, null, function (e, insertResult) {
         expect(e == null).to.be(true);
 
-        publisherclient.getPaths('4_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', function (e, results) {
+        publisherclient.getPaths('2_websockets_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', function (e, results) {
 
           expect(results.length == 2).to.be(true);
           callback(e);
@@ -777,7 +776,7 @@ describe('4_websockets_embedded_sanity', function() {
     this.timeout(default_timeout);
 
     //We put the data we want to delete into the database
-    publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
+    publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
       property1: 'property1',
       property2: 'property2',
       property3: 'property3'
@@ -786,7 +785,7 @@ describe('4_websockets_embedded_sanity', function() {
       //////////////////console.log('did delete set');
       //path, event_type, count, handler, done
       //We listen for the DELETE event
-      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
+      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
         event_type: 'remove',
         count: 1
       }, function (eventData) {
@@ -798,7 +797,7 @@ describe('4_websockets_embedded_sanity', function() {
         //instance of this event - the event listener should have been removed 
         ////console.log('listenerclient.events');
         ////console.log(listenerclient.events);
-        expect(listenerclient.events['/REMOVE@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me'].length).to.be(0);
+        expect(listenerclient.events['/REMOVE@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me'].length).to.be(0);
 
         ////console.log(eventData);
 
@@ -819,12 +818,12 @@ describe('4_websockets_embedded_sanity', function() {
 
         ////console.log('listenerclient.events, pre');
         ////console.log(listenerclient.events);
-        expect(listenerclient.events['/REMOVE@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me'].length).to.be(1);
+        expect(listenerclient.events['/REMOVE@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me'].length).to.be(1);
 
         //////////////////console.log('subscribed, about to delete');
 
         //We perform the actual delete
-        publisherclient.remove('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', null, function (e, result) {
+        publisherclient.remove('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', null, function (e, result) {
 
 
           //////////////////console.log('REMOVE HAPPENED!!!');
@@ -847,16 +846,16 @@ describe('4_websockets_embedded_sanity', function() {
 
     var currentListenerId;
 
-    listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0}, function (message) {
+    listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0}, function (message) {
 
       //we detach all listeners from the path here
       ////console.log('ABOUT OFF PATH');
-      listenerclient.off('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', function (e) {
+      listenerclient.off('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', function (e) {
 
         if (e)
           return callback(new Error(e));
 
-        listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0},
+        listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0},
           function (message) {
 
             ////console.log('ON RAN');
@@ -877,7 +876,7 @@ describe('4_websockets_embedded_sanity', function() {
 
             currentListenerId = listenerId;
 
-            publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+            publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
               property1: 'property1',
               property2: 'property2',
               property3: 'property3'
@@ -897,7 +896,7 @@ describe('4_websockets_embedded_sanity', function() {
 
       currentListenerId = listenerId;
 
-      publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+      publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
@@ -916,8 +915,8 @@ describe('4_websockets_embedded_sanity', function() {
 
     listenerclient.onAll(function (eventData, meta) {
 
-      if (meta.action == '/REMOVE@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' || 
-          meta.action == '/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
+      if (meta.action == '/REMOVE@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' || 
+          meta.action == '/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
         caughtCount++;
 
       if (caughtCount == 2)
@@ -927,13 +926,13 @@ describe('4_websockets_embedded_sanity', function() {
 
       if (e) return callback(e);
 
-      publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all', {
+      publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all', {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
       }, null, function (e, put_result) {
 
-        publisherclient.remove('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all', null, function (e, del_result) {
+        publisherclient.remove('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all', null, function (e, del_result) {
 
 
         });
@@ -958,7 +957,7 @@ describe('4_websockets_embedded_sanity', function() {
 
       if (e) return callback(e);
 
-      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {event_type: 'set', count: 0},
+      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {event_type: 'set', count: 0},
         function (message) {
           onHappened = true;
           callback(new Error('this wasnt meant to happen'));
@@ -969,7 +968,7 @@ describe('4_websockets_embedded_sanity', function() {
           listenerclient.offAll(function (e) {
             if (e) return callback(e);
 
-            publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {
+            publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {
               property1: 'property1',
               property2: 'property2',
               property3: 'property3'

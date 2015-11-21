@@ -1,13 +1,14 @@
-var expect = require('expect.js');
-var happn = require('../lib/index')
-var service1 = happn.service;
-var service2 = happn.service;
-var serviceDefault = happn.service;
+describe('8_websockets_embedded_ports', function() {
 
-var happn_client = happn.client;
-var async = require('async');
+	var expect = require('expect.js');
+	var happn = require('../lib/index')
+	var service1 = happn.service;
+	var service2 = happn.service;
+	var serviceDefault = happn.service;
 
-describe('a2_websockets_embedded_ports', function() {
+	var happn_client = happn.client;
+	var async = require('async');
+
 
 	var service1Port = 8000;
 	var service2Port = 8001;

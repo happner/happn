@@ -1,11 +1,13 @@
-var expect = require('expect.js');
-var happn = require('../lib/index')
-var service = happn.service;
-var happn_client = happn.client;
-var async = require('async');
-var request = require('request');
 
-describe('7_browser-client-test', function() {
+describe('4_browser-client-test', function() {
+
+	var expect = require('expect.js');
+	var happn = require('../lib/index')
+	var service = happn.service;
+	var happn_client = happn.client;
+	var async = require('async');
+	var request = require('request');
+
 	var test_secret = 'test_secret';
 	var happnInstance = null;
 
@@ -44,11 +46,11 @@ describe('7_browser-client-test', function() {
 						log_component:'prepare'
 					}
 				}, 
-				function(e, happn){
+				function(e, happnInst){
 					if (e)
 						return callback(e);
 
-					happnInstance = happn;
+					happnInstance = happnInst;
 					callback();
 				});
 		}catch(e){

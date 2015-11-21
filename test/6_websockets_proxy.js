@@ -1,12 +1,14 @@
-var expect = require('expect.js');
-var happn = require('../lib/index')
-var gateway = happn.service;
-var device1 = happn.service;
-var device2 = happn.service;
-var happn_client = happn.client;
-var async = require('async');
 
-describe('9_websockets_proxy', function() {
+
+describe('6_websockets_proxy', function() {
+
+	var expect = require('expect.js');
+	var happn = require('../lib/index')
+	var gateway = happn.service;
+	var device1 = happn.service;
+	var device2 = happn.service;
+	var happn_client = happn.client;
+	var async = require('async');
 
 	var gatewayPort = 8000;
 	var device1Port = 8001;

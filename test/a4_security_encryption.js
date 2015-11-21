@@ -1,13 +1,13 @@
-var expect = require('expect.js');
-var happn = require('../lib/index');
-var service = happn.service;
-var happn_client = happn.client;
-var async = require('async');
+describe('a4_security_encryption.js', function () {
 
-var bitcore = require('bitcore');
-var ECIES = require('bitcore-ecies');
+  var expect = require('expect.js');
+  var happn = require('../lib/index');
+  var service = happn.service;
+  var happn_client = happn.client;
+  var async = require('async');
 
-describe('a9_security_encryption.js', function () {
+  var bitcore = require('bitcore');
+  var ECIES = require('bitcore-ecies');
 
   var testConfigs = {};
 
@@ -27,6 +27,8 @@ describe('a9_security_encryption.js', function () {
   before('should initialize the service', function (callback) {
 
     var happnMock = {services:{}};
+
+    happnMock.utils = require('../lib/utils');
 
     async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
 

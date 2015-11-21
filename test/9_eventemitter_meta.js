@@ -1,10 +1,11 @@
-var expect = require('expect.js');
-var happn = require('../lib/index');
-var service = happn.service;
-var happn_client = happn.client;
-var async = require('async');
 
-describe('a5_eventemitter_meta.js', function () {
+describe('9_eventemitter_meta.js', function () {
+
+  var expect = require('expect.js');
+  var happn = require('../lib/index');
+  var service = happn.service;
+  var happn_client = happn.client;
+  var async = require('async');
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -18,7 +19,10 @@ describe('a5_eventemitter_meta.js', function () {
    */
 
   after(function(done) {
-      happnInstance.stop(done);
+      happnInstance.stop(function(e){
+        console.log('stopped ok?:::', e);
+        done(e);
+      });
   });
 
   it('should initialize the service', function (callback) {
@@ -50,11 +54,11 @@ describe('a5_eventemitter_meta.js', function () {
             log_component: 'prepare'
           }
         },
-        function (e, happn) {
+        function (e, happnInst) {
           if (e)
             return callback(e);
 
-          happnInstance = happn;
+          happnInstance = happnInst;
           callback();
         });
     } catch (e) {

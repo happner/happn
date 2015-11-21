@@ -1,10 +1,10 @@
-var expect = require('expect.js');
-var happn = require('../lib/index');
-var service = happn.service;
-var happn_client = happn.client;
-var async = require('async');
+describe('7_eventemitter_listeners', function () {
 
-describe('a1_eventemitter_listeners', function () {
+  var expect = require('expect.js');
+  var happn = require('../lib/index');
+  var service = happn.service;
+  var happn_client = happn.client;
+  var async = require('async');
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -18,9 +18,7 @@ describe('a1_eventemitter_listeners', function () {
    */
 
   after(function(done) {
-      setTimeout(function(){
-        happnInstance.stop(done);
-      }, 5000)
+    happnInstance.stop(done);
   });
 
   it('should initialize the service', function (callback) {
@@ -52,11 +50,11 @@ describe('a1_eventemitter_listeners', function () {
             log_component: 'prepare'
           }
         },
-        function (e, happn) {
+        function (e, happnInst) {
           if (e)
             return callback(e);
 
-          happnInstance = happn;
+          happnInstance = happnInst;
           callback();
         });
     } catch (e) {

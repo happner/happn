@@ -1,13 +1,13 @@
-var expect = require('expect.js');
-var happn = require('../lib/index');
-var service = happn.service;
-var happn_client = happn.client;
-var async = require('async');
+describe('a6_eventemitter_security_groups', function () {
 
-var bitcore = require('bitcore');
-var ECIES = require('bitcore-ecies');
+  var expect = require('expect.js');
+  var happn = require('../lib/index');
+  var service = happn.service;
+  var happn_client = happn.client;
+  var async = require('async');
 
-describe('b2_eventemitter_security_groups', function () {
+  var bitcore = require('bitcore');
+  var ECIES = require('bitcore-ecies');
 
   var testConfigs = {};
 
@@ -25,30 +25,33 @@ describe('b2_eventemitter_security_groups', function () {
 
     this.timeout(10000);
 
-    setTimeout(function(){
+    var happnMock = {services:{},utils:require('../lib/utils')};
+    testServices = {};
+    testServices.data = require('../lib/services/data_embedded/service');
+    testServices.security = require('../lib/services/security/service');
 
-      var happnMock = {services:{},utils:require('../lib/utils')};
-      testServices = {};
-      testServices.data = require('../lib/services/data_embedded/service');
-      testServices.security = require('../lib/services/security/service');
+    async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
 
-      async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
+      testServices[serviceName] = new testServices[serviceName]();
+      testServices[serviceName].happn = happnMock;
 
-        testServices[serviceName] = new testServices[serviceName]();
-        testServices[serviceName].happn = happnMock;
+      testServices[serviceName].initialize(testConfigs[serviceName], function(e, instance){
+        if (e)  return  eachServiceCB(e);
 
-        testServices[serviceName].initialize(testConfigs[serviceName], function(e, instance){
-          if (e)  return  eachServiceCB(e);
+        happnMock.services[serviceName] = testServices[serviceName];
+      
+        eachServiceCB();
 
-          happnMock.services[serviceName] = testServices[serviceName];
-        
-          eachServiceCB();
+      });
+    }, function(e){
 
-        });
-      }, callback);
+      testServices.data.get('/*', {}, function(e, resp){
+        console.log('resp:::', resp);
+        callback();
+      });
 
-    }, 5000)
-    
+    });
+
   }
 
   before('should initialize the service', initializeMockServices);
@@ -58,7 +61,7 @@ describe('b2_eventemitter_security_groups', function () {
      callback();
   });
 
-   it('the default keypair in memory must exist in the system security leaf', function (callback) {
+  it('the default keypair in memory must exist in the system security leaf', function (callback) {
      
       testServices.data.get('/_SYSTEM/_SECURITY/_SETTINGS/KEYPAIR', {}, function(e, response){
 

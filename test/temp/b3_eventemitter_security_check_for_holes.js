@@ -1,11 +1,10 @@
+describe('b3_check_for_holes', function() {
 
-var happn = require('../../lib/index');
-var serviceInstance;
-var expect = require('expect.js');
-var test_id = Date.now() + '_' + require('shortid').generate();
-var HAPPNER_STOP_DELAY = 5000;
-
-describe('b8_check_for_holes', function() {
+  var happn = require('../lib/index');
+  var serviceInstance;
+  var expect = require('expect.js');
+  var test_id = Date.now() + '_' + require('shortid').generate();
+  var HAPPNER_STOP_DELAY = 5000;
 
   var getService = function(config, callback){
    happn.service.create(config,
@@ -33,15 +32,8 @@ describe('b8_check_for_holes', function() {
   });
 
   after('should delete the temp data file', function(callback) {
-
-    this.timeout(HAPPNER_STOP_DELAY + 5000);
-    
-    serviceInstance.stop(function(e){
-       setTimeout(function(){
-          callback(e);
-        }, HAPPNER_STOP_DELAY)
-    });
-    
+    console.log('stopping:::');
+    serviceInstance.stop(callback);
   });
 
   /*
@@ -103,7 +95,7 @@ describe('b8_check_for_holes', function() {
       });
 
       if (apples.length > 0){
-        console.log(apples);
+        console.log('bad apples:::',apples);
         return done(new Error('found forbidden method signatures...'));
       }
        

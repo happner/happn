@@ -1,11 +1,11 @@
+describe('a3_eventemitter_multiple_datasource', function() {
 
-var expect = require('expect.js');
-var async = require('async');
-var fs = require('fs');
-var happn = require('../../lib/index');
-var HAPPNER_STOP_DELAY = 5000;
 
-describe('a8_eventemitter_multiple_datasource', function() {
+  var expect = require('expect.js');
+  var async = require('async');
+  var fs = require('fs');
+  var happn = require('../lib/index');
+  var HAPPNER_STOP_DELAY = 5000;
 
   var testport = 8000;
   var test_secret = 'test_secret';
@@ -91,8 +91,8 @@ describe('a8_eventemitter_multiple_datasource', function() {
                   name:'memory',
                   isDefault:true,
                   patterns:[
-                    '/a8_eventemitter_multiple_datasource/' + test_id + '/memorytest/*',
-                    '/a8_eventemitter_multiple_datasource/' + test_id + '/memorynonwildcard'
+                    '/a3_eventemitter_multiple_datasource/' + test_id + '/memorytest/*',
+                    '/a3_eventemitter_multiple_datasource/' + test_id + '/memorynonwildcard'
                   ]
                 },
                 {
@@ -101,8 +101,8 @@ describe('a8_eventemitter_multiple_datasource', function() {
                     filename:tempFile1
                   },
                   patterns:[
-                    '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedtest/*',
-                    '/a8_eventemitter_multiple_datasource/' + test_id + '/persistednonwildcard'
+                    '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedtest/*',
+                    '/a3_eventemitter_multiple_datasource/' + test_id + '/persistednonwildcard'
                   ]
                 }
               ]
@@ -131,56 +131,51 @@ describe('a8_eventemitter_multiple_datasource', function() {
 
       });
     },
-    callback);
-  });
-
-  before('should initialize the clients', function (callback) {
-    this.timeout(default_timeout);
-
-    getClient(services[0], function(e, client){
+    function(e){
 
       if (e) return callback(e);
 
-      singleClient = client;
-
-      getClient(services[1], function(e, client){
+      getClient(services[0], function(e, client){
 
         if (e) return callback(e);
 
-        multipleClient = client;
+        singleClient = client;
 
-        callback();
+        getClient(services[1], function(e, client){
+
+          if (e) return callback(e);
+
+          multipleClient = client;
+
+          callback();
+
+        });
 
       });
+    
 
     });
-  
+
   });
 
   after('should delete the temp data files', function(callback) {
 
-    this.timeout(HAPPNER_STOP_DELAY + 5000);
-    
     fs.unlink(tempFile, function(e){
       if (e) return callback(e);
       fs.unlink(tempFile1, function(e){
         if (e) return callback(e);
 
-        async.each(services, function(currentService, eachServiceCB){
-
-          currentService.stop(function(e){
-            setTimeout(function(){
-              eachServiceCB(e);
-            }, HAPPNER_STOP_DELAY)
-          });
-
-        }, callback);
+        async.each(services, 
+          function(currentService, eachServiceCB){
+            currentService.stop(eachServiceCB);
+        }, 
+        callback);
 
       });
+
     });
 
   });
-
 
 
   it('should push some data into the single datastore service', function(callback) {
@@ -189,7 +184,7 @@ describe('a8_eventemitter_multiple_datasource', function() {
 
     try {
       var test_path_end = require('shortid').generate();
-      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/set/' + test_path_end;
+      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/set/' + test_path_end;
 
       singleClient.set(test_path, {
         property1: 'property1',
@@ -219,7 +214,7 @@ describe('a8_eventemitter_multiple_datasource', function() {
 
     try {
       var test_path_end = require('shortid').generate();
-      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/set/' + test_path_end;
+      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/set/' + test_path_end;
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -288,7 +283,7 @@ describe('a8_eventemitter_multiple_datasource', function() {
 
     try {
       var test_path_end = require('shortid').generate();
-      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/memorytest/' + test_path_end;
+      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/memorytest/' + test_path_end;
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -330,7 +325,7 @@ describe('a8_eventemitter_multiple_datasource', function() {
 
     try {
       var test_path_end = require('shortid').generate();
-      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedtest/' + test_path_end;
+      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedtest/' + test_path_end;
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -373,7 +368,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
      this.timeout(4000);
 
     try {
-      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/memorynonwildcard';
+      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/memorynonwildcard';
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -414,7 +409,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
      this.timeout(4000);
 
     try {
-      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistednonwildcard';
+      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistednonwildcard';
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -457,7 +452,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
      this.timeout(4000);
 
     try {
-      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/default';
+      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/default';
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -499,7 +494,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
     var randomTag = require('shortid').generate();
 
-    var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedtest/tag'
+    var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedtest/tag'
 
     multipleClient.set(test_path, {
       property1: 'property1',
@@ -562,8 +557,8 @@ it('should push some data into the multiple datastore, memory datastore, exact p
     this.timeout(10000);
     var caughtCount = 0;
 
-    var memoryTestPath = '/a8_eventemitter_multiple_datasource/' + test_id + '/memorytest/event';
-    var persistedTestPath = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedtest/event';
+    var memoryTestPath = '/a3_eventemitter_multiple_datasource/' + test_id + '/memorytest/event';
+    var persistedTestPath = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedtest/event';
 
     multipleClient.onAll(function (eventData, meta) {
 
@@ -620,7 +615,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
      this.timeout(4000);
 
     try {
-      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
+      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
 
       multipleClient.set(test_path, {
         property1: 'property1',
@@ -661,7 +656,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
      this.timeout(4000);
 
     try {
-      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
+      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
       
       services[1].services.data.addDataStoreFilter(test_path, 'persisted');
 
@@ -707,7 +702,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
     try {
 
-      var test_path = '/a8_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
+      var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
       var patternExists = false;
 
       services[1].services.data.datastores.persisted.config.patterns.map(function(pattern){
