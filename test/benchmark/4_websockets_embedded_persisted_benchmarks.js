@@ -14,6 +14,8 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
   var happnInstance = null;
   var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
 
+  var TESTPORT = 8080;
+
   /*
   should handle sequences of events by writing each one after each other asap, without storing
   2330ms
@@ -35,6 +37,7 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
     try{
       service.create({
+          port:TESTPORT,
           mode:'embedded', 
           services:{
             auth:{
@@ -92,12 +95,12 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
       this.timeout(default_timeout);
 
       try {
-        happn_client.create({config:{secret:test_secret}}, function(e, instance) {
+        happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, instance) {
 
           if (e) return callback(e);
 
           publisherclient = instance;
-          happn_client.create({config:{secret:test_secret}}, function(e, instance) {
+          happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, instance) {
 
             if (e) return callback(e);
             listenerclient = instance;
@@ -118,7 +121,7 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
     if (e) return callback(e);
 
     var count = 0;
@@ -216,7 +219,7 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(50000);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
 
       if (e) return callback(e);
 
@@ -280,7 +283,7 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
       
       if (e) return callback(e);
       setTimeout(function () {
@@ -373,7 +376,7 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
       
       if (e) return callback(e);
       setTimeout(function () {
@@ -452,7 +455,7 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
     if (e) return callback(e);
 
       var count = 0;
@@ -535,7 +538,7 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
       
       if (e) return callback(e);
       var count = 0;
@@ -621,7 +624,7 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-      happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+      happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
       if (e) return callback(e);
 
       var count = 0;
@@ -706,7 +709,7 @@ it('should handle sequences of events by when the previous one is done', functio
 
     this.timeout(default_timeout);
 
-      happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+      happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
       if (e) return callback(e);
 
       var count = 0;

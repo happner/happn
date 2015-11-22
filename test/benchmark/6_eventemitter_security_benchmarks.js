@@ -22,7 +22,9 @@ tail -f test/.e2e_eventemitter_embedded_benchmarks.csv
 var expect = require('expect.js');
 
 
-describe('6_eventemitter_security_benchmarks.js', function() {
+describe('6_eventemitter_security_benchmarks', function() {
+
+  context('6_eventemitter_security_benchmarks', function() {
 
   var happn = require('../../lib/index');
   var service = happn.service;
@@ -760,5 +762,7 @@ describe('6_eventemitter_security_benchmarks.js', function() {
     });
 
   });
+
+});
 
 });
