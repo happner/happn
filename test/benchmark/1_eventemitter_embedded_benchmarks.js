@@ -35,6 +35,8 @@ describe('1_eventemitter_embedded_benchmarks', function() {
   var default_timeout = 100000;
   var happnInstance = null;
 
+  var testClients = [];
+
   before('should initialize the service', function(callback) {
 
     this.timeout(20000);
@@ -76,7 +78,18 @@ describe('1_eventemitter_embedded_benchmarks', function() {
   });
 
   after(function(done) {
-    happnInstance.stop(done);
+
+    async.eachSeries(testClients, function(client, eachCB){
+      client.disconnect(eachCB);
+    }, function(err){
+
+      if (err)
+        console.warn('failed closing test clients:::');
+      
+      happnInstance.stop(done);
+
+    });
+
   });
 
   var publisherclient;
@@ -95,6 +108,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
         if (e) return callback(e);
 
         publisherclient = instance;
+        testClients.push(publisherclient);
 
         happn_client.create({
           plugin: happn.client_plugins.intra_process,
@@ -103,6 +117,8 @@ describe('1_eventemitter_embedded_benchmarks', function() {
 
           if (e) return callback(e);
           listenerclient = instance;
+          testClients.push(listenerclient);
+
           callback();
 
         });
@@ -125,7 +141,8 @@ describe('1_eventemitter_embedded_benchmarks', function() {
       function(e, stressTestClient) {
 
         if (e) return callback(e);
-       
+        testClients.push(stressTestClient);
+        
         var count = 0;
         var expected = 1000;
         var receivedCount = 0;
@@ -229,6 +246,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
       function(e, stressTestClient) {
 
         if (e) return callback(e);
+        testClients.push(stressTestClient);
 
         var count = 0;
         var expected = 1000;
@@ -289,6 +307,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
     function(e, stressTestClient) {
 
       if (e) return callback(e);
+      testClients.push(stressTestClient);
 
       var count = 0;
       var expected = 1000;
@@ -354,6 +373,8 @@ describe('1_eventemitter_embedded_benchmarks', function() {
     function(e, stressTestClient) {
 
       if (e) return callback(e);
+      testClients.push(stressTestClient);
+
       setTimeout(function() {
 
         var count = 0;
@@ -432,6 +453,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
     function(e, stressTestClient) {
 
       if (e) return callback(e);
+      testClients.push(stressTestClient);
 
       var count = 0;
       var timerName = 'CSV.colm 5 testTime2';
@@ -497,6 +519,8 @@ describe('1_eventemitter_embedded_benchmarks', function() {
     function(e, stressTestClient) {
 
       if (e) return callback(e);
+      testClients.push(stressTestClient);
+
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
@@ -595,7 +619,10 @@ describe('1_eventemitter_embedded_benchmarks', function() {
       context: happnInstance
     },
     function(e, stressTestClient) {
+
       if (e) return callback(e);
+
+      testClients.push(stressTestClient);
 
       var count = 0;
       var expected = 1000;
@@ -694,7 +721,10 @@ describe('1_eventemitter_embedded_benchmarks', function() {
       context: happnInstance
     },
     function(e, stressTestClient) {
+
       if (e) return callback(e);
+
+      testClients.push(stressTestClient);
 
       var count = 0;
       var expected = 1000;

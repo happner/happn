@@ -11,6 +11,8 @@ describe('3_websockets_embedded_benchmarks', function () {
   var default_timeout = 5000;
   var happnInstance = null;
 
+  var testClients = [];
+
   /*
   This test demonstrates starting up the happn service - 
   the authentication service will use authTokenSecret to encrypt web tokens identifying
@@ -56,7 +58,19 @@ describe('3_websockets_embedded_benchmarks', function () {
   });
 
   after(function(done) {
-    happnInstance.stop(done);
+
+    async.eachSeries(testClients, function(client, eachCB){
+      client.disconnect(eachCB);
+    }, function(err){
+
+      if (err)
+        console.warn('failed closing test clients:::');
+      
+      happnInstance.stop(done);
+
+    });
+
+    
   });
 
   var publisherclient;
@@ -74,10 +88,15 @@ describe('3_websockets_embedded_benchmarks', function () {
           if (e) return callback(e);
 
           publisherclient = instance;
+          testClients.push(publisherclient);
+
           happn_client.create(function(e, instance) {
 
             if (e) return callback(e);
+
             listenerclient = instance;
+            testClients.push(listenerclient);
+
             callback();
 
           });
@@ -97,6 +116,8 @@ describe('3_websockets_embedded_benchmarks', function () {
 
     happn_client.create(function(e, stressTestClient) {
     if (e) return callback(e);
+
+    testClients.push(stressTestClient);
 
     var count = 0;
     var expected = 1000;
@@ -197,6 +218,8 @@ describe('3_websockets_embedded_benchmarks', function () {
 
       if (e) return callback(e);
 
+      testClients.push(stressTestClient);
+
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
@@ -206,17 +229,9 @@ describe('3_websockets_embedded_benchmarks', function () {
       stressTestClient.on('/e2e_test1/testsubscribe/sequence1', {event_type:'set', count:0}, function (message) {
 
         receivedCount++;
-        //////////////console.log('RCOUNT');
-
-
-        //////////console.log(receivedCount);
-        //////////console.log(sent.length);
-
+       
         if (receivedCount == expected) {
           console.timeEnd(timerName);
-          //expect(Object.keys(received).length == expected).to.be(true);
-          //////////////console.log(received);
-
           callback();
         }
 
@@ -262,6 +277,9 @@ describe('3_websockets_embedded_benchmarks', function () {
     happn_client.create(function(e, stressTestClient) {
       
       if (e) return callback(e);
+
+      testClients.push(stressTestClient);
+
       setTimeout(function () {
 
         var count = 0;
@@ -275,9 +293,6 @@ describe('3_websockets_embedded_benchmarks', function () {
         for (var i = 0; i < expected; i++) {
           sent[i] = require('shortid').generate();
         }
-
-        //////////////console.log('about to go');
-        //////////////console.log(sent);
 
         //first listen for the change
         stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore', {event_type:'set', count:0}, function (message) {
@@ -294,11 +309,6 @@ describe('3_websockets_embedded_benchmarks', function () {
           else
             received[message.property1] = 1;
 
-          //////////////console.log('RCOUNT');
-
-
-          //////////console.log(receivedCount);
-          //////////console.log(sent.length);
 
           if (receivedCount == sent.length) {
             console.timeEnd('timeTest1');
@@ -355,6 +365,9 @@ describe('3_websockets_embedded_benchmarks', function () {
     happn_client.create(function(e, stressTestClient) {
       
       if (e) return callback(e);
+
+      testClients.push(stressTestClient);
+
       setTimeout(function () {
 
         var count = 0;
@@ -432,7 +445,10 @@ describe('3_websockets_embedded_benchmarks', function () {
     this.timeout(default_timeout);
 
     happn_client.create(function(e, stressTestClient) {
-    if (e) return callback(e);
+
+      if (e) return callback(e);
+
+      testClients.push(stressTestClient);
 
       var count = 0;
       var expected = 1000;
@@ -445,9 +461,6 @@ describe('3_websockets_embedded_benchmarks', function () {
         sent[i] = require('shortid').generate();
       }
 
-      //////////////console.log('about to go');
-      //////////////console.log(sent);
-
       //first listen for the change
       stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set', count:0}, function (message) {
 
@@ -457,12 +470,6 @@ describe('3_websockets_embedded_benchmarks', function () {
           received[message.property1] = received[message.property1] + 1;
         else
           received[message.property1] = 1;
-
-        //////////////console.log('RCOUNT');
-
-
-        //////////console.log(receivedCount);
-        //////////console.log(sent.length);
 
         if (receivedCount == sent.length) {
           console.timeEnd('timeTest1');
@@ -474,8 +481,6 @@ describe('3_websockets_embedded_benchmarks', function () {
 
       }, function (e) {
 
-        //////////////console.log('ON HAS HAPPENED: ' + e);
-
         if (!e) {
 
           expect(stressTestClient.events['/SET@/e2e_test1/testsubscribe/sequence_persist'].length).to.be(1);
@@ -483,16 +488,9 @@ describe('3_websockets_embedded_benchmarks', function () {
 
           while (count < expected) {
 
-            //////////////console.log(count);
-            //////////////console.log(expected);
-            //////////////console.log(sent[count]);
-
             publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {
               property1: sent[count]
             }, {excludeId: true}, function (e, result) {
-
-              //////////////console.log(e);
-              //////////////console.log(result);
 
               if (e)
                 return callback(e);
@@ -517,6 +515,9 @@ describe('3_websockets_embedded_benchmarks', function () {
     happn_client.create(function(e, stressTestClient) {
       
       if (e) return callback(e);
+
+      testClients.push(stressTestClient);
+
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
@@ -603,6 +604,8 @@ describe('3_websockets_embedded_benchmarks', function () {
       happn_client.create(function(e, stressTestClient) {
       if (e) return callback(e);
 
+      testClients.push(stressTestClient);
+
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
@@ -687,6 +690,8 @@ it('should handle sequences of events by when the previous one is done', functio
 
       happn_client.create(function(e, stressTestClient) {
       if (e) return callback(e);
+
+      testClients.push(stressTestClient);
 
       var count = 0;
       var expected = 1000;

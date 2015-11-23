@@ -14,16 +14,8 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
   var happnInstance = null;
   var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
 
-  var TESTPORT = 8080;
-
-  /*
-  should handle sequences of events by writing each one after each other asap, without storing
-  2330ms
-  2290ms
-  
-  2344ms
-  2387ms
-  */
+  var TESTPORT = 55000;
+  var testClients = [];
 
   /*
   This test demonstrates starting up the happn service - 
@@ -77,9 +69,18 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
   after('should delete the temp data file', function(callback) {
  
-    fs.unlink(tempFile, function(e){
-      if (e) return callback(e);
-      happnInstance.stop(callback);
+    async.eachSeries(testClients, function(client, eachCB){
+      client.disconnect(eachCB);
+    }, function(err){
+
+      if (err)
+        console.warn('failed closing test clients:::');
+
+      fs.unlink(tempFile, function(e){
+        if (e) return callback(e);
+        happnInstance.stop(callback);
+      });
+
     });
 
   });
@@ -100,10 +101,12 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
           if (e) return callback(e);
 
           publisherclient = instance;
+          testClients.push(publisherclient);
           happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, instance) {
 
             if (e) return callback(e);
             listenerclient = instance;
+            testClients.push(listenerclient);
             callback();
 
           });
@@ -123,6 +126,8 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
     happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
     if (e) return callback(e);
+
+    testClients.push(stressTestClient);
 
     var count = 0;
     var expected = 1000;
@@ -223,6 +228,8 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
       if (e) return callback(e);
 
+      testClients.push(stressTestClient);
+
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
@@ -286,6 +293,9 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
     happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
       
       if (e) return callback(e);
+
+      testClients.push(stressTestClient);
+
       setTimeout(function () {
 
         var count = 0;
@@ -308,8 +318,7 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
 
           //////////////console.log('Event happened', message);
 
-          if (e)
-            return callback(e);
+          if (e) return callback(e);
 
           receivedCount++;
 
@@ -379,6 +388,9 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
     happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
       
       if (e) return callback(e);
+
+      testClients.push(stressTestClient);
+
       setTimeout(function () {
 
         var count = 0;
@@ -456,6 +468,9 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
     this.timeout(default_timeout);
 
     happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
+    
+    testClients.push(stressTestClient);
+
     if (e) return callback(e);
 
       var count = 0;
@@ -541,6 +556,9 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
     happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
       
       if (e) return callback(e);
+
+      testClients.push(stressTestClient);
+
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
@@ -627,6 +645,8 @@ describe('4_websockets_embedded_persisted_benchmarks', function () {
       happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
       if (e) return callback(e);
 
+      testClients.push(stressTestClient);
+
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
@@ -711,6 +731,8 @@ it('should handle sequences of events by when the previous one is done', functio
 
       happn_client.create({config:{secret:test_secret, port:TESTPORT}}, function(e, stressTestClient) {
       if (e) return callback(e);
+
+      testClients.push(stressTestClient);
 
       var count = 0;
       var expected = 1000;
