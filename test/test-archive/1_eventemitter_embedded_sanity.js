@@ -1,12 +1,11 @@
-
+var expect = require('expect.js');
+var happn = require('../lib/index')
+var service = happn.service;
+var happn_client = happn.client;
+var async = require('async');
 
 describe('1_eventemitter_embedded_sanity', function () {
 
-  var expect = require('expect.js');
-  var happn = require('../lib/index')
-  var service = happn.service;
-  var happn_client = happn.client;
-  var async = require('async');
   var testport = 8000;
   var test_secret = 'test_secret';
   var mode = "embedded";
@@ -49,11 +48,11 @@ describe('1_eventemitter_embedded_sanity', function () {
             log_component: 'prepare'
           }
         },
-        function (e, happnInst) {
+        function (e, happn) {
           if (e)
             return callback(e);
 
-          happnInstance = happnInst;
+          happnInstance = happn;
           callback();
 
         });
@@ -314,22 +313,21 @@ describe('1_eventemitter_embedded_sanity', function () {
 
    it('should contain the same payload between 2 non-merging consecutive stores', function (done) {
     var object = {param1: 10, param2: 20};
-    var firstTimeNonMergeConsecutive;
+    var firstTime;
 
-    listenerclient.on('setTest/nonMergeConsecutive', {event_type: 'set', count: 2}, function (message, meta) {
-
-      if (firstTimeNonMergeConsecutive === undefined) {
-        firstTimeNonMergeConsecutive = message;
+    listenerclient.on('setTest/object', {event_type: 'set', count: 2}, function (message) {
+      if (firstTime === undefined) {
+        firstTime = message;
         return;
       } else {
-        expect(message).to.eql(firstTimeNonMergeConsecutive);
+        expect(message).to.eql(firstTime);
         done();
       }
     }, function (err) {
       expect(err).to.not.be.ok();
-      publisherclient.set('setTest/nonMergeConsecutive', object, {}, function (err) {
+      publisherclient.set('setTest/object', object, {}, function (err) {
         expect(err).to.not.be.ok();
-        publisherclient.set('setTest/nonMergeConsecutive', object, {}, function (err) {
+        publisherclient.set('setTest/object', object, {}, function (err) {
           expect(err).to.not.be.ok();
         });
       });
