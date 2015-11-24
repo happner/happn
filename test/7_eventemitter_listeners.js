@@ -240,9 +240,6 @@ describe('7_eventemitter_listeners', function () {
           count: 1
         }, function (eventData) {
 
-          ////console.log('on count 1 delete ');
-          //////////////////console.log(message);
-
           //we are looking at the event internals on the listener to ensure our event management is working - because we are only listening for 1
           //instance of this event - the event listener should have been removed 
           ////console.log('listenerclient.events');

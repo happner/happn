@@ -80,25 +80,16 @@ describe('8_websockets_embedded_ports', function() {
 		  	if (e) return callback(e);
 
 		  	service1Client = instance;
-
-		  	console.log('have service1Client:::');
-
 		    happn_client.create({config:{port:service2Port}}, function(e, instance) {
 
 		    	if (e) return callback(e);
 
 		  		service2Client = instance;
-
-		  		console.log('have service2Client:::');
-
 		      	happn_client.create({config:{port:55000}}, function(e, instance) {
 
 		      		if (e) return callback(e);
 
 		      		defaultClient = instance;
-
-		      		console.log('have defaultClient:::');
-
 		      		callback();
 
 		      	});

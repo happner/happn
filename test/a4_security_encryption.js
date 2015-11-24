@@ -78,11 +78,6 @@ describe('a4_security_encryption.js', function () {
 
     expect(typeof keyPairSerialized).to.be('string');
     expect(keyPairDeserialized.publicKey.toString()).to.be(keyPair.publicKey.toString());
-
-    console.log('-------');
-    console.log(keyPairDeserialized.toString());
-    console.log(keyPair.toString());
-
     expect(keyPairDeserialized.privateKey.toString()).to.be(keyPair.privateKey.toString());
 
     callback();

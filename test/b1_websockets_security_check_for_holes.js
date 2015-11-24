@@ -21,8 +21,6 @@ describe('b1_websockets_security_check_for_holes', function() {
 
       if (e) return done(e);
 
-      console.log('service up:::');
-
       serviceInstance = service;
      
       done();
@@ -40,8 +38,6 @@ describe('b1_websockets_security_check_for_holes', function() {
 
     .then(function(clientInstance){
       websocketsClient = clientInstance;
-
-      console.log('ws client up:::');
 
       done();
 

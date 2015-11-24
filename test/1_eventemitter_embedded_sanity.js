@@ -176,9 +176,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
         if (!e) {
           publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
-            ////////////console.log('new data results');
-          
-            // expect(results.payload.length == 1).to.be(true);
+           
             expect(results.property1 == 'property1').to.be(true);
 
             if (mode != 'embedded')

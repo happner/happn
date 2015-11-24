@@ -19,10 +19,7 @@ describe('9_eventemitter_meta.js', function () {
    */
 
   after(function(done) {
-      happnInstance.stop(function(e){
-        console.log('stopped ok?:::', e);
-        done(e);
-      });
+      happnInstance.stop(done);
   });
 
   it('should initialize the service', function (callback) {
@@ -121,9 +118,6 @@ describe('9_eventemitter_meta.js', function () {
       //first listen for the change
       listenerclient.on(test_path, {event_type: 'set', count: 1}, function (data, meta) {
 
-        //console.log('EVENT-DATA: ', data);
-        //console.log('META: ', meta);
-
         expect(meta.path).to.be(test_path);
         callback();
 
@@ -141,9 +135,6 @@ describe('9_eventemitter_meta.js', function () {
           }, null, function (e, result) {
 
             if (e) return callback(e);
-
-            console.log('result:::', result);
-
             expect(result._meta.path).to.be(test_path);
           });
         }
@@ -166,7 +157,6 @@ describe('9_eventemitter_meta.js', function () {
 
       if (e) return callback(e);
 
-      //console.log('SET-DATA: ', result);
       expect(result._meta.path).to.be(test_path);
 
       callback();
@@ -189,12 +179,8 @@ describe('9_eventemitter_meta.js', function () {
       expect(result._meta.path).to.be(test_path_remove);
 
       listenerclient.on(test_path_remove, {event_type: 'remove', count: 1}, function (data, meta) {
-      
-        console.log('REM-DATA: ', data, meta);
         expect(meta.path).to.be(test_path_remove);
-
         callback();
-
       }, function(e){
 
         if (e) return callback(e);
