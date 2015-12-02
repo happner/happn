@@ -6,7 +6,7 @@ describe('a4_security_encryption.js', function () {
   var happn_client = happn.client;
   var async = require('async');
 
-  var bitcore = require('bitcore');
+  var bitcore = require('bitcore-lib');
   var ECIES = require('bitcore-ecies');
 
   var testConfigs = {};

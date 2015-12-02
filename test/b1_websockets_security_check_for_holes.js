@@ -45,6 +45,10 @@ describe('b1_websockets_security_check_for_holes', function() {
 
   });
 
+  after('should delete the temp data file', function(callback) {
+    serviceInstance.stop(callback);
+  });
+
   it('traverses the websocket clients object model to look for forbidden method signatures', function(done) {
 
     this.timeout(20000);

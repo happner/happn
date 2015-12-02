@@ -1,6 +1,6 @@
-describe('5_eventemitter_stoppingstarting', function() {
+describe('b2_eventemitter_security_stoppingstarting', function() {
 
-  context('stopping and starting meshes', function() {
+  context('stopping and starting secure meshes', function() {
 
     var expect = require('expect.js');
     var async = require('async');
@@ -30,6 +30,7 @@ describe('5_eventemitter_stoppingstarting', function() {
       var doInitService = function(){
 
           var serviceConfig = {
+            secure:true,
             mode: 'embedded',
             services: {
               data: {
@@ -45,8 +46,6 @@ describe('5_eventemitter_stoppingstarting', function() {
 
           serviceConfig.services.data.config.filename = filename;
           serviceConfig.name = name;
-
-          console.log('starting with config:::', serviceConfig.services.data);
 
           happn.service.create(serviceConfig,
           function(e, happnService){
@@ -65,8 +64,10 @@ describe('5_eventemitter_stoppingstarting', function() {
 
     var getClient = function(service, callback){
       happn.client.create({
+          config:{username:'_ADMIN', password:'happn'},
           plugin: happn.client_plugins.intra_process,
-          context: service
+          context: service,
+          secure:true
         }, function(e, instance) {
 
           if (e) return callback(e);
@@ -79,7 +80,7 @@ describe('5_eventemitter_stoppingstarting', function() {
     before('should initialize the service', function(callback) {
 
       this.timeout(20000);
-      initService(tmpFile, '5_eventemitter_stoppingstarting', callback);
+      initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', callback);
 
     });
 
@@ -117,7 +118,7 @@ describe('5_eventemitter_stoppingstarting', function() {
    it('should disconnect then reconnect and reverify the data', function(callback) {
 
     this.timeout(default_timeout);
-    initService(tmpFile, '5_eventemitter_stoppingstarting', function(e){
+    initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', function(e){
 
       if (e) return callback(e);
 
@@ -141,7 +142,7 @@ describe('5_eventemitter_stoppingstarting', function() {
 
     this.timeout(default_timeout);
 
-    initService(null, '5_eventemitter_stoppingstarting', function(e){
+    initService(null, 'b2_eventemitter_security_stoppingstarting', function(e){
 
       if (e) return callback(e);
      
@@ -165,27 +166,62 @@ describe('5_eventemitter_stoppingstarting', function() {
    it('should stop then start and verify the server name', function(callback) {
 
     this.timeout(default_timeout);
-    initService(tmpFile, '5_eventemitter_stoppingstarting', function(e){
+    initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', function(e){
 
       if (e) return callback(e);
 
       var currentPersistedServiceName = currentService.services.system.name;
-      expect(currentPersistedServiceName).to.be('5_eventemitter_stoppingstarting');
+      expect(currentPersistedServiceName).to.be('b2_eventemitter_security_stoppingstarting');
 
       initService(null, null, function(e){
 
         var currentUnpersistedServiceName = currentService.services.system.name;
-        expect(currentUnpersistedServiceName).to.not.be('5_eventemitter_stoppingstarting');
+        expect(currentUnpersistedServiceName).to.not.be('b2_eventemitter_security_stoppingstarting');
         expect(currentUnpersistedServiceName).to.not.be(null);
         expect(currentUnpersistedServiceName).to.not.be(undefined);
-
-        console.log('unpersisted config name:::', currentUnpersistedServiceName);
 
         initService(tmpFile, null, function(e){
           if (e) return callback(e);
 
           var currentPersistedRestartedServiceName = currentService.services.system.name;
-          expect(currentPersistedRestartedServiceName).to.be('5_eventemitter_stoppingstarting');
+          expect(currentPersistedRestartedServiceName).to.be('b2_eventemitter_security_stoppingstarting');
+          callback();
+
+        });
+
+      });
+
+    });
+
+
+   });
+
+  it('should stop then start and verify the server keypair', function(callback) {
+
+    this.timeout(default_timeout);
+    initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', function(e){
+
+      if (e) return callback(e);
+
+      var currentPersistedServicePublicKey = currentService.services.security._keyPair.publicKey.toString();
+      
+      expect(currentPersistedServicePublicKey).to.not.be(null);
+      expect(currentPersistedServicePublicKey).to.not.be(undefined);
+      expect(currentPersistedServicePublicKey).to.not.be('');
+
+      initService(null, null, function(e){
+
+        var currentUnPersistedServicePublicKey = currentService.services.security._keyPair.publicKey.toString();
+        expect(currentUnPersistedServicePublicKey).to.not.be(currentPersistedServicePublicKey);
+        expect(currentUnPersistedServicePublicKey).to.not.be(null);
+        expect(currentUnPersistedServicePublicKey).to.not.be(undefined);
+        expect(currentUnPersistedServicePublicKey).to.not.be('');
+
+        initService(tmpFile, null, function(e){
+          if (e) return callback(e);
+
+          var currentPersistedRestartedServicePublicKey = currentService.services.security._keyPair.publicKey.toString();
+          expect(currentPersistedRestartedServicePublicKey).to.be(currentPersistedServicePublicKey);
           callback();
 
         });
