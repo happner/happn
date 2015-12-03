@@ -270,7 +270,7 @@ describe('a3_eventemitter_multiple_datasource', function() {
 
            });
 
-        }, 2000)
+        }, 1000)
 
     }catch(e){
       callback(e);
@@ -705,20 +705,25 @@ it('should push some data into the multiple datastore, memory datastore, exact p
       var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
       var patternExists = false;
 
-      services[1].services.data.datastores.persisted.config.patterns.map(function(pattern){
-        if (pattern == test_path)
+      for (var pattern in services[1].services.data.dataroutes){
+        if (pattern == test_path){
           patternExists = true;
-      });
+          break;
+        }
+      }
 
       expect(patternExists).to.be(true);
+
       patternExists = false;
 
-      services[1].services.data.removeDataStoreFilter(test_path, 'persisted');
+      services[1].services.data.removeDataStoreFilter(test_path);
 
-      services[1].services.data.datastores.persisted.config.patterns.map(function(pattern){
-        if (pattern == test_path)
+       for (var pattern in services[1].services.data.dataroutes){
+        if (pattern == test_path){
           patternExists = true;
-      });
+          break;
+        }
+      }
 
       expect(patternExists).to.be(false);
 
