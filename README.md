@@ -70,7 +70,6 @@ starting service:
 ```javascript
 var happn = require('../lib/index')
 var service = happn.service;
-var happn_client = happn.client;
 var happnInstance; //this will be your server instance
 
 //we are using a compact default config here, port defaults to 55000
@@ -85,8 +84,8 @@ var happnInstance; //this will be your server instance
     }
   },
   utils: {
-    log_level: 'info|error|warning',
-    log_component: 'prepare'
+    logLevel: 'error',
+    // see happn-logger module for more config options
   }
 },
 function (e, happn) {
@@ -94,6 +93,7 @@ function (e, happn) {
     return callback(e);
 
   happnInstance = happn; //here it is, your server instance
+  happnInstance.log.info('server up');
 
 });
 

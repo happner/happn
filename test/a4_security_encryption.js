@@ -5,6 +5,7 @@ describe('a4_security_encryption.js', function () {
   var service = happn.service;
   var happn_client = happn.client;
   var async = require('async');
+  var Logger = require('happn-logger');
 
   var bitcore = require('bitcore-lib');
   var ECIES = require('bitcore-ecies');
@@ -32,7 +33,7 @@ describe('a4_security_encryption.js', function () {
 
     async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
 
-      testServices[serviceName] = new testServices[serviceName]();
+      testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;
 
       testServices[serviceName].initialize(testConfigs[serviceName], function(e, instance){
