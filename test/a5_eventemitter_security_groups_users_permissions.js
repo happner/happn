@@ -7,6 +7,7 @@ describe('a5_eventemitter_security_groups', function () {
     var service = happn.service;
     var happn_client = happn.client;
     var async = require('async');
+    var Logger = require('happn-logger');
 
     var bitcore = require('bitcore-lib');
     var ECIES = require('bitcore-ecies');
@@ -41,11 +42,11 @@ describe('a5_eventemitter_security_groups', function () {
       testServices.security = require('../lib/services/security/service');
 
       var checkpoint = require('../lib/services/security/checkpoint');
-      testServices.checkpoint = new checkpoint();
+      testServices.checkpoint = new checkpoint({logger: Logger});
 
       async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
 
-        testServices[serviceName] = new testServices[serviceName]();
+        testServices[serviceName] = new testServices[serviceName]({logger: Logger});
         testServices[serviceName].happn = happnMock;
 
         testServices[serviceName].initialize(testConfigs[serviceName], function(e, instance){
