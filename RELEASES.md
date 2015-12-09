@@ -9,3 +9,10 @@
 
 - moved logger out into own module [happn-logger](https://github.com/happner/happn-logger)
 - no functional difference
+
+1.1.4 2015-12-08
+----------------
+
+- fixed issue with users and groups being updated, and passed directly up to the client - was causing a scope issue.
+- found an issue with the pubsub event emitter, test b3_login_info
+
