@@ -375,8 +375,6 @@ describe('a5_eventemitter_security_groups', function () {
 
             var user = result;
 
-            delete user._meta;
-
             testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + user.username, {},
               function(e, result){
 

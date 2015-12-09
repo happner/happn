@@ -22,10 +22,12 @@ context('login info for application layer', function() {
       var events = {};
 
       this.server.services.pubsub.on('authentic', function(evt) {
+        console.log('authentic event:::', evt);
         events['authentic'] = evt;
       });
 
       this.server.services.pubsub.on('disconnect', function(evt) {
+         console.log('disconnect event:::', evt);
         events['disconnect'] = evt;
       });
 
