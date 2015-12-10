@@ -8,25 +8,25 @@ context('login info for application layer', function() {
     beforeEach(function(done) {
       var _this = this;
       Happn.service.create({}).then(function(server) {
-        _this.server = server;
+        _this.server1 = server;
         done();
       }).catch(done);
     });
 
     afterEach(function(done) {
-      if (!this.server) done();
-      this.server.stop(done);
+      if (!this.server1) done();
+      this.server1.stop(done);
     });
 
     it('login info is carried across login', function(done) {
       var events = {};
 
-      this.server.services.pubsub.on('authentic', function(evt) {
+      this.server1.services.pubsub.on('authentic', function(evt) {
         console.log('authentic event:::', evt);
         events['authentic'] = evt;
       });
 
-      this.server.services.pubsub.on('disconnect', function(evt) {
+      this.server1.services.pubsub.on('disconnect', function(evt) {
          console.log('disconnect event:::', evt);
         events['disconnect'] = evt;
       });
@@ -56,7 +56,7 @@ context('login info for application layer', function() {
         });
         done();
 
-      }, 120);
+      }, 200);
 
     });
 
@@ -80,24 +80,24 @@ context('login info for application layer', function() {
           } 
         }
       }).then(function(server) {
-        _this.server = server;
+        _this.server2 = server;
         done();
       }).catch(done);
     });
 
     afterEach(function(done) {
-      if (!this.server) done();
-      this.server.stop(done);
+      if (!this.server2) done();
+      this.server2.stop(done);
     });
 
     it('login info is carried across login', function(done) {
       var events = {};
 
-      this.server.services.pubsub.on('authentic', function(evt) {
+      this.server2.services.pubsub.on('authentic', function(evt) {
         events['authentic'] = evt;
       });
 
-      this.server.services.pubsub.on('disconnect', function(evt) {
+      this.server2.services.pubsub.on('disconnect', function(evt) {
         events['disconnect'] = evt;
       });
 
@@ -109,11 +109,15 @@ context('login info for application layer', function() {
         info: {KEY: 'VALUE'}
       }).then(function(client) {
         // TODO: client.logout()
+
+
+        console.log('LOGOUT!!');
+
+
         client.pubsub.socket.close();
       }).catch(done);
 
       setTimeout(function RunAfterClientHasLoggedInAndOut() {
-
         expect(events).to.eql({
           'authentic': {
             info: {
@@ -130,9 +134,10 @@ context('login info for application layer', function() {
             }
           }
         });
+
         done();
 
-      }, 120);
+      }, 200);
 
     });
 
