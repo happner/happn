@@ -56,7 +56,7 @@ context('login info for application layer', function() {
         });
         done();
 
-      }, 1000);
+      }, 200);
 
     });
 
@@ -81,9 +81,6 @@ context('login info for application layer', function() {
         }
       }).then(function(server) {
         _this.server2 = server;
-
-        console.log('SERVER STARTED');
-
         done();
       }).catch(done);
     });
@@ -104,45 +101,40 @@ context('login info for application layer', function() {
         events['disconnect'] = evt;
       });
 
-      // setTimeout(function WaitForMaybeItsInTheBackgroundSecurityConfiguration() {
 
-        console.log('CLIENT CREATE');
+      Happn.client.create({
+        config: {
+          username: '_ADMIN',
+          password: 'secret',
+        },
+        info: {KEY: 'VALUE'}
+      }).then(function(client) {
+        // TODO!: client.logout()
+        client.pubsub.socket.close();
+      }).catch(done);
 
-        Happn.client.create({
-          config: {
-            username: '_ADMIN',
-            password: 'secret',
-          },
-          info: {KEY: 'VALUE'}
-        }).then(function(client) {
-          // TODO: client.logout()
-          client.pubsub.socket.close();
-        }).catch(done);
-
-        setTimeout(function RunAfterClientHasLoggedInAndOut() {
-          expect(events).to.eql({
-            'authentic': {
-              info: {
-                KEY: 'VALUE',
-                _browser: false,
-                _local: false,
-              }
-            },
-            'disconnect': {
-              info: {
-                KEY: 'VALUE',
-                _browser: false,
-                _local: false,
-              }
+      setTimeout(function RunAfterClientHasLoggedInAndOut() {
+        expect(events).to.eql({
+          'authentic': {
+            info: {
+              KEY: 'VALUE',
+              _browser: false,
+              _local: false,
             }
-          });
+          },
+          'disconnect': {
+            info: {
+              KEY: 'VALUE',
+              _browser: false,
+              _local: false,
+            }
+          }
+        });
 
-          done();
+        done();
 
-        // }, 100); // works, only if test is run alone
-        }, 1000);  // works, but with suspicious "AccessDenied: Invalid credentials"?
-
-      // }, 1000);
+      }, 200); // depending on how long it waits, more and more happn clients
+              // from previous tests are attaching to this test's server
 
     });
 
