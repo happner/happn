@@ -93,7 +93,7 @@ context('login info for application layer', function() {
       this.server2.stop(done);
     });
 
-    xit('login info is carried across login', function(done) {
+    it('login info is carried across login', function(done) {
       var events = {};
 
       this.server2.services.pubsub.on('authentic', function(evt) {
