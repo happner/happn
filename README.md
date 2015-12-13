@@ -5,44 +5,16 @@
 Introduction
 -------------------------
 
-Happn is an attempt at getting the same kind of functionality that [firebase](https://www.firebase.com/) offers, but it is free. It is a bit different from firebase in terms of it being a searchable key/value store, instead of arranging the data like one big json tree, like firebase does.
+Happn is a mini database combined with pub/sub, the system stores json objects on paths. Paths can be queried using wildcard syntax. The happn client can run in the browser or in a node process. Happn clients can subscribe to events on paths, events happn when data is changed by a client on a path, either by a set or a remove operation.
 
-Firebase is fricking awesome - but sometimes priced a little out of the reach of certain projects, but if you have the money to throw at it, it is well worth investigating. 
+Happn stores its data in a collection called 'happn' by default on your mongodb/nedb. The happn system is actually built to be a module, this is because the idea is that you will be able to initialize a server in your own code, and possibly attach your own plugins to various system events.
 
-The aim of this framework however is to create an http/json api that sits on top of a mongo/nedb backend as the server, which also has pub/sub baked in - so you can subscribe to changes in the data via the client - which can be used from a browser or from a node program, depending on how it is initialized.
+A paid for alternative to happn would be [firebase](https://www.firebase.com)
 
 Technologies used:
 Happn uses [Primus](https://github.com/primus/primus) to power websockets for its pub/sub framework and mongo or nedb depending on the mode it is running in as its data store, the API uses [connect](https://github.com/senchalabs/connect).
-
-
-Happn has 3 modes:
------------------------
-
-embedded:
----------
-
-This is the easiest setup, as the system uses nedb to store data internally, so you dont need mongo or redis running on your machine. You can just spin up an instance and start pushing data to it and listening for changes via the client.
-
-* NB - the search functionality works slightly differently in embedded mode, $all is not supported, and nested columns like data.firstname dont work, when you try and limit the columns returned - you'll see what I mean if you look at the tests *
-
-cluster: 
---------
-
-CLUSTER AINT WORKING ANYMORE - DUE TO MIGRATION AND FULL DUPLEX WEBSOCKETS... Busy fixing.
-
-single process:
----------------
-
-The system runs as a single process, but still needs a mongo db instance running for storing data.
-
-SINGLE PROCESS AINT WORKING ANYMORE - DUE TO MIGRATION AND FULL DUPLEX WEBSOCKETS... Busy fixing.
-
-additional info
----------------
-
-Happn stores its data in a collection called 'happn' by default on your mongodb/nedb. The happn system is actually built to be a module, this is because the idea is that you will be able to initialize a server in your own code, and possibly attach your own plugins to various system events. So the requirements and installation instructions show you how to reference happn and write the code that starts the instance up. This won't be a tremendously detailed document - so please do spelunk and get involved.
-
-Requirements & instructions
+ 
+Getting started
 ---------------------------
 
 You need NodeJS and NPM of course, you also need to know how node works (as my setup instructions are pretty minimal)
@@ -51,11 +23,7 @@ You need to install mocha to run the tests, ie: sudo npm install mocha -g --save
 
 then run "npm install happn"
 
-If you want to run in cluster mode, you need to install [Redis](http://redis.io/topics/quickstart) and have it up and running, on its standard port: 6379
-
-If you want to run in cluster or single process mode, you need to install [Mongo](http://docs.mongodb.org/manual/installation/) and have it up and running on its standard port: 27017
-
-You can just clone this repository, then run "npm install" and then run "mocha test" to see how things work, there are over 150 tests there that execute against happn service running in embedded mode. 
+You could just clone this repository, then run "npm install" and then run "mocha test" to see how things work, there are over 180 tests there that execute against happn service running in embedded mode.
 
 But if you want to run your own service do the following:
 
@@ -65,6 +33,8 @@ Create a directory you want to run your happn in, create a node application in i
 
 starting service:
 -------------------------------------------------------
+
+The service runs on port 55000 by default - the following code snippet demonstrates how to instantiate a server.
 
 ```javascript
 var happn = require('../lib/index')
@@ -96,10 +66,6 @@ function (e, happn) {
 
 });
 
-//Cluster mode (needs redis and mongo): 
-[TBD]
-
-```
 
 In your console, go to your application folder and run *node main* your server should start up and be listening on your port of choice.
 
@@ -311,5 +277,5 @@ my_client_instance.set('e2e_test1/testsubscribe/data/', {property1:'property1',p
 
 OTHER PLACES WHERE HAPPN IS USED:
 ----------------------------------
-Watch this space :) - we are building an experimental application engined thatuses happn for its nervous system, it is called happner, see: www.github.com/happner/happner
+Watch this space :) - we are building an experimental application engined that uses happn for its nervous system, it is called happner, see: www.github.com/happner/happner
 
