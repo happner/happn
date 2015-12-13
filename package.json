@@ -7,10 +7,11 @@
     "test": "mocha test"
   },
   "keywords": [
-    "faye",
     "mongo",
     "redis",
-    "nedb"
+    "nedb",
+    "primus",
+    "websockets"
   ],
   "repository": {
     "type": "git",
