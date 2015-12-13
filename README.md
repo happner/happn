@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.org/happner/happn.svg)](https://travis-ci.org/happner/happn)
 
-![Image of happn]
-(https://raw.githubusercontent.com/happner/happner-website/master/images/HAPPN%20Logo%20B.png =300x)
+<img href="https://raw.githubusercontent.com/happner/happner-website/master/images/HAPPN%20Logo%20B.png" style="width:300px">
 
 Introduction
 -------------------------
