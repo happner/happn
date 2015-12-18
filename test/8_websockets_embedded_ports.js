@@ -25,11 +25,19 @@ describe('8_websockets_embedded_ports', function() {
 
 	after('stop all services', function(callback) {
 
-	   async.eachSeries(instances, function(instance, eachCallback){
-	   	instance.stop(eachCallback);
-	   },
-	   callback
-	   );
+		service1Client.disconnect()
+	    .then(service2Client.disconnect()
+	    .then(defaultClient.disconnect()
+	    .then(function(){
+
+	    	async.eachSeries(instances, function(instance, eachCallback){
+		   		instance.stop(eachCallback);
+			},
+			   callback
+			);
+
+	    })))
+	    .catch(callback);
 
 	});
 	

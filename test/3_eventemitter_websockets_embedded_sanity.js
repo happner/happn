@@ -60,7 +60,11 @@ describe('3_eventemitter_websockets_embedded_sanity', function() {
 	});
 
   	after(function(done) {
-    	happnInstance.stop(done);
+    	 publisherclient.disconnect()
+	    .then(listenerclient.disconnect()
+	    .then(happnInstance.stop()
+	    .then(done)))
+	    .catch(done);
   	});
 
 	var publisherclient;

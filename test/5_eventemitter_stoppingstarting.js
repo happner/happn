@@ -46,8 +46,6 @@ describe('5_eventemitter_stoppingstarting', function() {
           serviceConfig.services.data.config.filename = filename;
           serviceConfig.name = name;
 
-          console.log('starting with config:::', serviceConfig.services.data);
-
           happn.service.create(serviceConfig,
           function(e, happnService){
             if (e) return callback(e);
@@ -178,8 +176,6 @@ describe('5_eventemitter_stoppingstarting', function() {
         expect(currentUnpersistedServiceName).to.not.be('5_eventemitter_stoppingstarting');
         expect(currentUnpersistedServiceName).to.not.be(null);
         expect(currentUnpersistedServiceName).to.not.be(undefined);
-
-        console.log('unpersisted config name:::', currentUnpersistedServiceName);
 
         initService(tmpFile, null, function(e){
           if (e) return callback(e);

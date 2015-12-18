@@ -1,6 +1,9 @@
 var Happn = require('../');
 var expect = require('expect.js');
 
+var service1Name;
+var service2Name;
+
 context('login info for application layer', function() {
 
   context('insecure server', function() {
@@ -9,6 +12,7 @@ context('login info for application layer', function() {
       var _this = this;
       Happn.service.create({}).then(function(server) {
         _this.server1 = server;
+        service1Name = server.name;
         done();
       }).catch(done);
     });
@@ -22,18 +26,16 @@ context('login info for application layer', function() {
       var events = {};
 
       this.server1.services.pubsub.on('authentic', function(evt) {
-        console.log('authentic event:::', evt);
         events['authentic'] = evt;
       });
 
       this.server1.services.pubsub.on('disconnect', function(evt) {
-         console.log('disconnect event:::', evt);
         events['disconnect'] = evt;
       });
 
       Happn.client.create({info: {KEY: 'VALUE'}}).then(function(client) {
         // TODO: client.logout()
-        client.pubsub.socket.close();
+        client.disconnect();
       }).catch(done);
 
       setTimeout(function RunAfterClientHasLoggedInAndOut() {
@@ -41,6 +43,9 @@ context('login info for application layer', function() {
         expect(events).to.eql({
           'authentic': {
             info: {
+              happn:{
+                name:service1Name
+              },
               KEY: 'VALUE',
               _browser: false, // client was not a browser
               _local: false,   // client was not intraprocess
@@ -48,6 +53,9 @@ context('login info for application layer', function() {
           },
           'disconnect': {
             info: {
+              happn:{
+                name:service1Name
+              },
               KEY: 'VALUE',
               _browser: false,
               _local: false,
@@ -81,6 +89,7 @@ context('login info for application layer', function() {
         }
       }).then(function(server) {
         _this.server2 = server;
+        service2Name = server.name;
         done();
       }).catch(done);
     });
@@ -110,13 +119,16 @@ context('login info for application layer', function() {
         info: {KEY: 'VALUE'}
       }).then(function(client) {
         // TODO!: client.logout()
-        client.pubsub.socket.close();
+        client.disconnect();
       }).catch(done);
 
       setTimeout(function RunAfterClientHasLoggedInAndOut() {
         expect(events).to.eql({
           'authentic': {
             info: {
+              happn:{
+                name:service2Name
+              },
               KEY: 'VALUE',
               _browser: false,
               _local: false,
@@ -124,6 +136,9 @@ context('login info for application layer', function() {
           },
           'disconnect': {
             info: {
+              happn:{
+                name:service2Name
+              },
               KEY: 'VALUE',
               _browser: false,
               _local: false,
