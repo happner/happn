@@ -16,3 +16,8 @@
 - fixed issue with users and groups being updated, and passed directly up to the client - was causing a scope issue.
 - found an issue with the pubsub event emitter, test b3_login_info
 
+1.1.5 2015-12-18
+----------------
+
+- fixed issue with disconnection not working between tests, pubsub service now disconnects properly - and client also has a disconnect call that works
+
