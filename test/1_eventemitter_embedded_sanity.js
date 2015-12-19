@@ -283,9 +283,6 @@ describe('1_eventemitter_embedded_sanity', function () {
           if (e)
             return callback(e);
 
-          //////////////console.log('merge set results');
-          //////////////console.log(result);
-
           publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, null, function (e, results) {
 
             if (e)
