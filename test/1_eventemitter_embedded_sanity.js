@@ -354,7 +354,7 @@ describe('1_eventemitter_embedded_sanity', function () {
   });
 
 
-  it.only('should search for a complex object', function (callback) {
+  it('should search for a complex object', function (callback) {
 
     //////////////////////////console.log('DOING COMPLEX SEARCH');
 
@@ -403,8 +403,6 @@ describe('1_eventemitter_embedded_sanity', function () {
           options: options1
         }, function (e, search_result) {
 
-          console.log('search result:::',[e, search_result]);
-
           expect(e == null).to.be(true);
           expect(search_result.length == 1).to.be(true);
 
@@ -412,13 +410,8 @@ describe('1_eventemitter_embedded_sanity', function () {
             criteria: criteria2,
             options: options2
           }, function (e, search_result) {
-
-            console.log(e);
-
             expect(e == null).to.be(true);
-
             expect(search_result.length == 2).to.be(true);
-
             callback(e);
           });
 
