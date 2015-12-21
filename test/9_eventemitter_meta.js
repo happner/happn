@@ -22,7 +22,7 @@ describe('9_eventemitter_meta.js', function () {
       happnInstance.stop(done);
   });
 
-  it('should initialize the service', function (callback) {
+  before('should initialize the service', function (callback) {
 
     this.timeout(20000);
 
@@ -71,7 +71,7 @@ describe('9_eventemitter_meta.js', function () {
    We are initializing 2 clients to test saving data against the database, one client will push data into the 
    database whilst another listens for changes.
    */
-  it('should initialize the clients', function (callback) {
+  before('should initialize the clients', function (callback) {
     this.timeout(default_timeout);
 
     try {
@@ -109,6 +109,7 @@ describe('9_eventemitter_meta.js', function () {
   var test_path_all = '/test/meta/all' + require('shortid').generate();
   var test_path_created_modified = '/test/meta/created_modified' + require('shortid').generate();
   var test_path_created_modified_notmerge = '/test/meta/created_modified_notmerge' + require('shortid').generate();
+  var test_path_timestamp = '/test/meta/test_path_timestamp' + require('shortid').generate();
 //	We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 
   it('tests the set meta data', function (callback) {
@@ -277,6 +278,108 @@ describe('9_eventemitter_meta.js', function () {
       }, 1000);
 
     });
+  });
+
+  it('searches by timestamps', function (callback) {
+
+    this.timeout(5000);
+
+    var itemIndexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    var windowStart = new Date();
+
+    //we save 10 items, with timestamp path, then do a search with modified, then a search created - ensure the counts are right
+    async.eachSeries(itemIndexes, 
+    function(index, eachCallback){
+
+      publisherclient.set(test_path_timestamp + index, {
+          property4: 'property4',
+          ind:index
+      }, eachCallback);
+
+    }, 
+    function(e){
+
+      if (e) return callback(e);
+
+      //now set an 11th after a second
+
+      setTimeout(function(){
+
+        var windowEnd = new Date();
+
+        publisherclient.set(test_path_timestamp + 10, {
+            property4: 'property4',
+            ind:10
+        }, function(e, eleventhItem){
+
+          var searchCriteria = {
+            '_meta.created':{
+              '$gte':windowStart, 
+              '$lt':windowEnd
+            }   
+          }
+
+          publisherclient.get('*', {criteria:searchCriteria}, function(e, items){
+
+            if (e) return callback(e);
+            expect(items.length == 10).to.be(true);
+
+            var searchCriteria = {
+              '_meta.created':{
+                '$gte':windowEnd
+              }  
+            }
+
+            publisherclient.get('*', {criteria:searchCriteria}, function(e, items){
+
+              if (e) return callback(e);
+
+              expect(items.length == 1).to.be(true);
+              expect(items[0].ind).to.be(10);
+
+              setTimeout(function(){
+
+                var lastModified = new Date();
+
+                publisherclient.set(test_path_timestamp + '0', {
+                  modifiedProperty:'modified'
+                }, {merge:true}, function(e, modifiedItem){
+
+                  if (e) return callback(e);
+
+                  var searchCriteria = {
+                    '_meta.modified':{
+                      '$gte':lastModified
+                    }  
+                  }
+
+                  publisherclient.get('*', {criteria:searchCriteria}, function(e, items){
+
+                    if (e) return callback(e);
+
+                    expect(items.length == 1).to.be(true);
+                    expect(items[0].ind).to.be(0);
+
+                    callback();
+
+                  });
+
+                });
+
+              }, 1000);
+
+            });
+
+          });
+
+        });
+
+
+      }, 2000);
+
+    });
+
   });
 
   it('tests the all meta data', function (callback) {
