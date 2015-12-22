@@ -371,15 +371,15 @@ describe('1_eventemitter_embedded_sanity', function () {
 
 
     var criteria1 = {
-      $or: [{"data.regions": {$in: ['North', 'South', 'East', 'West']}},
-        {"data.towns": {$in: ['North.Cape Town', 'South.East London']}},
-        {"data.categories": {$in: ["Action", "History"]}}],
-      "data.keywords": {$in: ["bass", "Penny Siopis"]}
+      $or: [{"regions": {$in: ['North', 'South', 'East', 'West']}},
+        {"towns": {$in: ['North.Cape Town', 'South.East London']}},
+        {"categories": {$in: ["Action", "History"]}}],
+      "keywords": {$in: ["bass", "Penny Siopis"]}
     }
 
     var options1 = {
       fields: {"data": 1},
-      sort: {"data.field1": 1},
+      sort: {"field1": 1},
       limit: 1
     }
 
@@ -387,7 +387,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
     var options2 = {
       fields: null,
-      sort: {"data.field1": 1},
+      sort: {"field1": 1},
       limit: 2
     }
 
