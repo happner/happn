@@ -286,7 +286,7 @@ describe('9_eventemitter_meta.js', function () {
 
     var itemIndexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    var windowStart = new Date();
+    var windowStart = Date.now();
 
     //we save 10 items, with timestamp path, then do a search with modified, then a search created - ensure the counts are right
     async.eachSeries(itemIndexes, 
@@ -306,7 +306,7 @@ describe('9_eventemitter_meta.js', function () {
 
       setTimeout(function(){
 
-        var windowEnd = new Date();
+        var windowEnd = Date.now();
 
         publisherclient.set(test_path_timestamp + 10, {
             property4: 'property4',
@@ -340,7 +340,7 @@ describe('9_eventemitter_meta.js', function () {
 
               setTimeout(function(){
 
-                var lastModified = new Date();
+                var lastModified = Date.now();
 
                 publisherclient.set(test_path_timestamp + '0', {
                   modifiedProperty:'modified'
