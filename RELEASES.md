@@ -21,3 +21,10 @@
 
 - fixed issue with disconnection not working between tests, pubsub service now disconnects properly - and client also has a disconnect call that works
 
+1.2.6 2015-12-23
+----------------
+
+- fixed issue where _meta is passed into return arrays on .get
+- improved search functionality, no longer any need to prepend search criteria/fields etc. with data.
+- modified to use the forked version of nedb, which stores created and modified dates as UTC values, and allows for the deep picking of fields when projecting
+
