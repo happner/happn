@@ -9,7 +9,7 @@ describe('9_eventemitter_meta.js', function () {
 
   var testport = 8000;
   var test_secret = 'test_secret';
-  var mode = "embedded";
+  var mode = "embedde d";
   var default_timeout = 10000;
   var happnInstance = null;
   /*

@@ -143,6 +143,23 @@ describe('2_websockets_embedded_sanity', function() {
     }
   });
 
+  it('the publisher should get null for unfound data, exact path', function (callback) {
+
+    this.timeout(default_timeout);
+
+    var test_path_end = require('shortid').generate();
+    publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/unfound/exact/' + test_path_end, null, function (e, results) {
+      ////////////console.log('new data results');
+    
+      expect(e).to.be(null);
+      expect(results).to.be(null);
+
+      callback(e);
+
+    });
+        
+  });
+
 
   it('the publisher should set new data', function (callback) {
 
@@ -231,24 +248,15 @@ describe('2_websockets_embedded_sanity', function() {
         if (e)
           return callback(e);
 
-        //////////////console.log('set results');
-        //////////////console.log(result);
-
         publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, {property4: 'property4'}, {merge: true}, function (e, result) {
 
           if (e)
             return callback(e);
 
-          //////////////console.log('merge set results');
-          //////////////console.log(result);
-
           publisherclient.get('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, null, function (e, results) {
 
             if (e)
               return callback(e);
-
-            //////////////console.log('merge get results');
-            //////////////console.log(results);
 
             expect(results.property4).to.be('property4');
             expect(results.property1).to.be('property1');
@@ -314,8 +322,6 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('should search for a complex object', function (callback) {
 
-    //////////////////////////console.log('DOING COMPLEX SEARCH');
-
     var test_path_end = require('shortid').generate();
 
     var complex_obj = {
@@ -355,7 +361,6 @@ describe('2_websockets_embedded_sanity', function() {
       publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end + '/1', complex_obj, null, function (e, put_result) {
         expect(e == null).to.be(true);
 
-        ////////////console.log('searching');
         publisherclient.get('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
           criteria: criteria1,
           options: options1
