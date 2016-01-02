@@ -28,7 +28,7 @@
 - improved search functionality, no longer any need to prepend search criteria/fields etc. with data.
 - modified to use the forked version of nedb, which stores created and modified dates as UTC values, and allows for the deep picking of fields when projecting
 
-2.1.6 2016-01-02
+2.1.7 2016-01-02
 ----------------
 
 - fixed issue where null data is returned as an object with only _meta for the websocket client, updated the tests
