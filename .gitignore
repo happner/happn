@@ -9,6 +9,7 @@ lib-cov
 *.log.*
 *.nedb
 *test/tmp*
+*test/test-tmp*
 *.db
 
 pids
