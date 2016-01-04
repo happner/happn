@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/happner/happn.svg)](https://travis-ci.org/happner/happn)
+[![Build Status](https://travis-ci.org/happner/happn.svg)](https://travis-ci.org/happner/happn) [![Coverage Status](https://coveralls.io/repos/happner/happn/badge.svg?branch=master&service=github)](https://coveralls.io/github/happner/happn?branch=master)
 
 <img src="https://raw.githubusercontent.com/happner/happner-website/master/images/HAPPN%20Logo%20B.png" width="300"></img>
 
