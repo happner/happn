@@ -307,7 +307,7 @@ happn.client.create({config:{username:'_ADMIN', password:'testPWD'}, secure:true
 ```
 
 
-HTTPS
+HTTPS SERVER
 -----------------------------
 
 *happn can also run in https mode, the config has a section called transport*
@@ -353,8 +353,11 @@ service.create(config ...
 
 ```
 
-NB - the client must now be initialized with a protocol of https, and if it is the node based client and the cert and key file was self signed, the allowSelfSignedCerts option must be set to true
------
+HTTPS CLIENT
+------------
+
+*NB - the client must now be initialized with a protocol of https, and if it is the node based client and the cert and key file was self signed, the allowSelfSignedCerts option must be set to true*
+
 
 ```javascript
 
