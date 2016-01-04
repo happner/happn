@@ -368,5 +368,5 @@ happn.client.create({config:{protocol:'https', allowSelfSignedCerts:true}},funct
 
 OTHER PLACES WHERE HAPPN IS USED:
 ----------------------------------
-Watch this space :) - we are building an experimental application engined that uses happn for its nervous system, it is called happner, see: www.github.com/happner/happner
+Watch this space :) - we are building an experimental application engine that uses happn for its nervous system, it is called happner, see: www.github.com/happner/happner
 
