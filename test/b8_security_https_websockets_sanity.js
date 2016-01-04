@@ -1,4 +1,4 @@
-describe('2_websockets_embedded_sanity', function() {
+describe('b8_security_https_websockets_sanity', function() {
 
   var expect = require('expect.js');
   var happn = require('../lib/index');
