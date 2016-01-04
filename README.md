@@ -57,8 +57,9 @@ function (e, happn) {
 
 });
 
+```
 
-In your console, go to your application folder and run *node main* your server should start up and be listening on your port of choice.
+In your console, go to your application folder and run*node main*your server should start up and be listening on your port of choice.
 
 Connecting to Happn
 -------------------------
@@ -121,7 +122,7 @@ my_client_instance.set('e2e_test1/testsubscribe/data/', {property1:'property1',p
 SET SIBLING
 -------------------------
 
-* sets your data to a unique path starting with the path you passed in as a parameter, suffixed with a random short id *
+*sets your data to a unique path starting with the path you passed in as a parameter, suffixed with a random short id*
 
 ```javascript
 	my_client_instance.setSibling('e2e_test1/siblings', {property1:'sib_post_property1',property2:'sib_post_property2'}, function(e, results){
@@ -132,7 +133,7 @@ SET SIBLING
 GET
 ---------------------------
 
-* Gets the data living at the specified branch *
+*Gets the data living at the specified branch*
 
 ```javascript
 my_client_instance.get('e2e_test1/testsubscribe/data', 
@@ -143,7 +144,7 @@ my_client_instance.get('e2e_test1/testsubscribe/data',
 	
 ```
 
-* You can also use wildcards, gets all items with the path starting e2e_test1/testsubscribe/data *
+*You can also use wildcards, gets all items with the path starting e2e_test1/testsubscribe/data*
 
 ```javascript
 my_client_instance.get('e2e_test1/testsubscribe/data*', 
@@ -155,7 +156,7 @@ my_client_instance.get('e2e_test1/testsubscribe/data*',
 	});
 ```
 
-*You can also just get paths, without data *
+*You can also just get paths, without data*
 
 ```javascript
 my_client_instance.getPaths('e2e_test1/testwildcard/*', function(e, results){
@@ -198,7 +199,7 @@ SEARCH
 DELETE
 ---------------------------
 
-* deletes the data living at the specified branch *
+*deletes the data living at the specified branch*
 
 ```javascript
 	my_client_instance.remove('/e2e_test1/testsubscribe/data/delete_me', null, function(e, result){
@@ -209,7 +210,7 @@ DELETE
 EVENTS
 ----------------------------
 
-* you can listen to any SET & REMOVE events happening in your data - you can specifiy a path you want to listen on or you can listen to all SET and DELETE events using a catch-all listener *
+*you can listen to any SET & REMOVE events happening in your data - you can specifiy a path you want to listen on or you can listen to all SET and DELETE events using a catch-all listener*
 
 Specific listener:
 ```javascript
@@ -242,7 +243,7 @@ my_client_instance.onAll(function(//your listener event handler
 TAGGING
 ----------------------------
 
-*You can do a set command and specify that you want to tag the data at the end of the path (or the data that is created as a result of the command), tagging will take a snapshot of the data as it currently stands, and will save the snapshot to a path that starts with the path you specify, and a '/' with the tag you specify at the end *
+*You can do a set command and specify that you want to tag the data at the end of the path (or the data that is created as a result of the command), tagging will take a snapshot of the data as it currently stands, and will save the snapshot to a path that starts with the path you specify, and a '/' with the tag you specify at the end*
 
 ```javascript
 
@@ -255,7 +256,7 @@ my_client_instance.set('e2e_test1/test/tag', {property1:'property1',property2:'p
 MERGING
 ----------------------------
 
-* you can do a set command and specify that you want to merge the json you are pushing with the existing dataset, this means any existing values that are not in the set json but exist in the database are persisted *
+*you can do a set command and specify that you want to merge the json you are pushing with the existing dataset, this means any existing values that are not in the set json but exist in the database are persisted*
 
 ```javascript
 
@@ -268,7 +269,7 @@ my_client_instance.set('e2e_test1/testsubscribe/data/', {property1:'property1',p
 SECURITY SERVER
 ---------------
 
-* happn server instances can be secured with user and group authentication, a default user and group called _ADMIN is created per happn instance, the admin password is 'happn' but is configurable (MAKE SURE PRODUCTION INSTANCES DO NOT RUN OFF THE DEFAULT PASSWORD) *
+*happn server instances can be secured with user and group authentication, a default user and group called _ADMIN is created per happn instance, the admin password is 'happn' but is configurable (MAKE SURE PRODUCTION INSTANCES DO NOT RUN OFF THE DEFAULT PASSWORD)*
 
 ```javascript
 
@@ -288,19 +289,19 @@ function (e, instance) {
 
 ```
 
-* at the moment, adding users, groups and permissions can only be done by directly accessing the security service, to see how this is done - please look at the [functional test for security](https://github.com/happner/happn/blob/master/test/a7_eventemitter_security_access.js)
+*at the moment, adding users, groups and permissions can only be done by directly accessing the security service, to see how this is done - please look at the [functional test for security](https://github.com/happner/happn/blob/master/test/a7_eventemitter_security_access.js)*
 
 SECURITY CLIENT
 ----------------
 
-* the client needs to be instantiated with user credentials and with the secure option set to true to connect to a secure server *
+*the client needs to be instantiated with user credentials and with the secure option set to true to connect to a secure server*
 
 ```javascript
 
 //logging in with the _ADMIN user
 
 var happn = require('happn'); 
-happn.client.create({config:{username:'_ADMIN', password:'testPWD'}},function(e, instance) {
+happn.client.create({config:{username:'_ADMIN', password:'testPWD'}, secure:true},function(e, instance) {
 
 
 ```
@@ -309,7 +310,7 @@ happn.client.create({config:{username:'_ADMIN', password:'testPWD'}},function(e,
 HTTPS
 -----------------------------
 
-* happn can also run in https mode, the config has a section called transport *
+*happn can also run in https mode, the config has a section called transport*
 
 ```javascript
 
@@ -353,7 +354,7 @@ service.create(config ...
 ```
 
 NB - the client must now be initialized with a protocol of https, and if it is the node based client and the cert and key file was self signed, the allowSelfSignedCerts option must be set to true
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----
 
 ```javascript
 
