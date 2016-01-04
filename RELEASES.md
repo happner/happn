@@ -33,3 +33,9 @@
 
 - fixed issue where null data is returned as an object with only _meta for the websocket client, updated the tests
 
+2.2.0 2016-01-04
+----------------
+
+- broke the initialization ocde out, into services module and transport module
+- the transport module now allows for happn to run in https mode
+

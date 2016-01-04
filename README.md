@@ -37,21 +37,12 @@ starting service:
 The service runs on port 55000 by default - the following code snippet demonstrates how to instantiate a server.
 
 ```javascript
-var happn = require('../lib/index')
-var service = happn.service;
+var happn = require('happn')
 var happnInstance; //this will be your server instance
 
 //we are using a compact default config here, port defaults to 55000
 
- service.create({
-  services: {
-    auth: {
-      path: './services/auth/service.js',
-      config: {
-        systemSecret: 'my secret'
-      }
-    }
-  },
+ happn.service.create({
   utils: {
     logLevel: 'error',
     // see happn-logger module for more config options
@@ -76,10 +67,9 @@ Using node:
 
 ```javascript
 var happn = require('happn'); 
-var happn_client = happn.client; 
 var my_client_instance; //this will be your client instance
 
-happn_client.create({config:{secret:'my secret'}}, function(e, instance) {
+happn.client.create([options], function(e, instance) {
 	
 	//instance is now connected to the server listening on port 55000
 	my_client_instance = instance;
@@ -96,7 +86,7 @@ To use the browser client, make sure the server is running, and reference the cl
 
 var my_client_instance; 
 
-HappnClient.create({config:{secret:'my secret'}}, function(e, instance) {
+HappnClient.create([options], function(e, instance) {
 	
 	//instance is now connected to the server listening on port 55000
 	my_client_instance = instance;
@@ -274,6 +264,106 @@ my_client_instance.set('e2e_test1/testsubscribe/data/', {property1:'property1',p
 });
 
 ```
+
+SECURITY SERVER
+---------------
+
+* happn server instances can be secured with user and group authentication, a default user and group called _ADMIN is created per happn instance, the admin password is 'happn' but is configurable (MAKE SURE PRODUCTION INSTANCES DO NOT RUN OFF THE DEFAULT PASSWORD) *
+
+```javascript
+
+var happn = require('happn')
+var happnInstance; //this will be your server instance
+
+happn.service.create({secure:true, adminUser:{password:'testPWD'}},
+function (e, instance) {
+
+  if (e)
+    return callback(e);
+
+  happnInstance = instance; //here it is, your server instance
+
+});
+
+
+```
+
+* at the moment, adding users, groups and permissions can only be done by directly accessing the security service, to see how this is done - please look at the [functional test for security](https://github.com/happner/happn/blob/master/test/a7_eventemitter_security_access.js)
+
+SECURITY CLIENT
+----------------
+
+* the client needs to be instantiated with user credentials and with the secure option set to true to connect to a secure server *
+
+```javascript
+
+//logging in with the _ADMIN user
+
+var happn = require('happn'); 
+happn.client.create({config:{username:'_ADMIN', password:'testPWD'}},function(e, instance) {
+
+
+```
+
+
+HTTPS
+-----------------------------
+
+* happn can also run in https mode, the config has a section called transport *
+
+```javascript
+
+//cert and key defined in config
+
+var config = {
+  	transport:{
+    	mode:'https',
+    	cert: '-----BEGIN CERTIFICATE-----\n[CERT ETC...]\n-----END CERTIFICATE-----',
+    	key: '-----BEGIN RSA PRIVATE KEY-----\n[KEY ETC...]\n-----END RSA PRIVATE KEY-----'
+  	}
+}
+
+// or cert and key file paths defined in config
+// IF BOTH OF THESE FILES DONT EXIST, THEY ARE AUTOMATICALLY CREATED AS SELF SIGNED
+
+var config = {
+	transport:{
+    	mode:'https',
+    	certPath:'home/my_cert.pem',
+    	keyPath:'home/my_key.rsa'
+	}
+}
+
+// or have the system create a cert and key for you, in the home directory of the user that started the happn process - called .happn-https-cert and .happn-https-key
+
+var config = {
+	transport:{
+    	mode:'https'
+	}
+}
+
+var happn = require('../lib/index')
+var service = happn.service;
+var happnInstance; //this will be your server instance
+
+//create the service here - now in https mode - running over the default port 55000
+
+service.create(config ...
+
+```
+
+NB - the client must now be initialized with a protocol of https, and if it is the node based client and the cert and key file was self signed, the allowSelfSignedCerts option must be set to true
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+```javascript
+
+var happn = require('happn'); 
+
+happn.client.create({config:{protocol:'https', allowSelfSignedCerts:true}},function(e, instance) {
+...
+
+```
+
 
 OTHER PLACES WHERE HAPPN IS USED:
 ----------------------------------
