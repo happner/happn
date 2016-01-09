@@ -22,9 +22,7 @@ describe('b8_security_https_websockets_sanity', function() {
     };
 
     http_request_options.path = path;
-    http_request_options.headers = {'Cookie': 'happn_token=' + token}
-
-    console.log('in doRequest:::', http_request_options);
+    http_request_options.headers = {'Cookie': ['happn_token=' + token]}
 
     http.request(http_request_options, callback).end();
   }
@@ -194,11 +192,11 @@ describe('b8_security_https_websockets_sanity', function() {
 
     try {
 
-      testGroup.permissions = {'/secure/route/test/GET':{actions:['get']}};
+      testGroup.permissions = {'/HTTPGET/secure/route/test':{actions:['get']}};
       
       happnInstance.services.security.upsertGroup(testGroup, {}, function(e, group){
         if (e) return done(e);
-        expect(group.permissions['/secure/route/test/GET']).to.eql({actions:['get']});
+        expect(group.permissions['/HTTPGET/secure/route/test']).to.eql({actions:['get']});
         
          doRequest('/secure/route/test', testClient.session.token, function(response){
 
