@@ -1,4 +1,4 @@
-describe('b8_security_https_websockets_sanity', function() {
+describe('b9_security_web_token', function() {
 
   var expect = require('expect.js');
   var happn = require('../lib/index');
@@ -192,11 +192,11 @@ describe('b8_security_https_websockets_sanity', function() {
 
     try {
 
-      testGroup.permissions = {'/HTTPGET/secure/route/test':{actions:['get']}};
+      testGroup.permissions = {'/@HTTP/secure/route/test':{actions:['get']}};
       
       happnInstance.services.security.upsertGroup(testGroup, {}, function(e, group){
         if (e) return done(e);
-        expect(group.permissions['/HTTPGET/secure/route/test']).to.eql({actions:['get']});
+        expect(group.permissions['/@HTTP/secure/route/test']).to.eql({actions:['get']});
         
          doRequest('/secure/route/test', testClient.session.token, function(response){
 
@@ -209,6 +209,16 @@ describe('b8_security_https_websockets_sanity', function() {
     } catch (e) {
       callback(e);
     }
+  });
+
+  xit('removes the permission from the test group - we ensure we can not access the resource with the token', function (callback) {
+    
+
+  });
+
+   xit('access a resource using the token as part of the url as a querystring argument', function (callback) {
+    
+
   });
 
 

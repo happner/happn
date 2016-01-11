@@ -301,8 +301,9 @@ describe('a5_eventemitter_security_groups', function () {
         testServices.security.upsertUser(testUser, {overwrite: false}, function(e, result){
           if (e) return callback(e);
 
+          expect(result.password).to.equal(undefined);
+
           delete result['_meta'];
-          delete result['password'];
 
           expect(result).to.eql({
             custom_data: {
