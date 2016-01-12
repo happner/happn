@@ -306,6 +306,108 @@ happn.client.create({config:{username:'_ADMIN', password:'testPWD'}, secure:true
 
 ```
 
+WEB PATH LEVEL SECURITY
+-----------------------
+
+*the http/s server that happn uses can also have custom routes associated with it, when the service is run in secure mode - only people who belong to groups that are granted @HTTP permissions that match wildcard patterns for the request path can access resources on the paths, here is how we grant permissions to paths:*
+
+
+```javascript
+
+var happn = require('happn')
+var happnInstance; //this will be your server instance
+
+happn.service.create({secure:true, adminUser:{password:'testPWD'}},
+function (e, instance) {
+
+  if (e)
+    return callback(e);
+
+  	happnInstance = instance; //here it is, your server instance
+
+  	var testGroup = {
+	  name:'TEST GROUP',
+	  custom_data:{
+	    customString:'custom1',
+	    customNumber:0
+	  }
+	}
+
+	testGroup.permissions = {
+		'/@HTTP/secure/route/*':{actions:['get']},//NB - we can wildcard the path
+		'/@HTTP/secure/another/route/test':{actions:['put','post']}//NB - actions confirm to http verbs
+	};
+
+	happnInstance.services.security.upsertGroup(testGroup, {}, function(e, group){
+
+		//our group has been upserted with the right permissions
+
+		//this is how we add custom routes to the service, these routes are both available to users who belong to the 'TEST GROUP' group or the _ADMIN user (who has permissions to all routes)
+
+		happnInstance.connect.use('/secure/route/test', function(req, res, next){
+
+		    res.setHeader('Content-Type', 'application/json');
+		    res.end(JSON.stringify({"secure":"value"}));
+
+		});
+
+		happnInstance.connect.use('/secure/another/route/test', function(req, res, next){
+
+		    res.setHeader('Content-Type', 'application/json');
+		    res.end(JSON.stringify({"secure":"value"}));
+
+		});
+
+
+
+
+	});
+
+
+
+});
+
+```
+
+*logging in with a secure client gives us access to a token that can be used, either by embedding the token in a cookie called happn_token or a query string parameter called happn_token, if the login has happened on the browser, the happn_token is autmatically set by default*
+
+
+```javascript
+
+//logging in with the _ADMIN user, who has permission to all web routes
+
+var happn = require('happn'); 
+happn.client.create({config:{username:'_ADMIN', password:'testPWD'}, secure:true},function(e, instance) {
+	
+	//the token can be derived from instance.session.token now
+
+	//here is an example of an http request using the token:
+
+	var http = require('http');
+
+	var options = {
+		host: '127.0.0.1',
+      	port:55000,
+      	path:'/secure/route/test'
+	}
+
+	if (use_query_string)
+      	options.path += '?happn_token=' + instance.session.token;
+    else
+    	options.headers = {'Cookie': ['happn_token=' + instance.session.token]}
+    
+    http.request(options, function(response){
+
+    	//response.statusCode should be 200;
+
+    }).end();
+
+
+});
+
+
+```
+
 
 HTTPS SERVER
 -----------------------------

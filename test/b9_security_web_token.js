@@ -14,7 +14,7 @@ describe('b9_security_web_token', function() {
   var adminClient;
   var testClient;
 
-  function doRequest(path, token, callback){
+  function doRequest(path, token, query, callback){
 
     var http_request_options = {
       host: '127.0.0.1',
@@ -22,7 +22,11 @@ describe('b9_security_web_token', function() {
     };
 
     http_request_options.path = path;
-    http_request_options.headers = {'Cookie': ['happn_token=' + token]}
+
+    if (!query)
+      http_request_options.headers = {'Cookie': ['happn_token=' + token]}
+    else
+      http_request_options.path += '?happn_token=' + token;
 
     http.request(http_request_options, callback).end();
   }
@@ -153,7 +157,30 @@ describe('b9_security_web_token', function() {
 
       });
 
-      doRequest('/secure/route', adminClient.session.token, function(response){
+      doRequest('/secure/route', adminClient.session.token, false, function(response){
+
+        expect(response.statusCode).to.equal(200);
+        callback();
+
+      });
+
+    } catch (e) {
+      callback(e);
+    }
+  });
+
+  it('the server should set up a secure route, the admin client should connect ok passing the token on the querystring', function (callback) {
+
+    try {
+
+      happnInstance.connect.use('/secure/route/qs', function(req, res, next){
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({"secure":"value"}));
+
+      });
+
+      doRequest('/secure/route/qs', adminClient.session.token, true, function(response){
 
         expect(response.statusCode).to.equal(200);
         callback();
@@ -176,7 +203,7 @@ describe('b9_security_web_token', function() {
 
       });
 
-      doRequest('/secure/route/test', testClient.session.token, function(response){
+      doRequest('/secure/route/test', testClient.session.token, false, function(response){
 
         expect(response.statusCode).to.equal(403);
         callback();
@@ -198,7 +225,7 @@ describe('b9_security_web_token', function() {
         if (e) return done(e);
         expect(group.permissions['/@HTTP/secure/route/test']).to.eql({actions:['get']});
         
-         doRequest('/secure/route/test', testClient.session.token, function(response){
+        doRequest('/secure/route/test', testClient.session.token, false, function(response){
 
           expect(response.statusCode).to.equal(200);
           callback();
@@ -216,7 +243,7 @@ describe('b9_security_web_token', function() {
 
   });
 
-   xit('access a resource using the token as part of the url as a querystring argument', function (callback) {
+  xit('access a resource using the token as part of the url as a querystring argument', function (callback) {
     
 
   });

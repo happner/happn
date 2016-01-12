@@ -63,8 +63,6 @@ describe('b7_security_https', function() {
 
     var serviceConfig = config.test1_config;
 
-    console.log('config.test1_config:::', config.test1_config);
-
     getService(serviceConfig, function(e){
 
       if (e) return done(e);
@@ -96,8 +94,7 @@ describe('b7_security_https', function() {
       return done();
 
     var serviceConfig = config.test3_config;
-    console.log('serviceConfig:::', config.test3_config);
-
+  
     getService(serviceConfig, function(e){
 
       if (e) return done(e);
