@@ -16,19 +16,21 @@ describe('b9_security_web_token', function() {
 
   function doRequest(path, token, query, callback){
 
-    var http_request_options = {
-      host: '127.0.0.1',
-      port:55000
+    var request = require('request');
+
+    var options = {
+      url: 'http://127.0.0.1:55000' + path,
     };
 
-    http_request_options.path = path;
-
     if (!query)
-      http_request_options.headers = {'Cookie': ['happn_token=' + token]}
+      options.headers = {'Cookie': ['happn_token=' + token]}
     else
-      http_request_options.path += '?happn_token=' + token;
+      options.url += '?happn_token=' + token;
 
-    http.request(http_request_options, callback).end();
+    request(options, function(error, response, body){
+      callback(response);
+    });
+
   }
 
   /*
@@ -44,12 +46,56 @@ describe('b9_security_web_token', function() {
 
     try{
       service.create({
-          secure:true
+          secure:true,
+          middleware:{
+            security:{
+              exclusions:[
+                '/test/excluded/specific',
+                '/test/excluded/wildcard/*',
+              ]
+            }
+          }
         },function (e, happnInst) {
               if (e)
                 return callback(e);
 
               happnInstance = happnInst;
+
+              happnInstance.connect.use('/secure/route/test', function(req, res, next){
+
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({"secure":"value"}));
+
+              });
+
+              happnInstance.connect.use('/secure/route', function(req, res, next){
+
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({"secure":"value"}));
+
+              });
+
+              happnInstance.connect.use('/secure/route/qs', function(req, res, next){
+
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify({"secure":"value"}));
+
+                });
+
+              happnInstance.connect.use('/test/excluded/wildcard/blah', function(req, res, next){
+
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify({"secure":"value"}));
+
+              });
+
+              happnInstance.connect.use('/test/excluded/specific', function(req, res, next){
+
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify({"secure":"value"}));
+
+              });
+
               callback();
 
             });
@@ -150,13 +196,6 @@ describe('b9_security_web_token', function() {
 
     try {
 
-      happnInstance.connect.use('/secure/route', function(req, res, next){
-
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({"secure":"value"}));
-
-      });
-
       doRequest('/secure/route', adminClient.session.token, false, function(response){
 
         expect(response.statusCode).to.equal(200);
@@ -173,13 +212,6 @@ describe('b9_security_web_token', function() {
 
     try {
 
-      happnInstance.connect.use('/secure/route/qs', function(req, res, next){
-
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({"secure":"value"}));
-
-      });
-
       doRequest('/secure/route/qs', adminClient.session.token, true, function(response){
 
         expect(response.statusCode).to.equal(200);
@@ -195,13 +227,6 @@ describe('b9_security_web_token', function() {
   it('the server should set up another secure route, the test client should fail to connect', function (callback) {
 
     try {
-
-      happnInstance.connect.use('/secure/route/test', function(req, res, next){
-
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({"secure":"value"}));
-
-      });
 
       doRequest('/secure/route/test', testClient.session.token, false, function(response){
 
@@ -236,6 +261,49 @@ describe('b9_security_web_token', function() {
     } catch (e) {
       callback(e);
     }
+  });
+
+  it('updates the group associated with the test user to allow gets to the path, the user should succeed in connecting to the url with the query string', function (callback) {
+
+    try {
+
+      testGroup.permissions = {'/@HTTP/secure/route/test':{actions:['get']}};
+      
+      happnInstance.services.security.upsertGroup(testGroup, {}, function(e, group){
+        if (e) return done(e);
+        expect(group.permissions['/@HTTP/secure/route/test']).to.eql({actions:['get']});
+        
+        doRequest('/secure/route/test', testClient.session.token, true, function(response){
+
+          expect(response.statusCode).to.equal(200);
+          callback();
+
+        });
+      });
+
+    } catch (e) {
+      callback(e);
+    }
+  });
+
+  it('tests the excluded wildcard route to ensure anyone can access it', function (callback) {
+  
+    doRequest('/test/excluded/wildcard/blah', null, false, function(response){
+      expect(response.statusCode).to.equal(200);
+      callback();
+    });
+
+  });
+
+  it('tests the excluded specific route to ensure anyone can access it', function (callback) {
+    
+    this.timeout(20000);
+
+    doRequest('/test/excluded/specific', null, true, function(response){
+      expect(response.statusCode).to.equal(200);
+      callback();
+    });
+
   });
 
   xit('removes the permission from the test group - we ensure we can not access the resource with the token', function (callback) {
