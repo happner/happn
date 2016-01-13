@@ -45,3 +45,11 @@
 - web token functionality added, so web requests are also vetted by the security component
 - fixed an issue whereby the password is being passed back when a user is updated, subsequent updates cause the hash being stored as a password
 
+2.3.1 2016-01-13
+----------------
+
+- fixed issue where web token was being passed as a qs argument
+- added functionality for exclusions on web paths
+
+
+
