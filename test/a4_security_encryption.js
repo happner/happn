@@ -31,7 +31,7 @@ describe('a4_security_encryption.js', function () {
 
     happnMock.utils = require('../lib/utils');
 
-    async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
+    async.eachSeries(['crypto', 'data', 'security'], function(serviceName, eachServiceCB){
 
       testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;
