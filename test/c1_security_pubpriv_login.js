@@ -40,8 +40,8 @@ describe('c1_security_pubpriv_login', function() {
           	security:{
           		config:{
           			keyPair:{
-          				privateKey:'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
-          				publicKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M='
+          				privateKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=',
+          				publicKey:'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
           			}
           		}
           	}
@@ -132,8 +132,8 @@ describe('c1_security_pubpriv_login', function() {
 		      	username:'_ADMIN', 
 		      	password:'happn', 
 		      	keyPair:{
-		      		publicKey:'j/noGOkT0V7rvu4JCQr/ZJOXLP4qq9xyBoH9/XVE8Ic=', 
-		      		privateKey:'Ap5u3pLpSm8EzDCROmiUfUgYBmm8xcrK5lcqJHA563Z1'}
+		      		publicKey:'AjN7wyfbEdI2LzWyFo6n31hvOrlYvkeHad9xGqOXTm1K', 
+		      		privateKey:'y5RTfdnn21OvbQrnBMiKBP9DURduo0aijMIGyLJFuJQ='}
 		      	},
 	      	secure:true
 	    })
