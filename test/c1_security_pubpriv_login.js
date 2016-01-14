@@ -16,8 +16,12 @@ describe('c1_security_pubpriv_login', function() {
   var adminClient;
   var testClient;
 
-  var bitcore = require('bitcore-lib');
-  var ECIES = require('bitcore-ecies');
+  var Crypto = require('consent-util-crypto');
+  var crypto = new Crypto();
+
+  var clientKeyPair = crypto.createKeyPair();
+  var serverKeyPair = crypto.createKeyPair();
+  var serverKeyPair1 = crypto.createKeyPair();
 
   /*
   This test demonstrates starting up the happn service - 
@@ -29,10 +33,19 @@ describe('c1_security_pubpriv_login', function() {
     
     this.timeout(20000);
 
-
     try{
       service.create({
-          secure:true
+          secure:true,
+          services:{
+          	security:{
+          		config:{
+          			keyPair:{
+          				privateKey:'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
+          				publicKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M='
+          			}
+          		}
+          	}
+          }
         },function (e, happnInst) {
         if (e)
           return callback(e);
@@ -41,7 +54,15 @@ describe('c1_security_pubpriv_login', function() {
 
         service.create({
             secure:true,
-            encryptPayloads:true
+            port:10000,
+            encryptPayloads:true,
+            services:{
+          		security:{
+	          		config:{
+	          			keyPair:serverKeyPair
+	          		}
+	          	}
+	        }
           },function (e, happnInst) {
           if (e)
             return callback(e);
@@ -57,93 +78,142 @@ describe('c1_security_pubpriv_login', function() {
     }
   });
 
-  after(function(done) {
+  	after(function(done) {
 
-    adminClient.disconnect()
-    .then(testClient.disconnect()
-    .then(happnInstance.stop()
-    .then(encryptedPayloadInstance.stop()
-    .then(done))))
-    .catch(done);
+	    adminClient.disconnect()
+	    .then(happnInstance.stop()
+	    .then(encryptedPayloadInstance.stop()
+	    .then(done)))
+	    .catch(done);
 
+  	});
 
-  });
+	it('tests the keypairs', function (callback){
 
+		var message = 'this is a secret';
 
-  it('logs in with the test client, without supplying a public key - attempts to encrypt a payload and fails', function (callback) {
+	    var encrypted = crypto.asymmetricEncrypt(serverKeyPair.privateKey,  clientKeyPair.publicKey, message);
+	    var decrypted = crypto.asymmetricDecrypt(clientKeyPair.privateKey, serverKeyPair.publicKey, encrypted);
 
-    happn.client.create({
-        config:{username:'_ADMIN', password:'happn'},
-        secure:true
-      })
+	    if (message == encrypted)
+	      throw new Error('encrypted data matches secret message');
 
-      .then(function(clientInstance){
-        adminClient = clientInstance;
-        adminClient.set('/an/encrypted/payload/target', {"encrypted":"test"}, {encryptPayload:true}, function(e, response){
+	    if (message != decrypted)
+	      throw new Error('decrypted data does not match secret message');
 
-          expect(e.toString()).to.equal('Error:missing session secret for encrypted payload, did you set the publicKey config option when creating the client?');
-          callback();
-          
-        });
-      })
+	    callback();
 
-      .catch(function(e){
-        callback(e);
-      });
-    });
+	});
 
-  });
+	it('tests static keypairs', function (callback){
 
-  it('logs in with the test client, supplying a public key - receives a sessionSecret and encrypts a payload using the option', function (callback) {
+		var message = 'this is a secret';
 
-    happn.client.create({
-        config:{username:'_ADMIN', password:'happn'},
-        secure:true,
-        publicKey:keyPair.publicKey.toString()
-      })
+	    var encrypted = crypto.asymmetricEncrypt('FtRDNOH1gU4ShXsmGZQhLbrdzM/eMP0kkFB5x9IUPkI=',  'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2', message);
+	    var decrypted = crypto.asymmetricDecrypt('Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=', 'A5pIYTF6P8ZG2/4SKi6a0W9dxSyaKD/t4lH/qEfKCZtx', encrypted);
 
-      .then(function(clientInstance){
+	    if (message == encrypted)
+	      throw new Error('encrypted data matches secret message');
 
-        adminClient = clientInstance;
+	    if (message != decrypted)
+	      throw new Error('decrypted data does not match secret message');
 
-         adminClient.set('/an/encrypted/payload/target', {"encrypted":"test"}, {encryptPayload:true}, function(e, response){
-
-          expect(e).to.equal(null);
-          callback();
-
-        });
-
-      })
-
-      .catch(function(e){
-        callback(e);
-      });
-    });
+	    callback();
 
 
-  });
+	});
+
+   	it('logs in with the test client, supplying a public key - we check that we have a session secret', function (callback) {
+
+	    happn.client.create({
+	      config:{username:'_ADMIN', password:'happn', publicKey:'FtRDNOH1gU4ShXsmGZQhLbrdzM/eMP0kkFB5x9IUPkI=', privateKey:'A5pIYTF6P8ZG2/4SKi6a0W9dxSyaKD/t4lH/qEfKCZtx'},
+	      secure:true
+	    })
+
+		.then(function(clientInstance){
+			
+		    adminClient = clientInstance;
+		    expect(adminClient.session.encryptedSecret).to.not.equal(undefined);
+		    expect(adminClient.session.encryptedSecret).to.not.equal(null);
+		    expect(adminClient.session.secret).to.not.equal(undefined);
+		    expect(adminClient.session.secret).to.not.equal(null);
+
+		    callback();
+		})
+
+		.catch(function(e){
+		    callback(e);
+		});
+
+  	});
+
+  	it('logs in with the test client, without supplying a public key - attempts to encrypt a payload and fails', function (callback) {
+
+	    happn.client.create({
+	      config:{username:'_ADMIN', password:'happn'},
+	      secure:true
+	    })
+
+		.then(function(clientInstance){
+		    adminClient = clientInstance;
+		    adminClient.set('/an/encrypted/payload/target', {"encrypted":"test"}, {encryptPayload:true}, function(e, response){
+
+		      expect(e.toString()).to.equal('Error:missing session secret for encrypted payload, did you set the publicKey config option when creating the client?');
+		      callback();
+		      
+		    });
+		})
+
+		.catch(function(e){
+		    callback(e);
+		});
+
+  	});
+
+  	it('logs in with the test client, supplying a public key - receives a sessionSecret and encrypts a payload using the option', function (callback) {
+
+	    happn.client.create({
+	        config:{username:'_ADMIN', password:'happn', publicKey:keyPair.publicKey.toString()},
+	        secure:true
+	    })
+
+	    .then(function(clientInstance){
+
+	        adminClient = clientInstance;
+
+	         adminClient.set('/an/encrypted/payload/target', {"encrypted":"test"}, {encryptPayload:true}, function(e, response){
+
+	          expect(e).to.equal(null);
+	          callback();
+
+	        });
+
+	    })
+
+	    .catch(function(e){
+	        callback(e);
+	    });
+
+  	});
 
   
-  it('fails to log in with the test client, without supplying a public key to the default encryptPayload server', function (callback) {
+    it('fails to log in with the test client, without supplying a public key to the default encryptPayload server', function (callback) {
 
-    happn.client.create({
-        config:{
-          username:testUser.username, 
-          password:'TEST PWD',
-          port:10000
-        },
-        secure:true
-      })
+    	happn.client.create({
+	        config:{username:'_ADMIN', password:'happn'},
+	        port:10000,
+	        secure:true
+	    })
 
-      .then(function(clientInstance){
-        callback(new Error('this wasnt meant to happen'));
-      })
+      	.then(function(clientInstance){
+        	callback(new Error('this wasnt meant to happen'));
+      	})
 
-      .catch(function(e){
-        expect(e.toString()).to.equal('Error: no public key supplied for encrypted payloads');
-        callback();
-      });
+      	.catch(function(e){
+	        expect(e.toString()).to.equal('Error: no public key supplied for encrypted payloads');
+	        callback();
+      	});
 
-  });
+  	});
 
 });

@@ -7,8 +7,8 @@ describe('a4_security_encryption.js', function () {
   var async = require('async');
   var Logger = require('happn-logger');
 
-  var bitcore = require('bitcore-lib');
-  var ECIES = require('bitcore-ecies');
+  var Crypto = require('consent-util-crypto');
+  var crypto = new Crypto();
 
   var testConfigs = {};
 
@@ -48,8 +48,10 @@ describe('a4_security_encryption.js', function () {
 
   });
 
-  var generatedPrivateKeyBob = new bitcore.PrivateKey();
-  var generatedPublicKeyBob = generatedPrivateKeyBob.publicKey;
+  var bobKeyPair = crypto.createKeyPair();
+
+  var generatedPrivateKeyBob = bobKeyPair.privateKey;
+  var generatedPublicKeyBob = bobKeyPair.publicKey;
  
   var generatedPrivateKeyAlice;
   var generatedPublicKeyAlice;
@@ -85,33 +87,33 @@ describe('a4_security_encryption.js', function () {
 
   });
 
-  it('should encrypt and decrypt data using the ECIES module directly', function (callback) {
+  // it('should encrypt and decrypt data using the ECIES module directly', function (callback) {
 
-    var bobSession = ECIES()
-    .privateKey(generatedPrivateKeyBob)
-    .publicKey(generatedPublicKeyAlice);
+  //   var bobSession = ECIES()
+  //   .privateKey(generatedPrivateKeyBob)
+  //   .publicKey(generatedPublicKeyAlice);
 
-    var aliceSession = ECIES()
-    .privateKey(generatedPrivateKeyAlice)
-    .publicKey(generatedPublicKeyBob);
+  //   var aliceSession = ECIES()
+  //   .privateKey(generatedPrivateKeyAlice)
+  //   .publicKey(generatedPublicKeyBob);
 
-    var message = 'this is a secret';
+  //   var message = 'this is a secret';
 
-    var encrypted = aliceSession
-    .encrypt(message);
+  //   var encrypted = aliceSession
+  //   .encrypt(message);
 
-    var decrypted = bobSession
-    .decrypt(encrypted);
+  //   var decrypted = bobSession
+  //   .decrypt(encrypted);
  
-    if (message == encrypted)
-      throw new Error('ecrypted data matches secret message');
+  //   if (message == encrypted)
+  //     throw new Error('ecrypted data matches secret message');
 
-    if (message != decrypted)
-      throw new Error('decrypted data does not match secret message');
+  //   if (message != decrypted)
+  //     throw new Error('decrypted data does not match secret message');
 
-    callback();
+  //   callback();
 
-  });
+  // });
 
   it('should encrypt and decrypt data using the security layer', function (callback) {
     var message = 'this is a secret';
