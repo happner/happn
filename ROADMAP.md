@@ -7,6 +7,7 @@ THINGS WE WANT TO DO
 
 OPTIMISATIONS/ISSUES
 ====================
+
 1. fix prototyping of service and initialization
 2. on publish, have the 'write' function of the intra-proc socket interface do a clone
 3. allow for only passing a function to the create method, options are then checked if function
