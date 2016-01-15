@@ -20,6 +20,7 @@ describe('c1_security_pubpriv_login', function() {
   var crypto = new Crypto();
 
   var clientKeyPair = crypto.createKeyPair();
+  var clientKeyPair1 = crypto.createKeyPair();
   var serverKeyPair = crypto.createKeyPair();
   var serverKeyPair1 = crypto.createKeyPair();
 
@@ -126,17 +127,15 @@ describe('c1_security_pubpriv_login', function() {
 
    	it('logs in with the test client, supplying a public key - we check that we have a session secret', function (callback) {
 
-   		console.log('clientKeyPair:::', clientKeyPair);
-
 	    happn.client.create({
 	      	config:{
 		      	username:'_ADMIN', 
 		      	password:'happn', 
 		      	keyPair:{
 		      		publicKey:'AjN7wyfbEdI2LzWyFo6n31hvOrlYvkeHad9xGqOXTm1K', 
-		      		privateKey:'y5RTfdnn21OvbQrnBMiKBP9DURduo0aijMIGyLJFuJQ='}
-		      	},
-	      	secure:true
+		      		privateKey:'y5RTfdnn21OvbQrnBMiKBP9DURduo0aijMIGyLJFuJQ='
+		      	}
+	      	}
 	    })
 
 		.then(function(clientInstance){
@@ -156,38 +155,14 @@ describe('c1_security_pubpriv_login', function() {
 
   	});
 
-  // 	it('logs in with the test client, without supplying a public key - attempts to encrypt a payload and fails', function (callback) {
-
-	 //    happn.client.create({
-	 //      config:{username:'_ADMIN', password:'happn'},
-	 //      secure:true
-	 //    })
-
-		// .then(function(clientInstance){
-		//     adminClient = clientInstance;
-		//     adminClient.set('/an/encrypted/payload/target', {"encrypted":"test"}, {encryptPayload:true}, function(e, response){
-
-		//       expect(e.toString()).to.equal('Error: missing session secret for encrypted payload, did you set the publicKey config option when creating the client?');
-		//       callback();
-		      
-		//     });
-		// })
-
-		// .catch(function(e){
-		//     callback(e);
-		// });
-
-  // 	});
-
-  	it.only('logs in with the test client, supplying a public key - receives a sessionSecret annd performs an operation', function (callback) {
+  	it('logs in with the test client, supplying a public key - receives a sessionSecret annd performs a set and get operation', function (callback) {
 
 	    happn.client.create({
 	        config:{
 	        	username:'_ADMIN', 
 	        	password:'happn',
 	        	keyPair:clientKeyPair
-	        },
-	        secure:true
+	        }
 	    })
 
 	    .then(function(clientInstance){
@@ -197,12 +172,110 @@ describe('c1_security_pubpriv_login', function() {
 	        adminClient.set('/an/encrypted/payload/target', {"encrypted":"test"}, {}, function(e, response){
 
 	          expect(e).to.equal(null);
+	          expect(response.encrypted == "test").to.equal(true);
+	         
+	          adminClient.get('/an/encrypted/payload/target', function(e, response){
 
-	          console.log('response to operation:::', response);
+	          	expect(e).to.equal(null);
+	          	expect(response.encrypted == "test").to.equal(true);
 
-	          callback();
+	          	callback();
+
+	          });
 
 	        });
+
+	    })
+
+	    .catch(function(e){
+	        callback(e);
+	    });
+
+  	});
+
+  	it('logs in with the test client, supplying a public key - receives a sessionSecret annd performs an on operation', function (callback) {
+
+	    happn.client.create({
+	        config:{
+	        	username:'_ADMIN', 
+	        	password:'happn',
+	        	keyPair:clientKeyPair
+	        }
+	    })
+
+	    .then(function(clientInstance){
+
+	        adminClient = clientInstance;
+
+	        adminClient.on('/an/encrypted/payload/target/event', {count:1}, function(data){
+
+	        	callback();
+
+	        }, function(e, response){
+
+	          expect(e).to.equal(null);
+	          
+	          adminClient.set('/an/encrypted/payload/target/event', {"test":"on"}, function(e, response){
+	          	if (e) return callback(e);
+	          })
+
+
+	        });
+
+	    })
+
+	    .catch(function(e){
+	        callback(e);
+	    });
+
+  	});
+
+  	it('logs in with 2 test clients, supplying a public key - receives a sessionSecret annd performs an on operation between the 2 clients', function (callback) {
+
+	    happn.client.create({
+	        config:{
+	        	username:'_ADMIN', 
+	        	password:'happn',
+	        	keyPair:clientKeyPair
+	        }
+	    })
+
+	    .then(function(clientInstance){
+
+	        adminClient = clientInstance;
+
+	        happn.client.create({
+		        config:{
+		        	username:'_ADMIN', 
+		        	password:'happn',
+		        	keyPair:clientKeyPair1
+		        }
+		    })
+
+		    .then(function(clientInstance){
+
+		        adminClient1 = clientInstance;
+
+		        adminClient1.on('/an/encrypted/payload/target/event', function(data){
+
+		        	callback();
+
+		        }, function(e, response){
+
+		          expect(e).to.equal(null);
+		          
+		          adminClient.set('/an/encrypted/payload/target/event', {"test":"on"}, function(e, response){
+		          	if (e) return callback(e);
+		          })
+
+
+		        });
+
+		    })
+
+		    .catch(function(e){
+		        callback(e);
+		    });
 
 	    })
 
