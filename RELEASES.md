@@ -51,5 +51,7 @@
 - fixed issue where web token was being passed as a qs argument
 - added functionality for exclusions on web paths
 
+next
+----
 
-
+- added .services.security.config.cookieName and .services.security.config.cookieDomain
