@@ -28,10 +28,12 @@ describe('a6_eventemitter_security_groups', function () {
 
     var happnMock = {services:{},utils:require('../lib/utils')};
     testServices = {};
+
+    testServices.crypto = require('../lib/services/crypto/service');
     testServices.data = require('../lib/services/data_embedded/service');
     testServices.security = require('../lib/services/security/service');
 
-    async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
+    async.eachSeries(['crypto','data', 'security'], function(serviceName, eachServiceCB){
 
       testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;
@@ -69,9 +71,9 @@ describe('a6_eventemitter_security_groups', function () {
 
         if (!response) return callback(new Error('keypair doesnt exist in database'));
 
-        expect(testServices.security.serializeKeyPair(testServices.security._keyPair)).to.be(response.data.value);
-        expect(testServices.security.deserializeKeyPair(response.data.value).privateKey.toString()).to.be(testServices.security._keyPair.privateKey.toString());
-        expect(testServices.security.deserializeKeyPair(response.data.value).publicKey.toString()).to.be(testServices.security._keyPair.publicKey.toString());
+        expect(testServices.crypto.serializeKeyPair(testServices.security._keyPair)).to.be(response.data.value);
+        expect(testServices.crypto.deserializeKeyPair(response.data.value).privateKey.toString()).to.be(testServices.security._keyPair.privateKey.toString());
+        expect(testServices.crypto.deserializeKeyPair(response.data.value).publicKey.toString()).to.be(testServices.security._keyPair.publicKey.toString());
 
         callback();
 
