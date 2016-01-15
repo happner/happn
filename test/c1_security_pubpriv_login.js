@@ -141,8 +141,7 @@ describe('c1_security_pubpriv_login', function() {
 		.then(function(clientInstance){
 
 		    adminClient = clientInstance;
-		    expect(adminClient.session.encryptedSecret).to.not.equal(undefined);
-		    expect(adminClient.session.encryptedSecret).to.not.equal(null);
+		  
 		    expect(adminClient.session.secret).to.not.equal(undefined);
 		    expect(adminClient.session.secret).to.not.equal(null);
 
