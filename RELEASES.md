@@ -57,3 +57,4 @@ next
 - added .services.security.config.cookieName and .services.security.config.cookieDomain
 - fixed '/' webmethod exclusion was effectively '/*', allowing entire site with authentication
 - added username to session token
+- fixed unmounted connect app when https
