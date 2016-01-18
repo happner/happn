@@ -128,7 +128,7 @@ describe('b7_security_https', function() {
     var serviceConfig = config.test4_config;
 
     getService(serviceConfig, function(e){
-      expect(e.toString()).to.equal('Error: error creating server: error:140DC009:SSL routines:SSL_CTX_use_certificate_chain_file:PEM lib');
+      expect(['Error: error creating server: error:140DC009:SSL routines:SSL_CTX_use_certificate_chain_file:PEM lib','Error: error creating server: error:0906D064:PEM routines:PEM_read_bio:bad base64 decode']).to.contain(e.toString());
       done();
     });
 
@@ -142,7 +142,7 @@ describe('b7_security_https', function() {
     var serviceConfig = config.test5_config;
 
     getService(serviceConfig, function(e){
-      expect(e.toString()).to.equal('Error: error creating server: PEM_read_bio_PrivateKey');
+      expect(['Error: error creating server: error:0906D064:PEM routines:PEM_read_bio:bad base64 decode','Error: error creating server: PEM_read_bio_PrivateKey']).to.contain(e.toString());
       done();
     });
 
