@@ -128,7 +128,8 @@ describe('b7_security_https', function() {
     var serviceConfig = config.test4_config;
 
     getService(serviceConfig, function(e){
-      expect(e.toString()).to.equal('Error: error creating server: error:140DC009:SSL routines:SSL_CTX_use_certificate_chain_file:PEM lib');
+      // expect(e.toString()).to.equal('Error: error creating server: error:140DC009:SSL routines:SSL_CTX_use_certificate_chain_file:PEM lib');
+      expect(e.toString()).to.match(/PEM/);
       done();
     });
 
@@ -142,7 +143,8 @@ describe('b7_security_https', function() {
     var serviceConfig = config.test5_config;
 
     getService(serviceConfig, function(e){
-      expect(e.toString()).to.equal('Error: error creating server: PEM_read_bio_PrivateKey');
+      // expect(e.toString()).to.equal('Error: error creating server: PEM_read_bio_PrivateKey');
+      expect(e.toString()).to.match(/PEM/);
       done();
     });
 

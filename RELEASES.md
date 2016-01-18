@@ -51,5 +51,10 @@
 - fixed issue where web token was being passed as a qs argument
 - added functionality for exclusions on web paths
 
+2.3.2 2016-01-18
+----------------
 
-
+- added .services.security.config.cookieName and .services.security.config.cookieDomain
+- fixed '/' webmethod exclusion was effectively '/*', allowing entire site without authentication
+- added username to session token
+- fixed unmounted connect app when https
