@@ -89,7 +89,7 @@ describe('a6_eventemitter_security_groups', function () {
         if (!response) return callback(new Error('admin group doesnt exist in database'));
 
         expect(response._meta.path).to.be('/_SYSTEM/_SECURITY/_GROUP/_ADMIN');
-        expect(response.data.permissions['/*'].actions[0]).to.be('*');
+        expect(response.data.permissions['*'].actions[0]).to.be('*');
 
         callback();
 
