@@ -661,7 +661,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
   });
 
   var caughtCount = 0;
-  it('should subscribe to the catch all notification', function(callback) {
+  it.only('should subscribe to the catch all notification', function(callback) {
 
     var caught = {};
 
@@ -686,12 +686,12 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
 
       socketClient.set('/e2e_test1/testsubscribe/data/catch_all', {property1:'property1',property2:'property2',property3:'property3'}, null, function(e, put_result){
 
-        ////////////////////////console.log('put_result');
+        console.log('put_result', put_result);
         ////////////////////////console.log(put_result);
 
         socketClient.remove('/e2e_test1/testsubscribe/data/catch_all', null, function(e, del_result){
 
-          ////////////////////////console.log('del_result');
+          console.log('del_result', del_result);
           ////////////////////////console.log(del_result);
         
         });
