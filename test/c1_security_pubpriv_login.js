@@ -97,6 +97,9 @@ describe('c1_security_pubpriv_login', function() {
 	    var encrypted = crypto.asymmetricEncrypt(clientKeyPair.publicKey,  serverKeyPair.privateKey, message);
 	    var decrypted = crypto.asymmetricDecrypt(serverKeyPair.publicKey, clientKeyPair.privateKey, encrypted);
 
+	    // var encrypted = crypto.asymmetricEncrypt(serverKeyPair.privateKey,  clientKeyPair.publicKey, message);
+	    // var decrypted = crypto.asymmetricDecrypt(clientKeyPair.privateKey, serverKeyPair.publicKey, encrypted);
+
 	    if (message == encrypted)
 	      throw new Error('encrypted data matches secret message');
 
