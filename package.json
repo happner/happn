@@ -28,6 +28,7 @@
     "connect": "3.4.0",
     "connect-cookies": "0.0.0",
     "consent-util-crypto": "^2.1.0",
+    "deep-copy": "^1.1.0",
     "happn-logger": "0.0.1",
     "happn-nedb": "^1.5.0",
     "jwt-simple": "^0.2.0",
