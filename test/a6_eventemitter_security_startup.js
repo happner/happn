@@ -7,9 +7,6 @@ describe('a6_eventemitter_security_groups', function () {
   var async = require('async');
   var Logger = require('happn-logger');
 
-  var bitcore = require('bitcore-lib');
-  var ECIES = require('bitcore-ecies');
-
   var testConfigs = {};
 
   testConfigs.data = {
