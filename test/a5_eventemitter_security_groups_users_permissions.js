@@ -9,8 +9,6 @@ describe('a5_eventemitter_security_groups', function () {
     var async = require('async');
     var Logger = require('happn-logger');
 
-    var bitcore = require('bitcore-lib');
-    var ECIES = require('bitcore-ecies');
     var test_id = Date.now() + '_' + require('shortid').generate();
     var Promise = require('bluebird');
     var HAPPNER_STOP_DELAY = 5000;

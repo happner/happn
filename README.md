@@ -470,6 +470,12 @@ happn.client.create({config:{protocol:'https', allowSelfSignedCerts:true}},funct
 
 ```
 
+PAYLOAD ENCRYPTION
+------------------
+
+*if the server is running in secure mode, it can also be configured to encrypt payloads between it and socket clients, this means that the client must include a keypair as part of its credentials on logging in, to see payload encryption in action plase go to the [following test](https://github.com/happner/happn/blob/master/test/c2_websockets_embedded_sanity_encryptedpayloads.js)*
+
+
 TESTING WITH KARMA
 ------------------
 
