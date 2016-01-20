@@ -38,13 +38,14 @@ describe('a5_eventemitter_security_groups', function () {
       //delete require.cache['/Users/simonbishop/Documents/Projects/happn/node_modules/nedb/index.js'];
       //delete require.cache['/Users/simonbishop/Documents/Projects/happn/lib/services/data_embedded/service.js'];
 
+      testServices.crypto = require('../lib/services/crypto/service');
       testServices.data = require('../lib/services/data_embedded/service');
       testServices.security = require('../lib/services/security/service');
 
       var checkpoint = require('../lib/services/security/checkpoint');
       testServices.checkpoint = new checkpoint({logger: Logger});
 
-      async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
+      async.eachSeries(['crypto', 'data', 'security'], function(serviceName, eachServiceCB){
 
         testServices[serviceName] = new testServices[serviceName]({logger: Logger});
         testServices[serviceName].happn = happnMock;

@@ -58,3 +58,11 @@
 - fixed '/' webmethod exclusion was effectively '/*', allowing entire site without authentication
 - added username to session token
 - fixed unmounted connect app when https
+
+2.4.0 2016-01-20
+----------------
+
+- added crypto service, and happn-crypto utility
+- added encrypt payloads functionality
+- handle circular references maximum callstack error a bit better
+

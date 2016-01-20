@@ -470,6 +470,11 @@ happn.client.create({config:{protocol:'https', allowSelfSignedCerts:true}},funct
 
 ```
 
+TESTING WITH KARMA
+------------------
+
+./node_modules/karma/bin/karma start karma.conf.js
+
 
 OTHER PLACES WHERE HAPPN IS USED:
 ----------------------------------
