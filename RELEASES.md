@@ -66,3 +66,11 @@
 - added encrypt payloads functionality
 - handle circular references maximum callstack error a bit better
 
+2.4.1 2016-01-21
+----------------
+
+- fixed issue where the publicKey wasnt getting to the server on logins where the keypair is generated on the client
+
+
+
+
