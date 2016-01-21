@@ -71,6 +71,12 @@
 
 - fixed issue where the publicKey wasnt getting to the server on logins where the keypair is generated on the client
 
+2.4.2 2016-01-21
+----------------
+
+- fixed issue where the browser version of the client was attempting to require the crypto library when it was already in the window
+- have browser tests all passing for encrypted payloads
+
 
 
 

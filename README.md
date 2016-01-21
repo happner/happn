@@ -479,7 +479,8 @@ PAYLOAD ENCRYPTION
 TESTING WITH KARMA
 ------------------
 
-./node_modules/karma/bin/karma start karma.conf.js
+testing payload encryption on the browser:
+gulp --gulpfile test/test-browser/gulp-01.js
 
 
 OTHER PLACES WHERE HAPPN IS USED:

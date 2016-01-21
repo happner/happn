@@ -1,4 +1,4 @@
-describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
+describe('c3_websockets_embedded_sanity_encryptedpayloads', function() {
 
   var expect = require('expect.js');
   var happn = require('../lib/index')
