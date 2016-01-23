@@ -77,6 +77,12 @@
 - fixed issue where the browser version of the client was attempting to require the crypto library when it was already in the window
 - have browser tests all passing for encrypted payloads
 
+2.4.3 2016-01-23
+----------------
+
+- fixed issue with client not initializing properly if Primus already exists in the browser
+
+
 
 
 
