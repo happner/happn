@@ -20,7 +20,7 @@ describe('a5_eventemitter_security_groups', function () {
     }
 
     testConfigs.security = {
-      
+
     }
 
     var testServices = {};
@@ -52,7 +52,7 @@ describe('a5_eventemitter_security_groups', function () {
           if (e)  return  eachServiceCB(e);
 
           happnMock.services[serviceName] = testServices[serviceName];
-        
+
           eachServiceCB();
 
         });
@@ -148,7 +148,7 @@ describe('a5_eventemitter_security_groups', function () {
         expect(result.name == testGroup.name).to.be(true);
         expect(result.custom_data.customString == testGroup.custom_data.customString).to.be(true);
         expect(result.custom_data.customNumber == testGroup.custom_data.customNumber).to.be(true);
-        
+
         addedGroup = result;
         callback();
 
@@ -182,7 +182,7 @@ describe('a5_eventemitter_security_groups', function () {
     });
 
     it('should get groups by group name', function (callback) {
-      
+
       testServices.security.listGroups('TEST*', function(e, results){
 
         if (e) return callback(e);
@@ -191,7 +191,7 @@ describe('a5_eventemitter_security_groups', function () {
         callback();
 
       });
-      
+
     });
 
     it('gets a specific group', function(callback) {
@@ -275,7 +275,7 @@ describe('a5_eventemitter_security_groups', function () {
 
           if (e) return callback(e);
 
-          expect(result.group.data.removed).to.be(1);
+          expect(result.removed).to.be(1);
 
           testServices.security.listGroups(groupToRemove.name, function(e, results){
 
@@ -286,7 +286,7 @@ describe('a5_eventemitter_security_groups', function () {
             callback();
           });
 
-        
+
         });
 
       });
@@ -317,7 +317,7 @@ describe('a5_eventemitter_security_groups', function () {
               expect(result.data.password != 'TEST PWD').to.be(true);
 
               delete result.data['password'];
-             
+
               expect(result.data).to.eql({
                 custom_data: {
                   something: 'usefull',
@@ -587,7 +587,7 @@ describe('a5_eventemitter_security_groups', function () {
       testServices.security.addUserGroup(testGroup, testUser, function(e, result){
 
       });
-      
+
     });
 
     it('should remove a user group', function (callback) {
@@ -595,11 +595,11 @@ describe('a5_eventemitter_security_groups', function () {
       testServices.security.removeUserGroup(testGroup, testUser, function(e, result){
 
       });
-      
+
     });
 
   */
 
   });
- 
+
 });

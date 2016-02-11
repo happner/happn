@@ -82,7 +82,10 @@
 
 - fixed issue with client not initializing properly if Primus already exists in the browser
 
+2.4.4 2016-02-11
+----------------
 
+- fixed issue with deleting groups
 
 
 
