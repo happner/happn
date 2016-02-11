@@ -85,7 +85,7 @@
 2.4.4 2016-02-11
 ----------------
 
-- fixed issue with deleting groups
+- fixed issue with deleting group
 
 
 
