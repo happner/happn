@@ -87,5 +87,11 @@
 
 - fixed issue with deleting group
 
+2.4.5 2016-02-14
+----------------
+
+- setSibling and tagging now uses uuid instead of shortid
+- fixed issue with .off incorrectly assuming 0 is a null reference
+
 
 
