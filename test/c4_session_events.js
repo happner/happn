@@ -22,7 +22,8 @@ describe('c4_session_events', function() {
       for (var eventName in eventsFired)
         if (!eventsFired[eventName]) return;
 
-      serviceInstance.close(callback);
+      console.log('All events fired - sweet...');
+      serviceInstance.stop(callback);
 
     }
 
@@ -35,18 +36,22 @@ describe('c4_session_events', function() {
 
         happnInst.services.pubsub.on('authentic', function(data){
 
-          console.log('authentic:::', data);
+          if (data.info._local)
+            eventsFired['authentic-eventemitter'] = true;
+          else
+            eventsFired['authentic-socket'] = true;
 
-          eventsFired['authentic'] = true;
           checkAllEventsFired(callback);
 
         });
 
         happnInst.services.pubsub.on('disconnect', function(data){
 
-          console.log('disconnect:::', data);
+          if (data.info._local)
+            eventsFired['disconnect-eventemitter'] = true;
+          else
+            eventsFired['disconnect-socket'] = true;
 
-          eventsFired['disconnect'] = true;
           checkAllEventsFired(callback);
 
         });
@@ -95,14 +100,14 @@ describe('c4_session_events', function() {
 
   it('tests session events on an unsecured mesh', function(callback) {
 
-    sessionEventsTest({secure:true}, callback);
+    sessionEventsTest({}, callback);
 
   });
 
-  // it('tests session events on a secure mesh', function(callback) {
+  it('tests session events on a secure mesh', function(callback) {
 
-  //   sessionEventsTest({},callback);
+     sessionEventsTest({secure:true},callback);
 
-  // });
+  });
 
 });
