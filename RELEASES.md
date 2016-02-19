@@ -93,5 +93,15 @@
 - setSibling and tagging now uses uuid instead of shortid
 - fixed issue with .off incorrectly assuming 0 is a null reference
 
+2.5.0 2016-02-18
+----------------
+
+- pubsub now emits 'disconnect' and 'authentic' events for both eventEmitter and socket clients, the events now contain the sessionid
+- the sessionId for all clients is now a guid instead of a shortid
+
+2.5.1 2016-02-19
+----------------
+
+- client now emits 'reconnect-scheduled','reconnect-successful','connection-ended' events
 
 
