@@ -104,4 +104,7 @@
 
 - client now emits 'reconnect-scheduled','reconnect-successful','connection-ended' events
 
+2.5.2 2016-02-22
+----------------
 
+- the security service now has a 'matchPassword' function, how we can do password validation without requiring a login
