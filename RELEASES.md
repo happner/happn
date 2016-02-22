@@ -113,3 +113,8 @@
 ----------------
 
 - the security service only raises an error when a new user is being saved without a password, by looking up - instead of checking for a _meta tag
+
+2.5.4 2016-02-22
+----------------
+
+- removed a console.log in the client base
