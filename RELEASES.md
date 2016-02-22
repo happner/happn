@@ -108,3 +108,8 @@
 ----------------
 
 - the security service now has a 'matchPassword' function, how we can do password validation without requiring a login
+
+2.5.3 2016-02-22
+----------------
+
+- the security service only raises an error when a new user is being saved without a password, by looking up - instead of checking for a _meta tag
