@@ -118,3 +118,8 @@
 ----------------
 
 - removed a console.log in the client base
+
+2.5.5 2016-02-24
+----------------
+
+- have db backwards compatability fix in place, change after version 1.5.6
