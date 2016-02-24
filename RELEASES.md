@@ -124,7 +124,7 @@
 
 - have db backwards compatability fix in place, change after version 1.5.6
 
-2.5.6 2016-02-24
+2.5.7 2016-02-24
 ----------------
 
-- test data added, this wasnt working because git ignored test-data folder regardless of it being configured
+- test data added, this wasnt working because git ignored test-data folder regardless of it being configured, bunch of publishes to fix this
