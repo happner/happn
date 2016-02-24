@@ -24,6 +24,10 @@ describe('c5_client_events', function() {
 
   }
 
+  after('it stops the test service', function(done){
+    serviceInstance.stop(done);
+  });
+
   before('start the test service', function(done){
 
     createService(done);
