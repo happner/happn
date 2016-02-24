@@ -11,7 +11,7 @@ describe('c6_backward_compatible_db', function() {
 
   var fs = require('fs');
 
-  this.timeout(5000);
+  this.timeout(10000);
 
   function createService(config, callback){
 
