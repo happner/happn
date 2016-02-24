@@ -27,15 +27,15 @@ describe('c6_backward_compatible_db', function() {
 
   it('starts up all the dbs in the backwards compatable folder', function(callback) {
 
-    var dbFiles = fs.readdirSync(__dirname + '/test-data/c6');
+    var dbFiles = fs.readdirSync(__dirname + '/data/c6');
 
     async.eachSeries(dbFiles, function(fileName, eachCallback){
 
       if (fileName == 'test') return eachCallback();
 
-      var testFile = __dirname + '/test-data/c6/test/' + fileName + '.test';
+      var testFile = __dirname + '/data/c6/test/' + fileName + '.test';
 
-      fs.createReadStream(__dirname + '/test-data/c6/' + fileName).pipe(fs.createWriteStream(testFile));
+      fs.createReadStream(__dirname + '/data/c6/' + fileName).pipe(fs.createWriteStream(testFile));
 
       var config = {
         secure:true,
