@@ -9,7 +9,7 @@ describe('c5_client_events', function() {
   var serviceConfig = {secure:true};
   var serviceInstance;
 
-  this.timeout(5000);
+  this.timeout(20000);
 
   function createService(callback){
 
