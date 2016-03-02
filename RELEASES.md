@@ -135,3 +135,9 @@
 - fixed the the backwards compatability db feature, as we were checking for the wrong error string
 - display happn version on startup
 
+2.5.9 2016-03-02
+----------------
+
+- adjustments to the security, system services for compatability with the mongo plugin
+
+
