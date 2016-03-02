@@ -128,3 +128,10 @@
 ----------------
 
 - test data added, this wasnt working because git ignored test-data folder regardless of it being configured, bunch of publishes to fix this
+
+2.5.8 2016-03-02
+----------------
+
+- fixed the the backwards compatability db feature, as we were checking for the wrong error string
+- display happn version on startup
+
