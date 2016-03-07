@@ -140,4 +140,10 @@
 
 - adjustments to the security, system services for compatability with the mongo plugin
 
+2.5.10 2016-03-07
+-----------------
+
+- the happn client reflects the commented version of happn at the top of the script
+
+
 
