@@ -45,7 +45,7 @@ describe('a3_eventemitter_multiple_datasource', function() {
 
   before('should initialize the services', function(callback) {
 
-    this.timeout(20000);
+    this.timeout(60000);//travis sometiems takes ages...
 
     var serviceConfigs = [
       {
@@ -152,7 +152,7 @@ describe('a3_eventemitter_multiple_datasource', function() {
         });
 
       });
-    
+
 
     });
 
@@ -165,10 +165,10 @@ describe('a3_eventemitter_multiple_datasource', function() {
       fs.unlink(tempFile1, function(e){
         if (e) return callback(e);
 
-        async.each(services, 
+        async.each(services,
           function(currentService, eachServiceCB){
             currentService.stop(eachServiceCB);
-        }, 
+        },
         callback);
 
       });
@@ -260,7 +260,7 @@ describe('a3_eventemitter_multiple_datasource', function() {
               stream.end();
               return callback(null, record);
              }
-              
+
             });
 
            stream.on('end', function(){
@@ -526,11 +526,11 @@ it('should push some data into the multiple datastore, memory datastore, exact p
         multipleClient.get(tagged_path, null, function (e, tagged) {
 
           expect(e).to.be(null);
-          
+
           expect(tagged.data.property1).to.be('property1');
           expect(tagged.data.property2).to.be('property2');
           expect(tagged.data.property3).to.be('property3');
-            
+
           findRecordInDataFile(tagged_path, tempFile1, function(e, record){
 
             if (e) return callback(e);
@@ -578,8 +578,8 @@ it('should push some data into the multiple datastore, memory datastore, exact p
           });
         }
       }
-        
-        
+
+
     }, function (e) {
 
       if (e) return callback(e);
@@ -600,7 +600,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
           if (e) return callback(e);
 
-          
+
 
         });
 
@@ -657,7 +657,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
     try {
       var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
-      
+
       services[1].services.data.addDataStoreFilter(test_path, 'persisted');
 
       multipleClient.set(test_path, {

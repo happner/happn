@@ -17,7 +17,7 @@ describe('a4_security_encryption.js', function () {
   }
 
   testConfigs.crypto = {
-    
+
   }
 
   var testServices = {};
@@ -40,7 +40,7 @@ describe('a4_security_encryption.js', function () {
         if (e)  return  eachServiceCB(e);
 
         happnMock.services[serviceName] = testServices[serviceName];
-      
+
         eachServiceCB();
 
       });
@@ -52,7 +52,7 @@ describe('a4_security_encryption.js', function () {
 
   var generatedPrivateKeyBob = bobKeyPair.privateKey;
   var generatedPublicKeyBob = bobKeyPair.publicKey;
- 
+
   var generatedPrivateKeyAlice;
   var generatedPublicKeyAlice;
 
@@ -86,34 +86,6 @@ describe('a4_security_encryption.js', function () {
     callback();
 
   });
-
-  // it('should encrypt and decrypt data using the ECIES module directly', function (callback) {
-
-  //   var bobSession = ECIES()
-  //   .privateKey(generatedPrivateKeyBob)
-  //   .publicKey(generatedPublicKeyAlice);
-
-  //   var aliceSession = ECIES()
-  //   .privateKey(generatedPrivateKeyAlice)
-  //   .publicKey(generatedPublicKeyBob);
-
-  //   var message = 'this is a secret';
-
-  //   var encrypted = aliceSession
-  //   .encrypt(message);
-
-  //   var decrypted = bobSession
-  //   .decrypt(encrypted);
- 
-  //   if (message == encrypted)
-  //     throw new Error('ecrypted data matches secret message');
-
-  //   if (message != decrypted)
-  //     throw new Error('decrypted data does not match secret message');
-
-  //   callback();
-
-  // });
 
   it('should encrypt and decrypt data using the security layer', function (callback) {
     var message = 'this is a secret';

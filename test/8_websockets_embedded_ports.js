@@ -16,7 +16,7 @@ describe('8_websockets_embedded_ports', function() {
 	var service1Client;
 	var service2Client;
 	var defaultClient;
-	
+
 	var mode = "embedded";
 
 	var default_timeout = 4000;
@@ -40,7 +40,7 @@ describe('8_websockets_embedded_ports', function() {
 	    .catch(callback);
 
 	});
-	
+
 	var initializeService = function(instance, port, callback){
 		instance.initialize({port:port},
 			function(e, instance){
@@ -53,7 +53,7 @@ describe('8_websockets_embedded_ports', function() {
 	}
 
 	it('should initialize the services', function(callback) {
-		
+
 		this.timeout(20000);
 
 		try{
@@ -81,7 +81,7 @@ describe('8_websockets_embedded_ports', function() {
 		this.timeout(default_timeout);
 
 		try{
-		  //plugin, config, context, 
+		  //plugin, config, context,
 
 		  happn_client.create({config:{port:service1Port}}, function(e, instance) {
 
@@ -110,6 +110,6 @@ describe('8_websockets_embedded_ports', function() {
 		}
 	});
 
-	
+
 
 });
