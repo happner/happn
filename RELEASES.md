@@ -145,5 +145,11 @@
 
 - the happn client reflects the commented version of happn at the top of the script
 
+2.2.11 2016-03-09
+-----------------
+
+- adjusted crypto utilities
+- fixed test timeouts
+
 
 
