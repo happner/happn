@@ -104,4 +104,17 @@
 
 - client now emits 'reconnect-scheduled','reconnect-successful','connection-ended' events
 
+2.5.2 2016-02-22
+----------------
 
+- the security service now has a 'matchPassword' function, how we can do password validation without requiring a login
+
+2.5.3 2016-02-22
+----------------
+
+- the security service only raises an error when a new user is being saved without a password, by looking up - instead of checking for a _meta tag
+
+2.5.4 2016-02-22
+----------------
+
+- removed a console.log in the client base
