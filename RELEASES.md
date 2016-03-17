@@ -152,6 +152,12 @@
 - adjusted crypto utilities
 - fixed test timeouts
 
+2.5.14 2016-03-17
+-----------------
+
+- fixed caching bug in security module, https://github.com/happner/happner/issues/74
+
+
 
 
 
