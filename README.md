@@ -13,7 +13,7 @@ A paid for alternative to happn would be [firebase](https://www.firebase.com)
 
 Technologies used:
 Happn uses [Primus](https://github.com/primus/primus) to power websockets for its pub/sub framework and mongo or nedb depending on the mode it is running in as its data store, the API uses [connect](https://github.com/senchalabs/connect).
- 
+
 Getting started
 ---------------------------
 
@@ -67,11 +67,11 @@ Connecting to Happn
 Using node:
 
 ```javascript
-var happn = require('happn'); 
+var happn = require('happn');
 var my_client_instance; //this will be your client instance
 
 happn.client.create([options], function(e, instance) {
-	
+
 	//instance is now connected to the server listening on port 55000
 	my_client_instance = instance;
 
@@ -85,10 +85,10 @@ To use the browser client, make sure the server is running, and reference the cl
 <script type="text/javascript" src="http://localhost:55000/browser_client"></script>
 <script>
 
-var my_client_instance; 
+var my_client_instance;
 
 HappnClient.create([options], function(e, instance) {
-	
+
 	//instance is now connected to the server listening on port 55000
 	my_client_instance = instance;
 
@@ -136,19 +136,19 @@ GET
 *Gets the data living at the specified branch*
 
 ```javascript
-my_client_instance.get('e2e_test1/testsubscribe/data', 
+my_client_instance.get('e2e_test1/testsubscribe/data',
 	null, //options
 	function(e, results){
 	//results is your data, if you used a wildcard in your path, you get back an array
 	//if you used an explicit path, you get back your data as the object on that path
-	
+
 ```
 
 *You can also use wildcards, gets all items with the path starting e2e_test1/testsubscribe/data*
 
 ```javascript
-my_client_instance.get('e2e_test1/testsubscribe/data*', 
-	null, 
+my_client_instance.get('e2e_test1/testsubscribe/data*',
+	null,
 	function(e, results){
 	//results is your data
 	results.map(function(item){
@@ -184,7 +184,7 @@ SEARCH
     publisherclient.get('/users/*', {
 	    criteria: criteria,
 	    options: options
-	  }, 
+	  },
 	  function (e, search_results) {
 	  	//and your results are here
 	  	search_results.map(function(user){
@@ -220,9 +220,9 @@ my_client_instance.on('/e2e_test1/testsubscribe/data/delete_me', //the path you 
 					function(//your listener event handler
 						message, //the actual object data being set or removed
 						meta){ //the meta data - path, modified,created _id etc.
-						
 
-					}, 
+
+					},
 					function(e){
 						//passes in an error if you were unable to register your listener
 					});
@@ -233,7 +233,7 @@ Catch all listener:
 my_client_instance.onAll(function(//your listener event handler
 						message, //the actual object data being set or removed
 						meta){ //the meta data - path, modified,created _id, also tells you what type of operation happened - ie. GET, SET etc.
-					}, 
+					},
 					function(e){
 						//passes in an error if you were unable to register your listener
 					});
@@ -300,7 +300,7 @@ SECURITY CLIENT
 
 //logging in with the _ADMIN user
 
-var happn = require('happn'); 
+var happn = require('happn');
 happn.client.create({config:{username:'_ADMIN', password:'testPWD'}, secure:true},function(e, instance) {
 
 
@@ -376,9 +376,9 @@ function (e, instance) {
 
 //logging in with the _ADMIN user, who has permission to all web routes
 
-var happn = require('happn'); 
+var happn = require('happn');
 happn.client.create({config:{username:'_ADMIN', password:'testPWD'}, secure:true},function(e, instance) {
-	
+
 	//the token can be derived from instance.session.token now
 
 	//here is an example of an http request using the token:
@@ -395,7 +395,7 @@ happn.client.create({config:{username:'_ADMIN', password:'testPWD'}, secure:true
       	options.path += '?happn_token=' + instance.session.token;
     else
     	options.headers = {'Cookie': ['happn_token=' + instance.session.token]}
-    
+
     http.request(options, function(response){
 
     	//response.statusCode should be 200;
@@ -463,12 +463,24 @@ HTTPS CLIENT
 
 ```javascript
 
-var happn = require('happn'); 
+var happn = require('happn');
 
 happn.client.create({config:{protocol:'https', allowSelfSignedCerts:true}},function(e, instance) {
 ...
 
 ```
+
+PAYLOAD ENCRYPTION
+------------------
+
+*if the server is running in secure mode, it can also be configured to encrypt payloads between it and socket clients, this means that the client must include a keypair as part of its credentials on logging in, to see payload encryption in action plase go to the [following test](https://github.com/happner/happn/blob/master/test/c2_websockets_embedded_sanity_encryptedpayloads.js)*
+
+
+TESTING WITH KARMA
+------------------
+
+testing payload encryption on the browser:
+gulp --gulpfile test/test-browser/gulp-01.js
 
 
 OTHER PLACES WHERE HAPPN IS USED:

@@ -46,6 +46,8 @@ describe('5_eventemitter_stoppingstarting', function() {
           serviceConfig.services.data.config.filename = filename;
           serviceConfig.name = name;
 
+          console.log('doing service init:::', serviceConfig);
+
           happn.service.create(serviceConfig,
           function(e, happnService){
             if (e) return callback(e);
@@ -84,13 +86,13 @@ describe('5_eventemitter_stoppingstarting', function() {
     after('should delete the temp data file', function(callback) {
 
       this.timeout(20000);
-      
+
       stopService(function(e){
         fs.unlink(tmpFile, function(e){
             callback();
-        });  
+        });
       });
-      
+
     });
 
 
@@ -102,9 +104,9 @@ describe('5_eventemitter_stoppingstarting', function() {
 
         if (e) return callback(e);
 
-        testclient.set(persistKey, 
-          {property1: "prop1", prop2: "prop2"}, 
-          null, 
+        testclient.set(persistKey,
+          {property1: "prop1", prop2: "prop2"},
+          null,
           callback
         );
 
@@ -126,7 +128,7 @@ describe('5_eventemitter_stoppingstarting', function() {
         testclient.get(persistKey, null, function(e, response){
 
           if (e) return callback(e);
-          
+
           expect(response.property1).to.be("prop1");
           callback();
         });
@@ -142,7 +144,7 @@ describe('5_eventemitter_stoppingstarting', function() {
     initService(null, '5_eventemitter_stoppingstarting', function(e){
 
       if (e) return callback(e);
-     
+
       getClient(currentService, function(e, testclient){
 
         if (e) return callback(e);

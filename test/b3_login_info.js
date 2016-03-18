@@ -22,10 +22,13 @@ context('login info for application layer', function() {
       this.server1.stop(done);
     });
 
+    var sessionId;
+
     it('login info is carried across login', function(done) {
       var events = {};
 
       this.server1.services.pubsub.on('authentic', function(evt) {
+        sessionId = evt.session.id;
         events['authentic'] = evt;
       });
 
@@ -41,6 +44,7 @@ context('login info for application layer', function() {
       setTimeout(function RunAfterClientHasLoggedInAndOut() {
 
         expect(events).to.eql({
+
           'authentic': {
             info: {
               happn:{
@@ -48,9 +52,13 @@ context('login info for application layer', function() {
               },
               KEY: 'VALUE',
               _browser: false, // client was not a browser
-              _local: false,   // client was not intraprocess
+              _local: false   // client was not intraprocess
+            },
+            session:{
+              id:sessionId
             }
           },
+
           'disconnect': {
             info: {
               happn:{
@@ -58,13 +66,17 @@ context('login info for application layer', function() {
               },
               KEY: 'VALUE',
               _browser: false,
-              _local: false,
+              _local: false
+            },
+            session:{
+              id:sessionId
             }
           }
         });
+
         done();
 
-      }, 200);
+      }, 500);
 
     });
 
@@ -85,7 +97,7 @@ context('login info for application layer', function() {
                 password: 'secret',
               }
             }
-          } 
+          }
         }
       }).then(function(server) {
         _this.server2 = server;
@@ -99,17 +111,19 @@ context('login info for application layer', function() {
       this.server2.stop(done);
     });
 
+    var sessionId;
+
     it('login info is carried across login', function(done) {
       var events = {};
 
       this.server2.services.pubsub.on('authentic', function(evt) {
+        sessionId = evt.session.id;
         events['authentic'] = evt;
       });
 
       this.server2.services.pubsub.on('disconnect', function(evt) {
         events['disconnect'] = evt;
       });
-
 
       Happn.client.create({
         config: {
@@ -132,7 +146,8 @@ context('login info for application layer', function() {
               KEY: 'VALUE',
               _browser: false,
               _local: false,
-            }
+            },
+            session: { id: sessionId }
           },
           'disconnect': {
             info: {
@@ -142,7 +157,8 @@ context('login info for application layer', function() {
               KEY: 'VALUE',
               _browser: false,
               _local: false,
-            }
+            },
+            session: { id: sessionId }
           }
         });
 

@@ -7,8 +7,8 @@ describe('a4_security_encryption.js', function () {
   var async = require('async');
   var Logger = require('happn-logger');
 
-  var bitcore = require('bitcore-lib');
-  var ECIES = require('bitcore-ecies');
+  var Crypto = require('happn-util-crypto');
+  var crypto = new Crypto();
 
   var testConfigs = {};
 
@@ -16,14 +16,14 @@ describe('a4_security_encryption.js', function () {
 
   }
 
-  testConfigs.security = {
-    
+  testConfigs.crypto = {
+
   }
 
   var testServices = {};
 
   testServices.data = require('../lib/services/data_embedded/service');
-  testServices.security = require('../lib/services/security/service');
+  testServices.crypto = require('../lib/services/crypto/service');
 
   before('should initialize the service', function (callback) {
 
@@ -31,7 +31,7 @@ describe('a4_security_encryption.js', function () {
 
     happnMock.utils = require('../lib/utils');
 
-    async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
+    async.eachSeries(['data', 'crypto'], function(serviceName, eachServiceCB){
 
       testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;
@@ -40,7 +40,7 @@ describe('a4_security_encryption.js', function () {
         if (e)  return  eachServiceCB(e);
 
         happnMock.services[serviceName] = testServices[serviceName];
-      
+
         eachServiceCB();
 
       });
@@ -48,9 +48,11 @@ describe('a4_security_encryption.js', function () {
 
   });
 
-  var generatedPrivateKeyBob = new bitcore.PrivateKey();
-  var generatedPublicKeyBob = generatedPrivateKeyBob.publicKey;
- 
+  var bobKeyPair = crypto.createKeyPair();
+
+  var generatedPrivateKeyBob = bobKeyPair.privateKey;
+  var generatedPublicKeyBob = bobKeyPair.publicKey;
+
   var generatedPrivateKeyAlice;
   var generatedPublicKeyAlice;
 
@@ -62,7 +64,7 @@ describe('a4_security_encryption.js', function () {
 
   it('should generate a keypair', function (callback) {
 
-    var keyPair = testServices.security.generateKeyPair();
+    var keyPair = testServices.crypto.createKeyPair();
 
     generatedPrivateKeyAlice = keyPair.privateKey;
     generatedPublicKeyAlice = keyPair.publicKey;
@@ -73,9 +75,9 @@ describe('a4_security_encryption.js', function () {
 
   it('should serialize and deserialize a keypair', function (callback) {
 
-    var keyPair = testServices.security.generateKeyPair();
-    var keyPairSerialized = testServices.security.serializeKeyPair(keyPair);
-    var keyPairDeserialized = testServices.security.deserializeKeyPair(keyPairSerialized);
+    var keyPair = testServices.crypto.createKeyPair();
+    var keyPairSerialized = testServices.crypto.serializeKeyPair(keyPair);
+    var keyPairDeserialized = testServices.crypto.deserializeKeyPair(keyPairSerialized);
 
     expect(typeof keyPairSerialized).to.be('string');
     expect(keyPairDeserialized.publicKey.toString()).to.be(keyPair.publicKey.toString());
@@ -85,39 +87,11 @@ describe('a4_security_encryption.js', function () {
 
   });
 
-  it('should encrypt and decrypt data using the ECIES module directly', function (callback) {
-
-    var bobSession = ECIES()
-    .privateKey(generatedPrivateKeyBob)
-    .publicKey(generatedPublicKeyAlice);
-
-    var aliceSession = ECIES()
-    .privateKey(generatedPrivateKeyAlice)
-    .publicKey(generatedPublicKeyBob);
-
-    var message = 'this is a secret';
-
-    var encrypted = aliceSession
-    .encrypt(message);
-
-    var decrypted = bobSession
-    .decrypt(encrypted);
- 
-    if (message == encrypted)
-      throw new Error('ecrypted data matches secret message');
-
-    if (message != decrypted)
-      throw new Error('decrypted data does not match secret message');
-
-    callback();
-
-  });
-
   it('should encrypt and decrypt data using the security layer', function (callback) {
     var message = 'this is a secret';
 
-    var encrypted = testServices.security.encryptAsymmetrical(generatedPrivateKeyAlice, generatedPublicKeyBob, message);
-    var decrypted = testServices.security.decryptAsymmetrical(generatedPrivateKeyBob, generatedPublicKeyAlice, encrypted);
+    var encrypted = testServices.crypto.asymmetricEncrypt(generatedPublicKeyBob, generatedPrivateKeyAlice, message);
+    var decrypted = testServices.crypto.asymmetricDecrypt(generatedPublicKeyAlice, generatedPrivateKeyBob, encrypted);
 
     if (message == encrypted)
       throw new Error('encrypted data matches secret message');
@@ -132,10 +106,10 @@ describe('a4_security_encryption.js', function () {
   it('should encrypt and decrypt data using symmetric hashing in the security layer', function (callback) {
 
     var message = 'this is a secret';
-    var hashed = testServices.security.generateHash(message, function(e, hash){
+    var hashed = testServices.crypto.generateHash(message, function(e, hash){
       if (e)  return  callback(e);
 
-      var verified = testServices.security.verifyHash(message, hash, function(e, verified){
+      var verified = testServices.crypto.verifyHash(message, hash, function(e, verified){
 
         if (e)  return  callback(e);
         expect(verified).to.be(true);

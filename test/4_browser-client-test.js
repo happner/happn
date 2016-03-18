@@ -12,18 +12,18 @@ describe('4_browser-client-test', function() {
 	var happnInstance = null;
 
 	/*
-	This test demonstrates starting up the happn service - 
+	This test demonstrates starting up the happn service -
 	the authentication service will use authTokenSecret to encrypt web tokens identifying
 	the logon session. The utils setting will set the system to log non priority information
 	*/
 
 	it('should initialize the service', function(callback) {
-		
+
 		this.timeout(20000);
 
 		try{
 			service.create({
-					mode:'embedded', 
+					mode:'embedded',
 					services:{
 						auth:{
 							path:'./services/auth/service.js',
@@ -45,7 +45,7 @@ describe('4_browser-client-test', function() {
 						log_level:'info|error|warning',
 						log_component:'prepare'
 					}
-				}, 
+				},
 				function(e, happnInst){
 					if (e)
 						return callback(e);
@@ -63,23 +63,25 @@ describe('4_browser-client-test', function() {
   	});
 
 	it('should fetch the browser client', function(callback) {
-		
+
 		this.timeout(5000);
 
 		try{
 
 			require('request')({uri:'http://127.0.0.1:55000/browser_client',
 					 method:'GET'
-					}, 
+					},
 					function(e, r, b){
 
 						if (!e){
-							////console.log('got body!!!');
-							////console.log(b);
+							var path = require('path');
+							var happnPath = path.dirname(path.resolve(require.resolve('../lib/index'), '..' + path.sep));
+							var happnVersion = require(happnPath + path.sep + 'package.json').version;
+							expect(b.indexOf('\/\/happn client v' + happnVersion)).to.be(0);
 							callback();
 						}else
 							callback(e);
-						
+
 
 					});
 
@@ -87,5 +89,5 @@ describe('4_browser-client-test', function() {
 			callback(e);
 		}
 	});
-	
+
 });

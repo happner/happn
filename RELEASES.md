@@ -58,3 +58,106 @@
 - fixed '/' webmethod exclusion was effectively '/*', allowing entire site without authentication
 - added username to session token
 - fixed unmounted connect app when https
+
+2.4.0 2016-01-20
+----------------
+
+- added crypto service, and happn-crypto utility
+- added encrypt payloads functionality
+- handle circular references maximum callstack error a bit better
+
+2.4.1 2016-01-21
+----------------
+
+- fixed issue where the publicKey wasnt getting to the server on logins where the keypair is generated on the client
+
+2.4.2 2016-01-21
+----------------
+
+- fixed issue where the browser version of the client was attempting to require the crypto library when it was already in the window
+- have browser tests all passing for encrypted payloads
+
+2.4.3 2016-01-23
+----------------
+
+- fixed issue with client not initializing properly if Primus already exists in the browser
+
+2.4.4 2016-02-11
+----------------
+
+- fixed issue with deleting group
+
+2.4.5 2016-02-14
+----------------
+
+- setSibling and tagging now uses uuid instead of shortid
+- fixed issue with .off incorrectly assuming 0 is a null reference
+
+2.5.0 2016-02-18
+----------------
+
+- pubsub now emits 'disconnect' and 'authentic' events for both eventEmitter and socket clients, the events now contain the sessionid
+- the sessionId for all clients is now a guid instead of a shortid
+
+2.5.1 2016-02-19
+----------------
+
+- client now emits 'reconnect-scheduled','reconnect-successful','connection-ended' events
+
+2.5.2 2016-02-22
+----------------
+
+- the security service now has a 'matchPassword' function, how we can do password validation without requiring a login
+
+2.5.3 2016-02-22
+----------------
+
+- the security service only raises an error when a new user is being saved without a password, by looking up - instead of checking for a _meta tag
+
+2.5.4 2016-02-22
+----------------
+
+- removed a console.log in the client base
+
+2.5.5 2016-02-24
+----------------
+
+- have db backwards compatability fix in place, change after version 1.5.6
+
+2.5.7 2016-02-24
+----------------
+
+- test data added, this wasnt working because git ignored test-data folder regardless of it being configured, bunch of publishes to fix this
+
+2.5.8 2016-03-02
+----------------
+
+- fixed the the backwards compatability db feature, as we were checking for the wrong error string
+- display happn version on startup
+
+2.5.9 2016-03-02
+----------------
+
+- adjustments to the security, system services for compatability with the mongo plugin
+
+2.5.10 2016-03-07
+-----------------
+
+- the happn client reflects the commented version of happn at the top of the script
+
+
+2.5.12-13 2016-03-10
+--------------------
+
+- adjusted crypto utilities
+- fixed test timeouts
+
+2.5.15 2016-03-17
+-----------------
+
+- fixed caching bug in security module, https://github.com/happner/happner/issues/74
+
+
+
+
+
