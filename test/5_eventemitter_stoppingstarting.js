@@ -46,8 +46,6 @@ describe('5_eventemitter_stoppingstarting', function() {
           serviceConfig.services.data.config.filename = filename;
           serviceConfig.name = name;
 
-          console.log('doing service init:::', serviceConfig);
-
           happn.service.create(serviceConfig,
           function(e, happnService){
             if (e) return callback(e);

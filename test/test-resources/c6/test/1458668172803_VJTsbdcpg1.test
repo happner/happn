@@ -1,0 +1,5 @@
+{"_id":"/_SYSTEM/_NETWORK/_SETTINGS/NAME","data":{"value":"ivypython_Eygaj-uq6l"},"created":1458668173012,"modified":1458668173012}
+{"_id":"/_SYSTEM/_SECURITY/_SETTINGS/KEYPAIR","data":{"value":"{\"privateKey\":\"j0CAFHem/bfiggKA2d498eORpmtiO/qwypUWMoZvmOs=\",\"publicKey\":\"Aw/U7i9UwYGELNXMAk2qFyxbdFxqhwdOi1c8fnhiQFtt\"}"},"created":1458668173056,"modified":1458668173056}
+{"_id":"/_SYSTEM/_SECURITY/_GROUP/_ADMIN","data":{"custom_data":{"description":"the default administration group for happn"},"name":"_ADMIN","permissions":{"*":{"actions":["*"]}}},"created":1458668173059,"modified":1458668173059}
+{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN","data":{"custom_data":{},"username":"_ADMIN","password":"pbkdf2$10000$0c3c1d4f2c5674e8b0e2de85d309883c68b715d7e45874fa27edf0306d81efb6158aeb72717f5fac79d2510de7c2697f09187669511038c6a5670db815bd2091$32319b25747a10e2f9c1feb88111dc4a0bac93ece17840f23b26e711f3c1a70741ed55b95afe83f36cbd0f232ad45f64b62f996cb069662f1d5a14b45d1575a7"},"created":1458668173094,"modified":1458668173094}
+{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN/_USER_GROUP/_ADMIN","data":{},"created":1458668173096,"modified":1458668173096}

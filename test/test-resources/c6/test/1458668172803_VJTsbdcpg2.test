@@ -1,0 +1,5 @@
+{"_id":"/_SYSTEM/_NETWORK/_SETTINGS/NAME","data":{"value":"quiltiguana_Nk0o-dcpx"},"created":1458668173238,"modified":1458668173238}
+{"_id":"/_SYSTEM/_SECURITY/_SETTINGS/KEYPAIR","data":{"value":"{\"privateKey\":\"rptKXyMfR96dvio0aasTkcY6f9vaf+hfnU7dWGh4rog=\",\"publicKey\":\"AvbkgdiZiNKASgCnkvIbpmE0Ir75QJAJoajklOgSWwYw\"}"},"created":1458668173269,"modified":1458668173269}
+{"_id":"/_SYSTEM/_SECURITY/_GROUP/_ADMIN","data":{"custom_data":{"description":"the default administration group for happn"},"name":"_ADMIN","permissions":{"*":{"actions":["*"]}}},"created":1458668173272,"modified":1458668173272}
+{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN","data":{"custom_data":{},"username":"_ADMIN","password":"pbkdf2$10000$da0830b28130a8c09680ce18225697cdce3a88ea8136318ea15876b023799955a3d4d6599e1d751840821db0b27c2fd7e934b923595037508345bc4262fef42c$ce34c409ca2ea0b613775f11eeda0224c934d4a3be38ec1377975efbc76a2b126d48335442481d70164bc63e49f68b22b28833c711487e12847854760f1cdb90"},"created":1458668173310,"modified":1458668173310}
+{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN/_USER_GROUP/_ADMIN","data":{},"created":1458668173314,"modified":1458668173314}
