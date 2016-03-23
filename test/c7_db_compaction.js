@@ -13,9 +13,9 @@ describe('c7_db_compaction', function() {
 
   var initialFileSize = 0;
 
-  var test_file1 = __dirname + '/test-resources/c6/test/' + test_id + '1.test';
-  var test_file2 = __dirname + '/test-resources/c6/test/' + test_id + '2.test';
-  var test_file3 = __dirname + '/test-resources/c6/test/' + test_id + '3.test';
+  var test_file1 = __dirname + '/test-resources/c7/test/' + test_id + '1.test';
+  var test_file2 = __dirname + '/test-resources/c7/test/' + test_id + '2.test';
+  var test_file3 = __dirname + '/test-resources/c7/test/' + test_id + '3.test';
 
   var serviceConfig1 =  {
     secure:true,
@@ -50,7 +50,7 @@ describe('c7_db_compaction', function() {
         path: './services/data_embedded/service.js',
         config:{
            filename:test_file3,
-           compactInterval:1000//compact every second
+           compactInterval:500//compact every second
         }
       }
     }
@@ -87,11 +87,15 @@ describe('c7_db_compaction', function() {
   var serviceInstance2;
   var serviceInstance3;
 
-  var randomActivityGenerator = require(__dirname + "/test-resources/random_activity_generator");
+  var RandomActivityGenerator = require(__dirname + "/test-resources/random_activity_generator");
 
   var randomActivity1;
   var randomActivity2;
   var randomActivity3;
+
+  var client1;
+  var client2;
+  var client3;
 
   var getService = function(config, callback){
    happn.service.create(config,
@@ -113,35 +117,28 @@ describe('c7_db_compaction', function() {
       });
   }
 
-  before('it creates 3 test dbs', function(callback){
+  before('it creates 2 test dbs', function(callback){
     getService(serviceConfig1, function(e, serviceInstance){
       if (e) return callback(e);
       serviceInstance1 = serviceInstance;
       getService(serviceConfig2, function(e, serviceInstance){
         if (e) return callback(e);
         serviceInstance2 = serviceInstance;
-        getService(serviceConfig3, function(e, serviceInstance){
-        if (e) return callback(e);
-          serviceInstance3 = serviceInstance;
-          console.log('servers created:::');
-          callback();
-        });
+        callback();
       });
     });
   });
 
   before('it creates 3 test clients and data generators', function(callback){
-    getClient(clientConfig1, function(e){
+    getClient(clientConfig1, function(e, client){
       if (e) return callback(e);
       console.log('client1 created:::');
-      getClient(clientConfig2, function(e){
+      client1 = client;
+      getClient(clientConfig2, function(e, client){
         if (e) return callback(e);
         console.log('client2 created:::');
-        getClient(clientConfig3, function(e){
-          if (e) return callback(e);
-          console.log('client3 created:::');
-          callback();
-        });
+        client2 = client;
+        callback();
       });
     });
   });
@@ -159,16 +156,75 @@ describe('c7_db_compaction', function() {
     });
   });
 
+  function getFileSize(filepath){
+
+  }
+
   it('for testfile1 creates data, measures the db size, compacts the db, checks the new db filesize is smaller than the original db', function(callback){
-    callback();
+
+    var fileSizeInitial = getFileSize(test_file1);
+
+    randomActivity1 = new RandomActivityGenerator(client1);
+
+    randomActivity1.generateActivity(1000, function(e){
+
+      var fileSizeAfterActivity = getFileSize(test_file1);
+      expect(fileSizeAfterActivity > fileSizeInitial).to.be(true);
+
+      serviceInstance1.services.data.compact(function(e){
+        var fileSizeAfterCompact = getFileSize(test_file1);
+        expect(fileSizeAfterCompact > fileSizeInitial).to.be(true);
+        expect(fileSizeAfterCompact < fileSizeAfterActivity).to.be(true);
+        callback();
+      });
+    });
+
   });
 
   it('starts compaction for every n seconds, then do random inserts and deletes, then verify the data', function(callback){
-    callback();
+    var fileSizeInitial = getFileSize(test_file2);
+
+    randomActivity2 = new RandomActivityGenerator(client2);
+
+    randomActivity2.generateActivityStart();
+
+    var compactionCount = 0;
+
+    serviceInstance2.services.data.compact(1000, function(e){
+
+      if (e) return callback(e);
+
+      compactionCount++;
+
+      if (compactionCount == 3){//we have compacted 3 times
+        randomActivity2.generateActivityEnd();
+        randomActivity2.verifyData();//checks to see all the data that should be there exists and all the data that shouldnt be there doesnt
+      }
+
+    });
+
   });
 
   it('starts a db configured to compact, does a replay of random activity1, then verifies the data is smaller than the initial size of the uncompacted file', function(callback){
-    callback();
+    getService(serviceConfig3, function(e, serviceInstance){
+      if (e) return callback(e);
+      serviceInstance3 = serviceInstance;
+      getClient(clientConfig3, function(e, client){
+
+          if (e) return callback(e);
+          console.log('client3 created:::');
+          client3 = client;
+
+          randomActivity3 = new RandomActivityGenerator(client3);
+          randomActivity3.replay(randomActivity1, function(e){
+
+            if (e) return callback(e);
+
+
+          });
+
+      });
+    });
   });
 
 });
