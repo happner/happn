@@ -160,15 +160,18 @@ describe('c7_db_compaction', function() {
 
   }
 
+  var fileSizeAfterActivity1;
+
   it('for testfile1 creates data, measures the db size, compacts the db, checks the new db filesize is smaller than the original db', function(callback){
 
     var fileSizeInitial = getFileSize(test_file1);
 
     randomActivity1 = new RandomActivityGenerator(client1);
 
-    randomActivity1.generateActivity(1000, function(e){
+    //generate random activity for 2 seconds
+    randomActivity1.generateActivity(2000, function(e){
 
-      var fileSizeAfterActivity = getFileSize(test_file1);
+      fileSizeAfterActivity1 = getFileSize(test_file1);
       expect(fileSizeAfterActivity > fileSizeInitial).to.be(true);
 
       serviceInstance1.services.data.compact(function(e){
@@ -198,7 +201,8 @@ describe('c7_db_compaction', function() {
 
       if (compactionCount == 3){//we have compacted 3 times
         randomActivity2.generateActivityEnd();
-        randomActivity2.verifyData();//checks to see all the data that should be there exists and all the data that shouldnt be there doesnt
+        //checks to see all the data that should be there exists and all the data that shouldnt be there doesnt
+        randomActivity2.verifyData(callback);
       }
 
     });
@@ -216,10 +220,14 @@ describe('c7_db_compaction', function() {
           client3 = client;
 
           randomActivity3 = new RandomActivityGenerator(client3);
-          randomActivity3.replay(randomActivity1, function(e){
+          randomActivity3.replay(randomActivity1.getOperationLog(), function(e){//we perform the same set of operations we did in the first test
 
             if (e) return callback(e);
 
+            var fileSizeAfterActivity3 = getFileSize(test_file3);
+            expect(fileSizeAfterActivity3 < fileSizeAfterActivity1).to.be(true);
+
+            randomActivity3.verifyData(callback);
 
           });
 
