@@ -303,4 +303,26 @@ describe('random_activity_generator', function() {
 		});
 	});
 
+	it('can run in daemon mode', function (callback) {
+		generator.generateActivityStart("test", function(){
+			setTimeout(function(){
+				generator.generateActivityEnd("test", function(aggregatedLog){
+					expect(generator.__operationLog["test"].length > 0).to.be(true);
+					generator.generateActivityStart("test", function(){
+					setTimeout(function(){
+						generator.generateActivityEnd("test", function(aggregatedLog){
+							expect(aggregatedLog.get > 0).to.be(true);
+							expect(aggregatedLog.set > 0).to.be(true);
+							expect(aggregatedLog.on > 0).to.be(true);
+							expect(aggregatedLog.remove > 0).to.be(true);
+							expect(generator.__operationLog["test"].length).to.be(0);
+							callback();
+						});
+					}, 2000);
+				}, "daemon");
+				});
+			}, 1000);
+		});
+	});
+
 });

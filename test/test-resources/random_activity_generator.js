@@ -45,11 +45,19 @@ function RandomActivityGenerator(happnClient, opts) {
 
   this.__updateLog = function(key, operationLogItem, operationResponse, operationError){
 
-    operationLogItem.response = operationResponse;
-    operationLogItem.error = operationError;
-    this.__operationLog[key].push(operationLogItem);
+    var mode = this.__operationLogAggregated[key].mode;
+
+    if (mode != "daemon"){
+      //we push into a teh replay and verify log
+      operationLogItem.response = operationResponse;
+      operationLogItem.error = operationError;
+      this.__operationLog[key].push(operationLogItem);
+    }
 
     this.__operationLogAggregated[key][operationLogItem.opType]++;
+
+    if (operationError)
+      this.__operationLogAggregated[key].errors++;
 
     return operationLogItem;
   }
@@ -158,13 +166,14 @@ function RandomActivityGenerator(happnClient, opts) {
     });
   }
 
-  this.__initializeActivity = function(key){
+  this.__initializeActivity = function(key, mode){
     var _this = this;
 
     if (!key)key = 'default';
+    if (!mode)mode = 'default';
 
     _this.__operationLog[key] = [];
-    _this.__operationLogAggregated[key] = {get:0, set:0, remove:0, on:0, initial:{on:0,get:0,remove:0}};
+    _this.__operationLogAggregated[key] = {get:0, set:0, remove:0, on:0, initial:{on:0,get:0,remove:0}, mode:mode};
     _this.__operationInitialData[key] = {on:[], remove:[], get:[]};
 
     return _this.__operationLogAggregated[key];
@@ -225,16 +234,19 @@ function RandomActivityGenerator(happnClient, opts) {
     }
   }
 
-  this.generateActivityStart = function(key, callback){
+  this.generateActivityStart = function(key, callback, mode){
 
     var _this = this;
 
     if (!key)key = 'default';
+    if (!mode)mode = 'default';
 
-    _this.__initializeActivity(key);
+    _this.__initializeActivity(key, mode);
     _this.__generateInitialData(key, function(e){
 
       if (e) return callback(e);
+
+      _this.__operationLogAggregated[key].started = Date.now();
 
       _this.__state[key] = setInterval(function(){
 
@@ -255,7 +267,7 @@ function RandomActivityGenerator(happnClient, opts) {
 
       }, opts.interval);
 
-      callback();
+      callback(null, _this.__operationLogAggregated[key]);
 
     });
 
@@ -263,10 +275,15 @@ function RandomActivityGenerator(happnClient, opts) {
 
   this.generateActivityEnd = function(key, callback){
     var _this = this;
+
+    if (!key)key = 'default';
+
     setTimeout(function(){
       clearInterval(_this.__state[key]);
+       _this.__operationLogAggregated[key].completed = Date.now();
       callback(_this.__operationLogAggregated[key]);
-    },  _this.__operationLogAggregated[key].initializationTimespan);
+    },
+    _this.__operationLogAggregated[key].initializationTimespan);//we take this into account - so if you do a 2 second run, the initialization time doesnt impact it
 
   }
 
@@ -367,6 +384,9 @@ function RandomActivityGenerator(happnClient, opts) {
     var _this = this;
 
     if (!key)key = 'default';
+
+    if (generator.__operationLogAggregated[key].mode == "daemon")
+      return callback(new Error("invalid mode daemon was used, you need to record for replay in default mode"));
 
     _this.__initializeActivity(key);
 
