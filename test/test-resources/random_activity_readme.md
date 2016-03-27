@@ -77,7 +77,7 @@ replay
 -------
 *you can create 2 generators, have one do a run, then pass it to another generator (perhaps connected to a different db) - its logs is parsed and exactly the same activity is replicated*
 
-the following is an example [from the test]()
+the following is an example [from the test](https://github.com/happner/happn/blob/feature/compaction/test/test-resources/random_activity_generator_test.js#L281)
 ```javascript
 generator.generateActivityStart("test", function(){
 	setTimeout(function(){
@@ -110,7 +110,7 @@ daemon mode
 *this is for testing activity over a long period (days/weeks/months), running in this mode does not store a replay log, and only stores aggregated data related to the run*
 
 
-following example from the [test]()
+following example from the [test](https://github.com/happner/happn/blob/feature/compaction/test/test-resources/random_activity_generator_test.js#L307)
 ```javascript
 
 generator.generateActivityStart("test", function(){
