@@ -184,6 +184,9 @@ describe('c7_db_compaction', function() {
           expect(fileSizeAfterActivity1 > fileSizeInitial).to.be(true);
           serviceInstance1.services.data.compact(function(e){
             var fileSizeAfterCompact = getFileSize(test_file1);
+
+            console.log('fileSizeAfterCompact:::',fileSizeAfterCompact);
+
             expect(fileSizeAfterCompact > fileSizeInitial).to.be(true);
             expect(fileSizeAfterCompact < fileSizeAfterActivity1).to.be(true);
             callback();
