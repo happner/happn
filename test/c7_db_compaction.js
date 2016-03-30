@@ -87,7 +87,7 @@ describe('c7_db_compaction', function() {
   var serviceInstance2;
   var serviceInstance3;
 
-  var RandomActivityGenerator = require(__dirname + "/test-resources/random_activity_generator");
+  var RandomActivityGenerator = require("happn-random-activity-generator");
 
   var randomActivity1;
   var randomActivity2;
@@ -107,14 +107,7 @@ describe('c7_db_compaction', function() {
   }
 
   var getClient = function(config, callback){
-     happn_client.create(config,
-      function(e, instance) {
-
-        if (e) return callback(e);
-        testClient = instance;
-        callback();
-
-      });
+     happn_client.create(config, callback);
   }
 
   before('it creates 2 test dbs', function(callback){
@@ -129,7 +122,7 @@ describe('c7_db_compaction', function() {
     });
   });
 
-  before('it creates 3 test clients and data generators', function(callback){
+  before('it creates 3 test clients', function(callback){
     getClient(clientConfig1, function(e, client){
       if (e) return callback(e);
       console.log('client1 created:::');
@@ -148,6 +141,9 @@ describe('c7_db_compaction', function() {
       fs.unlinkSync(test_file1);
        serviceInstance2.stop(function(e){
           fs.unlinkSync(test_file2);
+
+          if (!serviceInstance3) return callback();
+
           serviceInstance3.stop(function(e){
             fs.unlinkSync(test_file3);
             callback();
@@ -157,7 +153,12 @@ describe('c7_db_compaction', function() {
   });
 
   function getFileSize(filepath){
+     var stats = fs.statSync(filepath);
+     //Convert the file size to megabytes (optional)
+     if (!stats) return 0;
+     if (!stats["size"]) return 0;
 
+     return stats["size"];
   }
 
   var fileSizeAfterActivity1;
@@ -168,23 +169,33 @@ describe('c7_db_compaction', function() {
 
     randomActivity1 = new RandomActivityGenerator(client1);
 
-    //generate random activity for 2 seconds
-    randomActivity1.generateActivity(2000, function(e){
+    console.log('fileSizeInitial:::',fileSizeInitial);
 
-      fileSizeAfterActivity1 = getFileSize(test_file1);
-      expect(fileSizeAfterActivity > fileSizeInitial).to.be(true);
+    randomActivity1.generateActivityStart("test", function(){
+      setTimeout(function(){
+        randomActivity1.generateActivityEnd("test", function(aggregatedLog){
 
-      serviceInstance1.services.data.compact(function(e){
-        var fileSizeAfterCompact = getFileSize(test_file1);
-        expect(fileSizeAfterCompact > fileSizeInitial).to.be(true);
-        expect(fileSizeAfterCompact < fileSizeAfterActivity).to.be(true);
-        callback();
-      });
+          console.log('aggregatedLog:::', aggregatedLog);
+
+          fileSizeAfterActivity1 = getFileSize(test_file1);
+
+          console.log('fileSizeAfterActivity:::',fileSizeAfterActivity1);
+
+          expect(fileSizeAfterActivity1 > fileSizeInitial).to.be(true);
+          serviceInstance1.services.data.compact(function(e){
+            var fileSizeAfterCompact = getFileSize(test_file1);
+            expect(fileSizeAfterCompact > fileSizeInitial).to.be(true);
+            expect(fileSizeAfterCompact < fileSizeAfterActivity1).to.be(true);
+            callback();
+          });
+        });
+
+      }, 2000);
     });
 
   });
 
-  it('starts compaction for every n seconds, then do random inserts and deletes, then verify the data', function(callback){
+  xit('starts compaction for every n seconds, then do random inserts and deletes, then verify the data', function(callback){
     var fileSizeInitial = getFileSize(test_file2);
 
     randomActivity2 = new RandomActivityGenerator(client2);
@@ -209,7 +220,7 @@ describe('c7_db_compaction', function() {
 
   });
 
-  it('starts a db configured to compact, does a replay of random activity1, then verifies the data is smaller than the initial size of the uncompacted file', function(callback){
+  xit('starts a db configured to compact, does a replay of random activity1, then verifies the data is smaller than the initial size of the uncompacted file', function(callback){
     getService(serviceConfig3, function(e, serviceInstance){
       if (e) return callback(e);
       serviceInstance3 = serviceInstance;
