@@ -5,7 +5,8 @@
   "main": "./lib/index",
   "scripts": {
     "test": "mocha silence.js test",
-    "test-cover": "istanbul cover _mocha -- silence.js test"
+    "test-cover": "istanbul cover _mocha -- silence.js test",
+    "test-memory": "mocha --expose-gc test/test-memory"
   },
   "author": "",
   "license": "MIT",
