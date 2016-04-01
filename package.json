@@ -5,7 +5,8 @@
   "main": "./lib/index",
   "scripts": {
     "test": "mocha silence.js test",
-    "test-cover": "istanbul cover _mocha -- silence.js test"
+    "test-cover": "istanbul cover _mocha -- silence.js test",
+    "test-memory": "mocha --expose-gc test/test-memory"
   },
   "author": "",
   "license": "MIT",
@@ -51,7 +52,7 @@
     "ws": "1.0.1"
   },
   "devDependencies": {
-    "chai": "^3.2.0",
+    "chai": "^3.5.0",
     "coveralls": "^2.11.6",
     "expect.js": "*",
     "gulp": "^3.9.0",
