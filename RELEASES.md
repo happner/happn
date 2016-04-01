@@ -157,6 +157,12 @@
 
 - fixed caching bug in security module, https://github.com/happner/happner/issues/74
 
+2.5.16 2016-04-01
+-----------------
+
+- Fixed memory leak in meshClient (#23)
+- Fixed noPublish check (#22)
+
 
 
 
