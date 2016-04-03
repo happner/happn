@@ -10,6 +10,8 @@ lib-cov
 *.nedb
 *test/tmp*
 *test/test-tmp*
+test/test-temp/*
+!test/test-temp/.tests.use.this
 *.db
 
 pids
