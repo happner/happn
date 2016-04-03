@@ -2,6 +2,9 @@
 
 describe('b4_start_no_config', function () {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index')
   var service = happn.service;
@@ -10,7 +13,7 @@ describe('b4_start_no_config', function () {
   var test_id;
 
   /*
-   This test demonstrates starting up the happn service - 
+   This test demonstrates starting up the happn service -
    the authentication service will use authTokenSecret to encrypt web tokens identifying
    the logon session. The utils setting will set the system to log non priority information
    */
@@ -43,5 +46,6 @@ describe('b4_start_no_config', function () {
     happnInstance.stop(done);
   });
 
-})
-;
+  require('benchmarket').stop();
+
+});

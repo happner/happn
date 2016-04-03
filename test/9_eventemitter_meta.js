@@ -1,5 +1,7 @@
-
 describe('9_eventemitter_meta.js', function () {
+
+  require('benchmarket').start();
+  after(require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index');
@@ -13,7 +15,7 @@ describe('9_eventemitter_meta.js', function () {
   var default_timeout = 10000;
   var happnInstance = null;
   /*
-   This test demonstrates starting up the happn service - 
+   This test demonstrates starting up the happn service -
    the authentication service will use authTokenSecret to encrypt web tokens identifying
    the logon session. The utils setting will set the system to log non priority information
    */
@@ -68,14 +70,14 @@ describe('9_eventemitter_meta.js', function () {
   var listenerclient;
 
   /*
-   We are initializing 2 clients to test saving data against the database, one client will push data into the 
+   We are initializing 2 clients to test saving data against the database, one client will push data into the
    database whilst another listens for changes.
    */
   before('should initialize the clients', function (callback) {
     this.timeout(default_timeout);
 
     try {
-     
+
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
@@ -128,7 +130,7 @@ describe('9_eventemitter_meta.js', function () {
         if (!e) {
 
           expect(listenerclient.events['/SET@' + test_path].length).to.be(1);
-        
+
           //then make the change
           publisherclient.set(test_path, {
             property1: 'property1',
@@ -177,7 +179,7 @@ describe('9_eventemitter_meta.js', function () {
 
       if (e) return callback(e);
 
-     
+
       expect(result._meta.path).to.be(test_path_remove);
 
       listenerclient.on(test_path_remove, {event_type: 'remove', count: 1}, function (data, meta) {
@@ -187,8 +189,8 @@ describe('9_eventemitter_meta.js', function () {
 
         if (e) return callback(e);
 
-        publisherclient.remove(test_path_remove,  
-          {}, 
+        publisherclient.remove(test_path_remove,
+          {},
           function (e, result) {
 
           if (e) return callback(e);
@@ -289,7 +291,7 @@ describe('9_eventemitter_meta.js', function () {
     var windowStart = Date.now();
 
     //we save 10 items, with timestamp path, then do a search with modified, then a search created - ensure the counts are right
-    async.eachSeries(itemIndexes, 
+    async.eachSeries(itemIndexes,
     function(index, eachCallback){
 
       publisherclient.set(test_path_timestamp + index, {
@@ -297,7 +299,7 @@ describe('9_eventemitter_meta.js', function () {
           ind:index
       }, eachCallback);
 
-    }, 
+    },
     function(e){
 
       if (e) return callback(e);
@@ -315,9 +317,9 @@ describe('9_eventemitter_meta.js', function () {
 
           var searchCriteria = {
             '_meta.created':{
-              '$gte':windowStart, 
+              '$gte':windowStart,
               '$lt':windowEnd
-            }   
+            }
           }
 
           publisherclient.get('*', {criteria:searchCriteria}, function(e, items){
@@ -328,7 +330,7 @@ describe('9_eventemitter_meta.js', function () {
             var searchCriteria = {
               '_meta.created':{
                 '$gte':windowEnd
-              }  
+              }
             }
 
             publisherclient.get('*', {criteria:searchCriteria}, function(e, items){
@@ -351,7 +353,7 @@ describe('9_eventemitter_meta.js', function () {
                   var searchCriteria = {
                     '_meta.modified':{
                       '$gte':lastModified
-                    }  
+                    }
                   }
 
                   publisherclient.get('*', {criteria:searchCriteria}, function(e, items){
@@ -411,12 +413,14 @@ describe('9_eventemitter_meta.js', function () {
           expect(result._meta.path).to.be(test_path_all);
 
         });
-       
+
       });
 
     } catch (e) {
       callback(e);
     }
   });
+
+  require('benchmarket').stop();
 
 });

@@ -1,5 +1,8 @@
 describe('2_eventemitter_websockets_embedded_benchmarks', function () {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../../lib/index');
   var service = happn.service;
@@ -20,12 +23,12 @@ describe('2_eventemitter_websockets_embedded_benchmarks', function () {
    */
 
   before('should initialize the service', function(callback) {
-    
+
     this.timeout(20000);
 
     try{
       service.create({
-          mode:'embedded', 
+          mode:'embedded',
           services:{
             auth:{
               path:'./services/auth/service.js',
@@ -46,7 +49,7 @@ describe('2_eventemitter_websockets_embedded_benchmarks', function () {
             log_level:'info|error|warning',
             log_component:'prepare'
           }
-        }, 
+        },
         function(e, happnInst){
           if (e)
             return callback(e);
@@ -67,7 +70,7 @@ describe('2_eventemitter_websockets_embedded_benchmarks', function () {
 
       if (err)
         console.warn('failed closing test clients:::', err);
-      
+
       happnInstance.stop(done);
 
     });
@@ -78,7 +81,7 @@ describe('2_eventemitter_websockets_embedded_benchmarks', function () {
   var listenerclient;
 
   /*
-  We are initializing 2 clients to test saving data against the database, one client will push data into the 
+  We are initializing 2 clients to test saving data against the database, one client will push data into the
   database whilst another listens for changes.
   */
   it('should initialize the clients', function(callback) {
@@ -175,11 +178,11 @@ describe('2_eventemitter_websockets_embedded_benchmarks', function () {
     var  writeData = function() {
 
       if (receivedCount == expected) return;
-      
+
       //////////console.log('putting data: ', count);
       publisherclient.set('/e2e_test1/testsubscribe/sequence3', {
         property1: receivedCount
-      }, {noStore: true},  
+      }, {noStore: true},
       function (e, result) {
         if (e)
           return callback(e);
@@ -189,7 +192,7 @@ describe('2_eventemitter_websockets_embedded_benchmarks', function () {
     }
 
     listenerclient.on('/e2e_test1/testsubscribe/sequence3', {event_type:'set', count:0}, function (message) {
- 
+
       ////////console.log('Event happened', message);
       receivedCount++;
 
@@ -638,7 +641,7 @@ describe('2_eventemitter_websockets_embedded_benchmarks', function () {
     this.timeout(default_timeout);
 
       happn_client.create(function(e, stressTestClient) {
-      
+
       if (e) return callback(e);
       testClients.push(stressTestClient);
 
@@ -765,5 +768,7 @@ it('should handle sequences of events by when the previous one is done', functio
     });
 
   });
+
+  require('benchmarket').stop();
 
 });

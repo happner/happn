@@ -1,5 +1,8 @@
 describe('7_websockets_security_benchmarks', function () {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../../lib/index');
   var service = happn.service;
@@ -713,5 +716,7 @@ it('should handle sequences of events by when the previous one is done', functio
         });
       });
   });
+
+  require('benchmarket').stop();
 
 });

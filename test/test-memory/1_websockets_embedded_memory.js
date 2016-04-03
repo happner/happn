@@ -5,6 +5,9 @@ if (!global.gc) {
 
 describe('1-websockets-embedded-memory', function () {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var spawn = require('child_process').spawn;
   var should = require('chai').should();
   var happn = require('../../lib/index');
@@ -110,5 +113,7 @@ describe('1-websockets-embedded-memory', function () {
 
     }
   });
+
+  require('benchmarket').stop();
 
 });

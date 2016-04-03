@@ -1,5 +1,7 @@
 describe('a3_eventemitter_multiple_datasource', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
 
   var expect = require('expect.js');
   var async = require('async');
@@ -734,5 +736,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
     }
 
   });
+
+  require('benchmarket').stop();
 
 });

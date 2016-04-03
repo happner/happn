@@ -1,6 +1,9 @@
 
 describe('4_browser-client-test', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
 	var expect = require('expect.js');
 	var happn = require('../lib/index')
 	var service = happn.service;
@@ -89,5 +92,7 @@ describe('4_browser-client-test', function() {
 			callback(e);
 		}
 	});
+
+  require('benchmarket').stop();
 
 });

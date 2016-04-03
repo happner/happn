@@ -1,5 +1,8 @@
 describe('7_eventemitter_listeners', function () {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
@@ -12,7 +15,7 @@ describe('7_eventemitter_listeners', function () {
   var default_timeout = 10000;
   var happnInstance = null;
   /*
-   This test demonstrates starting up the happn service - 
+   This test demonstrates starting up the happn service -
    the authentication service will use authTokenSecret to encrypt web tokens identifying
    the logon session. The utils setting will set the system to log non priority information
    */
@@ -67,14 +70,14 @@ describe('7_eventemitter_listeners', function () {
   var listenerclient;
 
   /*
-   We are initializing 2 clients to test saving data against the database, one client will push data into the 
+   We are initializing 2 clients to test saving data against the database, one client will push data into the
    database whilst another listens for changes.
    */
   it('should initialize the clients', function (callback) {
     this.timeout(default_timeout);
 
     try {
-     
+
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
@@ -241,7 +244,7 @@ describe('7_eventemitter_listeners', function () {
         }, function (eventData) {
 
           //we are looking at the event internals on the listener to ensure our event management is working - because we are only listening for 1
-          //instance of this event - the event listener should have been removed 
+          //instance of this event - the event listener should have been removed
           ////console.log('listenerclient.events');
           ////console.log(listenerclient.events);
           expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me'].length).to.be(0);
@@ -362,7 +365,7 @@ describe('7_eventemitter_listeners', function () {
 
     listenerclient.onAll(function (eventData, meta) {
 
-      if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
+      if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' ||
           meta.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
         caughtCount++;
 
@@ -380,7 +383,7 @@ describe('7_eventemitter_listeners', function () {
         property3: 'property3'
       }, null, function (e, put_result) {
 
-       
+
 
         publisherclient.remove('/e2e_test1/testsubscribe/data/catch_all', null, function (e, del_result) {
 
@@ -437,4 +440,7 @@ describe('7_eventemitter_listeners', function () {
       );
     });
   });
+
+  require('benchmarket').stop();
+
 });
