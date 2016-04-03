@@ -1,5 +1,8 @@
 describe('b5_websockets_search', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var happn = require('../lib/index');
   var serviceInstance;
   var searchClient;
@@ -63,7 +66,7 @@ describe('b5_websockets_search', function() {
        searchClient.get('movie/*',{criteria: criteria, options: options},
         function(e, result){
           if(e) return done(e);
-         
+
           expect(result.length).to.be(1);
           done();
 
@@ -137,7 +140,7 @@ describe('b5_websockets_search', function() {
       function(e, result){
 
         if(e) return done(e);
-       
+
         expect(result.length).to.be(1);
 
         latestResult = result[0];
@@ -205,7 +208,7 @@ describe('b5_websockets_search', function() {
         function(e, result){
 
           if(e) return done(e);
-         
+
           expect(result.length).to.be(1);
 
           latestResult = result[0];
@@ -241,5 +244,7 @@ describe('b5_websockets_search', function() {
       });
 
     });
+
+  require('benchmarket').stop();
 
 });

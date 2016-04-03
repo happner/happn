@@ -1,5 +1,8 @@
 describe('b9_security_web_token', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
@@ -34,13 +37,13 @@ describe('b9_security_web_token', function() {
   }
 
   /*
-  This test demonstrates starting up the happn service - 
+  This test demonstrates starting up the happn service -
   the authentication service will use authTokenSecret to encrypt web tokens identifying
   the logon session. The utils setting will set the system to log non priority information
   */
 
   before('should initialize the service', function(callback) {
-    
+
     this.timeout(20000);
 
 
@@ -116,11 +119,11 @@ describe('b9_security_web_token', function() {
   });
 
   /*
-    We are initializing 2 clients to test saving data against the database, one client will push data into the 
+    We are initializing 2 clients to test saving data against the database, one client will push data into the
     database whilst another listens for changes.
   */
   before('should initialize the admin client', function(callback) {
-      
+
       happn.client.create({
         config:{username:'_ADMIN', password:'happn'},
         secure:true
@@ -245,11 +248,11 @@ describe('b9_security_web_token', function() {
     try {
 
       testGroup.permissions = {'/@HTTP/secure/route/test':{actions:['get']}};
-      
+
       happnInstance.services.security.upsertGroup(testGroup, {}, function(e, group){
         if (e) return done(e);
         expect(group.permissions['/@HTTP/secure/route/test']).to.eql({actions:['get']});
-        
+
         doRequest('/secure/route/test', testClient.session.token, false, function(response){
 
           expect(response.statusCode).to.equal(200);
@@ -268,11 +271,11 @@ describe('b9_security_web_token', function() {
     try {
 
       testGroup.permissions = {'/@HTTP/secure/route/test':{actions:['get']}};
-      
+
       happnInstance.services.security.upsertGroup(testGroup, {}, function(e, group){
         if (e) return done(e);
         expect(group.permissions['/@HTTP/secure/route/test']).to.eql({actions:['get']});
-        
+
         doRequest('/secure/route/test', testClient.session.token, true, function(response){
 
           expect(response.statusCode).to.equal(200);
@@ -287,7 +290,7 @@ describe('b9_security_web_token', function() {
   });
 
   it('tests the excluded wildcard route to ensure anyone can access it', function (callback) {
-  
+
     doRequest('/test/excluded/wildcard/blah', null, false, function(response){
       expect(response.statusCode).to.equal(200);
       callback();
@@ -296,7 +299,7 @@ describe('b9_security_web_token', function() {
   });
 
   it('tests the excluded specific route to ensure anyone can access it', function (callback) {
-    
+
     this.timeout(20000);
 
     doRequest('/test/excluded/specific', null, true, function(response){
@@ -307,14 +310,15 @@ describe('b9_security_web_token', function() {
   });
 
   xit('removes the permission from the test group - we ensure we can not access the resource with the token', function (callback) {
-    
+
 
   });
 
   xit('access a resource using the token as part of the url as a querystring argument', function (callback) {
-    
+
 
   });
 
+  require('benchmarket').stop();
 
 });

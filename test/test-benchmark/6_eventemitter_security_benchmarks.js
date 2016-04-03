@@ -24,6 +24,9 @@ var expect = require('expect.js');
 
 describe('6_eventemitter_security_benchmarks', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   context('6_eventemitter_security_benchmarks', function() {
 
   var happn = require('../../lib/index');
@@ -135,7 +138,7 @@ describe('6_eventemitter_security_benchmarks', function() {
       function(e, stressTestClient) {
 
         if (e) return callback(e);
-       
+
         var count = 0;
         var expected = 1000;
         var receivedCount = 0;
@@ -250,7 +253,7 @@ describe('6_eventemitter_security_benchmarks', function() {
         stressTestClient.on('/e2e_test1/testsubscribe/sequence1', {
           event_type: 'set',
           count: 0
-        }, 
+        },
         function(message) {
           receivedCount++;
 
@@ -320,13 +323,13 @@ describe('6_eventemitter_security_benchmarks', function() {
         ////console.log(message, meta);
 
         receivedCount++;
-       
+
         if (receivedCount == expected) {
           console.timeEnd(timerName);
           callback();
         }
 
-      }, 
+      },
       function(e) {
         if (!e) {
           console.time(timerName);
@@ -388,7 +391,7 @@ describe('6_eventemitter_security_benchmarks', function() {
         stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore', {
           event_type: 'set',
           count: 0
-        }, 
+        },
         function(message) {
 
           receivedCount++;
@@ -401,11 +404,11 @@ describe('6_eventemitter_security_benchmarks', function() {
           if (receivedCount == sent.length) {
             console.timeEnd(timerName);
             expect(Object.keys(received).length == expected).to.be(true);
-            
+
             callback();
           }
 
-        }, 
+        },
         function(e) {
 
           if (!e) {
@@ -463,7 +466,7 @@ describe('6_eventemitter_security_benchmarks', function() {
         sent[i] = require('shortid').generate();
       }
 
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set',count:0}, 
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set',count:0},
         function(message) {
 
           ////console.log(message);
@@ -483,7 +486,7 @@ describe('6_eventemitter_security_benchmarks', function() {
             expect(Object.keys(received).length == expected).to.be(true);
             callback();
           }
-        }, 
+        },
         function(e) {
 
           if (e) return callback(e);
@@ -493,7 +496,7 @@ describe('6_eventemitter_security_benchmarks', function() {
 
           while (count < expected) {
 
-            publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {}, 
+            publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {},
             function(e, result) {
               if (e) return callback(e);
             });
@@ -764,5 +767,7 @@ describe('6_eventemitter_security_benchmarks', function() {
   });
 
 });
+
+  require('benchmarket').stop();
 
 });

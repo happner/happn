@@ -2,6 +2,9 @@
 
 describe('5_eventemitter_embedded_persisted_benchmarks', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../../lib/index');
   var service = happn.service;
@@ -116,7 +119,7 @@ describe('5_eventemitter_embedded_persisted_benchmarks', function() {
       function(e, stressTestClient) {
 
         if (e) return callback(e);
-       
+
         var count = 0;
         var expected = 1000;
         var receivedCount = 0;
@@ -229,7 +232,7 @@ describe('5_eventemitter_embedded_persisted_benchmarks', function() {
         stressTestClient.on('/e2e_test1/testsubscribe/sequence1', {
           event_type: 'set',
           count: 0
-        }, 
+        },
         function(message) {
           receivedCount++;
 
@@ -295,13 +298,13 @@ describe('5_eventemitter_embedded_persisted_benchmarks', function() {
       }, function(message) {
 
         receivedCount++;
-       
+
         if (receivedCount == expected) {
           console.timeEnd(timerName);
           callback();
         }
 
-      }, 
+      },
       function(e) {
         if (!e) {
           console.time(timerName);
@@ -361,7 +364,7 @@ describe('5_eventemitter_embedded_persisted_benchmarks', function() {
         stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore', {
           event_type: 'set',
           count: 0
-        }, 
+        },
         function(message) {
 
           receivedCount++;
@@ -374,11 +377,11 @@ describe('5_eventemitter_embedded_persisted_benchmarks', function() {
           if (receivedCount == sent.length) {
             console.timeEnd(timerName);
             expect(Object.keys(received).length == expected).to.be(true);
-            
+
             callback();
           }
 
-        }, 
+        },
         function(e) {
 
           if (!e) {
@@ -434,7 +437,7 @@ describe('5_eventemitter_embedded_persisted_benchmarks', function() {
         sent[i] = require('shortid').generate();
       }
 
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set',count:0}, 
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set',count:0},
         function(message) {
           receivedCount++;
 
@@ -448,7 +451,7 @@ describe('5_eventemitter_embedded_persisted_benchmarks', function() {
             expect(Object.keys(received).length == expected).to.be(true);
             callback();
           }
-        }, 
+        },
         function(e) {
 
           if (e) return callback(e);
@@ -460,7 +463,7 @@ describe('5_eventemitter_embedded_persisted_benchmarks', function() {
 
             publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {
               excludeId: true
-            }, 
+            },
             function(e, result) {
               if (e) return callback(e);
             });
@@ -723,5 +726,7 @@ describe('5_eventemitter_embedded_persisted_benchmarks', function() {
     });
 
   });
+
+  require('benchmarket').stop();
 
 });

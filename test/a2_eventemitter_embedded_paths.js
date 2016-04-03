@@ -1,5 +1,8 @@
 describe('a2_eventemitter_embedded_paths', function () {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index')
   var service = happn.service;
@@ -14,7 +17,7 @@ describe('a2_eventemitter_embedded_paths', function () {
   var test_id;
 
   /*
-   This test demonstrates starting up the happn service - 
+   This test demonstrates starting up the happn service -
    the authentication service will use authTokenSecret to encrypt web tokens identifying
    the logon session. The utils setting will set the system to log non priority information
    */
@@ -71,14 +74,14 @@ describe('a2_eventemitter_embedded_paths', function () {
   var listenerclient;
 
    /*
-   We are initializing 2 clients to test saving data against the database, one client will push data into the 
+   We are initializing 2 clients to test saving data against the database, one client will push data into the
    database whilst another listens for changes.
    */
   before('should initialize the clients', function (callback) {
     this.timeout(default_timeout);
 
     try {
-     
+
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
@@ -167,10 +170,10 @@ describe('a2_eventemitter_embedded_paths', function () {
 
         if (!e) {
           publisherclient.get('a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
-            
+
             if (e) return callback(e);
 
-           
+
 
             // expect(results.payload.length == 1).to.be(true);
             expect(results.property1 == 'property1').to.be(true);
@@ -205,7 +208,7 @@ describe('a2_eventemitter_embedded_paths', function () {
 
         if (!e) {
           publisherclient.get('*/' + test_id + '/testsubscribe/wildcards/*', null, function (e, results) {
-            
+
             if (e) return callback(e);
 
             expect(results.length > 0).to.be(true);
@@ -227,12 +230,12 @@ describe('a2_eventemitter_embedded_paths', function () {
 
     this.timeout(default_timeout);
     var timesCount = 10;
-    
+
     var testBasePath = '/a2_eventemitter_embedded_paths/' + test_id + '/set_multiple'
 
     try {
 
-      async.times(timesCount, 
+      async.times(timesCount,
       function(n, timesCallback){
 
         var test_random_path2 = require('shortid').generate();
@@ -243,7 +246,7 @@ describe('a2_eventemitter_embedded_paths', function () {
           property3: 'property3'
         }, {noPublish: true}, timesCallback);
 
-      }, 
+      },
       function(e){
 
         if (e) return callback(e);
@@ -261,7 +264,7 @@ describe('a2_eventemitter_embedded_paths', function () {
               { property1: 'property1',
                 property2: 'property2',
                 property3: 'property3',
-                _meta: 
+                _meta:
                  { modified: 1443606046766,
                    created: 1443606046766,
                    path: '/a2_eventemitter_embedded_paths/1443606046555_VkyH6cE1l/set_multiple/E17kSpqE1l' } }
@@ -279,7 +282,7 @@ describe('a2_eventemitter_embedded_paths', function () {
 
       });
 
-     
+
     } catch (e) {
       callback(e);
     }
@@ -564,7 +567,7 @@ describe('a2_eventemitter_embedded_paths', function () {
         publisherclient.get('/_TAGS/a2_eventemitter_embedded_paths/' + test_id + '/test/tag/*', null, function (e, results) {
 
           expect(e).to.be(null);
-          
+
           expect(results.length > 0).to.be(true);
 
           var found = false;
@@ -816,7 +819,7 @@ describe('a2_eventemitter_embedded_paths', function () {
 
           expect(results.length == 2).to.be(true);
           callback(e);
-          
+
         });
       });
     });
@@ -874,7 +877,7 @@ describe('a2_eventemitter_embedded_paths', function () {
         //////////////////console.log(message);
 
         //we are looking at the event internals on the listener to ensure our event management is working - because we are only listening for 1
-        //instance of this event - the event listener should have been removed 
+        //instance of this event - the event listener should have been removed
         ////console.log('listenerclient.events');
         ////console.log(listenerclient.events);
         expect(listenerclient.events['/REMOVE@/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/delete_me'].length).to.be(0);
@@ -995,7 +998,7 @@ describe('a2_eventemitter_embedded_paths', function () {
 
     listenerclient.onAll(function (eventData, meta) {
 
-      if (meta.action == '/REMOVE@/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/catch_all' || 
+      if (meta.action == '/REMOVE@/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/catch_all' ||
           meta.action == '/SET@/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/catch_all')
         caughtCount++;
 
@@ -1004,7 +1007,7 @@ describe('a2_eventemitter_embedded_paths', function () {
 
     }, function (e) {
 
-    
+
       if (e) return callback(e);
 
       publisherclient.set('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/catch_all', {
@@ -1069,5 +1072,6 @@ describe('a2_eventemitter_embedded_paths', function () {
     });
   });
 
-})
-;
+  require('benchmarket').stop();
+
+});

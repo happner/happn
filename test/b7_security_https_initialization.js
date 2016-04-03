@@ -1,5 +1,8 @@
 describe('b7_security_https', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var happn = require('../lib/index');
   var happn_client = happn.client;
 
@@ -16,7 +19,7 @@ describe('b7_security_https', function() {
 
   var clientConfig = {
     config:{
-      protocol:'https', 
+      protocol:'https',
       allowSelfSignedCerts:true
     }
   }
@@ -94,7 +97,7 @@ describe('b7_security_https', function() {
       return done();
 
     var serviceConfig = config.test3_config;
-  
+
     getService(serviceConfig, function(e){
 
       if (e) return done(e);
@@ -207,5 +210,6 @@ describe('b7_security_https', function() {
 
   });
 
-  
+  require('benchmarket').stop();
+
 });

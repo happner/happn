@@ -1,5 +1,7 @@
 describe('a7_eventemitter_security_access', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
 
   var happn = require('../lib/index');
   var serviceInstance;
@@ -217,7 +219,7 @@ describe('a7_eventemitter_security_access', function() {
             if (!e) return done(new Error('you managed to get data which you do not have permissions for'));
             expect(e.toString()).to.be('AccessDenied: unauthorized');
             done();
-            
+
           });
         });
       });
@@ -230,7 +232,7 @@ describe('a7_eventemitter_security_access', function() {
 
         if (e) return done(e);
         expect(result._meta.path).to.be('/TEST/a7_eventemitter_security_access/' + test_id + '/get');
-        
+
         testClient.set('/TEST/a7_eventemitter_security_access/' + test_id + '/get', {test:'test'}, {}, function(e, result){
           if (!e) return done(new Error('you just set data that you shouldnt have permissions to set'));
           expect(e.toString()).to.be('AccessDenied: unauthorized');
@@ -252,11 +254,11 @@ describe('a7_eventemitter_security_access', function() {
         expect(result._meta.path).to.be('/TEST/a7_eventemitter_security_access/' + test_id + '/comp/get_on');
 
           testClient.on('/TEST/a7_eventemitter_security_access/' + test_id + '/comp/get_on', {}, function(message){}, function(e){
-            
+
             if (e) return done(e);
 
             testClient.set('/TEST/a7_eventemitter_security_access/' + test_id + '/comp/get_on', {test:'test'}, {}, function(e, result){
-              
+
               if (!e) return done(new Error('you just set data that you shouldnt have permissions to set'));
               expect(e.toString()).to.be('AccessDenied: unauthorized');
               done();
@@ -279,7 +281,7 @@ describe('a7_eventemitter_security_access', function() {
         expect(result._meta.path).to.be('/TEST/a7_eventemitter_security_access/' + test_id + '/comp/get_not_on');
 
           testClient.on('/TEST/a7_eventemitter_security_access/' + test_id + '/comp/get_not_on', {}, function(message){}, function(e){
-            
+
             if (!e) return done(new Error('this should not have been allowed...'));
             expect(e.toString()).to.be('AccessDenied: unauthorized');
             done();
@@ -326,11 +328,11 @@ describe('a7_eventemitter_security_access', function() {
 
       testClient.set('/TEST/a7_eventemitter_security_access/' + test_id + '/comp/set_not_on', {'test-set':'test-set-val'}, {}, function(e, setResult){
 
-       
+
 
          if (e) return done(e);
          testClient.on('/TEST/a7_eventemitter_security_access/' + test_id + '/comp/set_not_on', {}, function(message){}, function(e){
-            
+
             if (!e) return done(new Error('this should not have been allowed...'));
             expect(e.toString()).to.be('AccessDenied: unauthorized');
             done();
@@ -387,7 +389,7 @@ describe('a7_eventemitter_security_access', function() {
     });
 
     it('deletes the test user, tests we are notified about the session closure, then have no access', function(done){
-       
+
       testClient.onSystemMessage(function(eventType, data){
 
         if (eventType == 'server-side-disconnect'){
@@ -413,5 +415,7 @@ describe('a7_eventemitter_security_access', function() {
     });
 
   });
+
+  require('benchmarket').stop();
 
 });

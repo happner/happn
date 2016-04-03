@@ -23,6 +23,9 @@ tail -f test/.e2e_eventemitter_embedded_benchmarks.csv
 
 describe('1_eventemitter_embedded_benchmarks', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../../lib/index');
   var service = happn.service;
@@ -85,7 +88,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
 
       if (err)
         console.warn('failed closing test clients:::');
-      
+
       happnInstance.stop(done);
 
     });
@@ -142,7 +145,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
 
         if (e) return callback(e);
         testClients.push(stressTestClient);
-        
+
         var count = 0;
         var expected = 1000;
         var receivedCount = 0;
@@ -256,7 +259,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
         stressTestClient.on('/e2e_test1/testsubscribe/sequence1', {
           event_type: 'set',
           count: 0
-        }, 
+        },
         function(message) {
           receivedCount++;
 
@@ -325,13 +328,13 @@ describe('1_eventemitter_embedded_benchmarks', function() {
         ////console.log(message, meta);
 
         receivedCount++;
-       
+
         if (receivedCount == expected) {
           console.timeEnd(timerName);
           callback();
         }
 
-      }, 
+      },
       function(e) {
         if (!e) {
           console.time(timerName);
@@ -393,7 +396,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
         stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore', {
           event_type: 'set',
           count: 0
-        }, 
+        },
         function(message) {
 
           receivedCount++;
@@ -406,11 +409,11 @@ describe('1_eventemitter_embedded_benchmarks', function() {
           if (receivedCount == sent.length) {
             console.timeEnd(timerName);
             expect(Object.keys(received).length == expected).to.be(true);
-            
+
             callback();
           }
 
-        }, 
+        },
         function(e) {
 
           if (!e) {
@@ -467,7 +470,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
         sent[i] = require('shortid').generate();
       }
 
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set',count:0}, 
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set',count:0},
         function(message) {
 
           ////console.log(message);
@@ -487,7 +490,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
             expect(Object.keys(received).length == expected).to.be(true);
             callback();
           }
-        }, 
+        },
         function(e) {
 
           if (e) return callback(e);
@@ -497,7 +500,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
 
           while (count < expected) {
 
-            publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {}, 
+            publisherclient.set('/e2e_test1/testsubscribe/sequence_persist', {property1: sent[count]}, {},
             function(e, result) {
               if (e) return callback(e);
             });
@@ -768,5 +771,7 @@ describe('1_eventemitter_embedded_benchmarks', function() {
     });
 
   });
+
+  require('benchmarket').stop();
 
 });

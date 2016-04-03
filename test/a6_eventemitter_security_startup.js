@@ -1,5 +1,8 @@
 describe('a6_eventemitter_security_groups', function () {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
@@ -14,7 +17,7 @@ describe('a6_eventemitter_security_groups', function () {
   }
 
   testConfigs.security = {
-    
+
   }
 
   var testServices = {};
@@ -39,7 +42,7 @@ describe('a6_eventemitter_security_groups', function () {
         if (e)  return  eachServiceCB(e);
 
         happnMock.services[serviceName] = testServices[serviceName];
-      
+
         eachServiceCB();
 
       });
@@ -61,7 +64,7 @@ describe('a6_eventemitter_security_groups', function () {
   });
 
   it('the default keypair in memory must exist in the system security leaf', function (callback) {
-     
+
       testServices.data.get('/_SYSTEM/_SECURITY/_SETTINGS/KEYPAIR', {}, function(e, response){
 
         if (e) return callback(e);
@@ -123,23 +126,26 @@ describe('a6_eventemitter_security_groups', function () {
   //we reset to only run in memory
 
   testConfigs.data = {
-    
+
   }
 
   testConfigs.security = {
-    
+
   }
 
   it('reinitializes services with specified admin user and keypair, admin user and keypair should match specified', function (callback) {
 
     initializeMockServices(function(e){
 
-      
+
 
     });
 
   });
-  
+
   */
- 
+
+
+  require('benchmarket').stop();
+
 });

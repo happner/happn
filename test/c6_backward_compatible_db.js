@@ -1,5 +1,8 @@
 describe('c6_backward_compatible_db', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index')
   var service = happn.service;
@@ -85,5 +88,7 @@ describe('c6_backward_compatible_db', function() {
     }, callback);
 
   });
+
+  require('benchmarket').stop();
 
 });

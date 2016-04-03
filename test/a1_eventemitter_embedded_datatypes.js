@@ -1,5 +1,8 @@
 describe('a1_eventemitter_embedded_datatypes', function () {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index')
   var service = happn.service;
@@ -14,7 +17,7 @@ describe('a1_eventemitter_embedded_datatypes', function () {
   var test_id;
 
   /*
-   This test demonstrates starting up the happn service - 
+   This test demonstrates starting up the happn service -
    the authentication service will use authTokenSecret to encrypt web tokens identifying
    the logon session. The utils setting will set the system to log non priority information
    */
@@ -74,14 +77,14 @@ describe('a1_eventemitter_embedded_datatypes', function () {
   var listenerclient;
 
    /*
-   We are initializing 2 clients to test saving data against the database, one client will push data into the 
+   We are initializing 2 clients to test saving data against the database, one client will push data into the
    database whilst another listens for changes.
    */
   before('should initialize the clients', function (callback) {
     this.timeout(default_timeout);
 
     try {
-     
+
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
@@ -124,7 +127,7 @@ describe('a1_eventemitter_embedded_datatypes', function () {
           expect(result.value).to.be(test_string);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_string);
@@ -157,7 +160,7 @@ describe('a1_eventemitter_embedded_datatypes', function () {
           expect(result.value).to.be(test_number);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_number);
@@ -191,7 +194,7 @@ describe('a1_eventemitter_embedded_datatypes', function () {
           expect(result.value).to.be(test_bool);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_bool);
@@ -224,7 +227,7 @@ describe('a1_eventemitter_embedded_datatypes', function () {
           expect(result.value).to.be(test_date);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_date);
@@ -257,7 +260,7 @@ describe('a1_eventemitter_embedded_datatypes', function () {
           expect(result.value).to.be(test_null);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_null);//YES. IT IS NOW UNDEFINED
@@ -290,7 +293,7 @@ it('the publisher should set undefined data', function (callback) {
           expect(result.value).to.be(test_undefined);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_undefined);
@@ -323,7 +326,7 @@ it('the publisher should set undefined data', function (callback) {
           expect(result.value.length).to.be(6);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value.length).to.be(6);
@@ -331,7 +334,7 @@ it('the publisher should set undefined data', function (callback) {
             expect(result.value[5]).to.be(5);
 
             callback(e);
-            
+
           });
         }
         else
@@ -370,7 +373,7 @@ it('the publisher should set undefined data', function (callback) {
 
           //then make the change
           publisherclient.set(test_base_url + '/' + test_path_end, "test string", null, function (e, result) {
-            
+
 
 
           });
@@ -383,5 +386,7 @@ it('the publisher should set undefined data', function (callback) {
       callback(e);
     }
   });
+
+  require('benchmarket').stop();
 
 });
