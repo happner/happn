@@ -1,7 +1,7 @@
 {
   "name": "happn",
   "description": "pub/sub api as a service using primus and mongo & redis or nedb, can work as cluster, single process or embedded using nedb, use in production at your own risk",
-  "version": "2.5.17",
+  "version": "2.5.18",
   "main": "./lib/index",
   "scripts": {
     "test": "mocha silence.js test",
@@ -24,7 +24,6 @@
   "dependencies": {
     "JSONStream": "0.10.0",
     "async": "0.9.2",
-    "benchmarket": "0.0.4",
     "bluebird": "2.10.2",
     "body-parser": "1.14.1",
     "byline": "4.2.1",
@@ -53,6 +52,7 @@
     "ws": "1.0.1"
   },
   "devDependencies": {
+    "benchmarket": "0.0.4",
     "chai": "^3.5.0",
     "coveralls": "^2.11.6",
     "expect.js": "*",
