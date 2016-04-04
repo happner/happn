@@ -58,3 +58,8 @@
 - fixed '/' webmethod exclusion was effectively '/*', allowing entire site without authentication
 - added username to session token
 - fixed unmounted connect app when https
+
+2.3.3 2016-04-04
+----------------
+
+- Pull fixes from 2.5.16 (#22 & #23)
