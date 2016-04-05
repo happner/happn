@@ -167,3 +167,8 @@
 
 
 
+feature/endpoints
+-----------------
+
+- Reconnect option can be now be passed into stop() to inform remotes to reconnect (defualt true), used by primus.destroy()
+
