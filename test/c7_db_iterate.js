@@ -115,11 +115,9 @@ describe('c7_db_iterate', function() {
   before('it creates 2 test clients', function(callback){
     getClient(clientConfig1, function(e, client){
       if (e) return callback(e);
-      console.log('client1 created:::');
       client1 = client;
       getClient(clientConfig2, function(e, client){
         if (e) return callback(e);
-        console.log('client2 created:::');
         client2 = client;
         callback();
       });
