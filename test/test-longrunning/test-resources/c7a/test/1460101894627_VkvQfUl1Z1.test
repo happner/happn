@@ -1,5 +1,0 @@
-{"_id":"/_SYSTEM/_NETWORK/_SETTINGS/NAME","data":{"value":"holysargent_NyxD7MIgJW"},"created":1460101894757,"modified":1460101894757}
-{"_id":"/_SYSTEM/_SECURITY/_SETTINGS/KEYPAIR","data":{"value":"{\"privateKey\":\"EckjCe7klKggxpoH836RAxfQS8vc/AImPWPKKGP8nx4=\",\"publicKey\":\"AzLH5pOeGkkQtyrr/Zd7JhpFRLqfHggOU7H4BaABKZ82\"}"},"created":1460101894797,"modified":1460101894797}
-{"_id":"/_SYSTEM/_SECURITY/_GROUP/_ADMIN","data":{"custom_data":{"description":"the default administration group for happn"},"name":"_ADMIN","permissions":{"*":{"actions":["*"]}}},"created":1460101894801,"modified":1460101894801}
-{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN","data":{"custom_data":{},"username":"_ADMIN","password":"pbkdf2$10000$002ec1de7c5244bb28d340fd94327b508e1743556b5448a4972590cb53e234cbec2f79c4cb8d6ff965157848fc036397ab559f31892a5a34fad7ecf2280f848c$96012377359a5e25696623c0619048500e7401d3d8ff19f156cdb907a58979fe120e38b515742903fbae232118bb4c7e4c91f0d53450d08e9e003fc1001a00e9"},"created":1460101894836,"modified":1460101894836}
-{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN/_USER_GROUP/_ADMIN","data":{},"created":1460101894839,"modified":1460101894839}
