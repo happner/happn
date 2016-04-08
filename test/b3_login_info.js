@@ -6,6 +6,9 @@ var service2Name;
 
 context('login info for application layer', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   context('insecure server', function() {
 
     beforeEach(function(done) {
@@ -171,5 +174,6 @@ context('login info for application layer', function() {
 
   });
 
+  require('benchmarket').stop();
 
 });

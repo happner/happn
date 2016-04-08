@@ -1,5 +1,8 @@
 describe('c4_session_events', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index')
   var service = happn.service;
@@ -109,5 +112,7 @@ describe('c4_session_events', function() {
      sessionEventsTest({secure:true},callback);
 
   });
+
+  require('benchmarket').stop();
 
 });

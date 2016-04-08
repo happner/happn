@@ -1,5 +1,8 @@
 describe('c1_security_pubpriv_login', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
@@ -25,13 +28,13 @@ describe('c1_security_pubpriv_login', function() {
   var serverKeyPair1 = crypto.createKeyPair();
 
   /*
-  This test demonstrates starting up the happn service - 
+  This test demonstrates starting up the happn service -
   the authentication service will use authTokenSecret to encrypt web tokens identifying
   the logon session. The utils setting will set the system to log non priority information
   */
 
   before('should initialize the service', function(callback) {
-    
+
     this.timeout(20000);
 
     try{
@@ -132,10 +135,10 @@ describe('c1_security_pubpriv_login', function() {
 
 	    happn.client.create({
 	      	config:{
-		      	username:'_ADMIN', 
-		      	password:'happn', 
+		      	username:'_ADMIN',
+		      	password:'happn',
 		      	keyPair:{
-		      		publicKey:'AjN7wyfbEdI2LzWyFo6n31hvOrlYvkeHad9xGqOXTm1K', 
+		      		publicKey:'AjN7wyfbEdI2LzWyFo6n31hvOrlYvkeHad9xGqOXTm1K',
 		      		privateKey:'y5RTfdnn21OvbQrnBMiKBP9DURduo0aijMIGyLJFuJQ='
 		      	}
 	      	}
@@ -144,7 +147,7 @@ describe('c1_security_pubpriv_login', function() {
 		.then(function(clientInstance){
 
 		    adminClient = clientInstance;
-		  
+
 		    expect(adminClient.session.secret).to.not.equal(undefined);
 		    expect(adminClient.session.secret).to.not.equal(null);
 
@@ -161,7 +164,7 @@ describe('c1_security_pubpriv_login', function() {
 
 	    happn.client.create({
 	        config:{
-	        	username:'_ADMIN', 
+	        	username:'_ADMIN',
 	        	password:'happn',
 	        	keyPair:clientKeyPair
 	        }
@@ -175,7 +178,7 @@ describe('c1_security_pubpriv_login', function() {
 
 	          expect(e).to.equal(null);
 	          expect(response.encrypted == "test").to.equal(true);
-	         
+
 	          adminClient.get('/an/encrypted/payload/target', function(e, response){
 
 	          	expect(e).to.equal(null);
@@ -199,7 +202,7 @@ describe('c1_security_pubpriv_login', function() {
 
 	    happn.client.create({
 	        config:{
-	        	username:'_ADMIN', 
+	        	username:'_ADMIN',
 	        	password:'happn',
 	        	keyPair:clientKeyPair
 	        }
@@ -216,7 +219,7 @@ describe('c1_security_pubpriv_login', function() {
 	        }, function(e, response){
 
 	          expect(e).to.equal(null);
-	          
+
 	          adminClient.set('/an/encrypted/payload/target/event', {"test":"on"}, function(e, response){
 	          	if (e) return callback(e);
 	          })
@@ -236,7 +239,7 @@ describe('c1_security_pubpriv_login', function() {
 
 	    happn.client.create({
 	        config:{
-	        	username:'_ADMIN', 
+	        	username:'_ADMIN',
 	        	password:'happn',
 	        	keyPair:clientKeyPair
 	        }
@@ -248,7 +251,7 @@ describe('c1_security_pubpriv_login', function() {
 
 	        happn.client.create({
 		        config:{
-		        	username:'_ADMIN', 
+		        	username:'_ADMIN',
 		        	password:'happn',
 		        	keyPair:clientKeyPair1
 		        }
@@ -265,7 +268,7 @@ describe('c1_security_pubpriv_login', function() {
 		        }, function(e, response){
 
 		          expect(e).to.equal(null);
-		          
+
 		          adminClient.set('/an/encrypted/payload/target/event', {"test":"on"}, function(e, response){
 		          	if (e) return callback(e);
 		          })
@@ -287,7 +290,7 @@ describe('c1_security_pubpriv_login', function() {
 
   	});
 
-  
+
     xit('fails to log in with the test client, without supplying a public key to the default encryptPayload server', function (callback) {
 
     	happn.client.create({
@@ -306,5 +309,8 @@ describe('c1_security_pubpriv_login', function() {
       	});
 
   	});
+
+
+  require('benchmarket').stop();
 
 });

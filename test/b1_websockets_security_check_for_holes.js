@@ -6,6 +6,9 @@ var test_id = Date.now() + '_' + require('shortid').generate();
 
 describe('b1_websockets_security_check_for_holes', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var getService = function(config, callback){
    happn.service.create(config,
       callback
@@ -22,7 +25,7 @@ describe('b1_websockets_security_check_for_holes', function() {
       if (e) return done(e);
 
       serviceInstance = service;
-     
+
       done();
 
     });
@@ -74,10 +77,12 @@ describe('b1_websockets_security_check_for_holes', function() {
         console.log(apples);
         return done(new Error('found forbidden method signatures...'));
       }
-       
+
 
       done();
 
   });
+
+  require('benchmarket').stop();
 
 });

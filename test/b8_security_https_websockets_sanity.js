@@ -1,5 +1,8 @@
 describe('b8_security_https_websockets_sanity', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
@@ -983,5 +986,7 @@ describe('b8_security_https_websockets_sanity', function() {
       );
     });
   });
+
+  require('benchmarket').stop();
 
 });

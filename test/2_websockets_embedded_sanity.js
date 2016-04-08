@@ -1,5 +1,8 @@
 describe('2_websockets_embedded_sanity', function() {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
@@ -12,20 +15,20 @@ describe('2_websockets_embedded_sanity', function() {
   	var happnInstance = null;
   	var test_id;
 	/*
-	This test demonstrates starting up the happn service - 
+	This test demonstrates starting up the happn service -
 	the authentication service will use authTokenSecret to encrypt web tokens identifying
 	the logon session. The utils setting will set the system to log non priority information
 	*/
 
 	before('should initialize the service', function(callback) {
-		
+
 		this.timeout(20000);
 
 		test_id = Date.now() + '_' + require('shortid').generate();
 
 		try{
 			service.create({
-					mode:'embedded', 
+					mode:'embedded',
 					services:{
 						auth:{
 							path:'./services/auth/service.js',
@@ -72,7 +75,7 @@ describe('2_websockets_embedded_sanity', function() {
 	var listenerclient;
 
 	/*
-  	We are initializing 2 clients to test saving data against the database, one client will push data into the 
+  	We are initializing 2 clients to test saving data against the database, one client will push data into the
   	database whilst another listens for changes.
 	*/
 	before('should initialize the clients', function(callback) {
@@ -150,14 +153,14 @@ describe('2_websockets_embedded_sanity', function() {
     var test_path_end = require('shortid').generate();
     publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/unfound/exact/' + test_path_end, null, function (e, results) {
       ////////////console.log('new data results');
-    
+
       expect(e).to.be(null);
       expect(results).to.be(null);
 
       callback(e);
 
     });
-        
+
   });
 
 
@@ -177,11 +180,11 @@ describe('2_websockets_embedded_sanity', function() {
         if (e) return callback(e);
 
         publisherclient.get('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
-          
+
           expect(results.property1 == 'property1').to.be(true);
           callback(e);
         });
-       
+
       });
 
     } catch (e) {
@@ -193,10 +196,10 @@ describe('2_websockets_embedded_sanity', function() {
 
     this.timeout(default_timeout);
     var timesCount = 10;
-    
+
     try {
 
-      async.times(timesCount, 
+      async.times(timesCount,
       function(n, timesCallback){
 
         var test_random_path2 = require('shortid').generate();
@@ -207,7 +210,7 @@ describe('2_websockets_embedded_sanity', function() {
           property3: 'property3'
         }, {noPublish: true}, timesCallback);
 
-      }, 
+      },
       function(e){
 
         if (e) return callback(e);
@@ -223,7 +226,7 @@ describe('2_websockets_embedded_sanity', function() {
 
       });
 
-     
+
     } catch (e) {
       callback(e);
     }
@@ -496,7 +499,7 @@ describe('2_websockets_embedded_sanity', function() {
         publisherclient.get('/_TAGS/2_websockets_embedded_sanity/' + test_id + '/test/tag/*', null, function (e, results) {
 
           expect(e).to.be(null);
-          
+
           expect(results.length > 0).to.be(true);
 
           var found = false;
@@ -748,7 +751,7 @@ describe('2_websockets_embedded_sanity', function() {
 
           expect(results.length == 2).to.be(true);
           callback(e);
-          
+
         });
       });
     });
@@ -805,7 +808,7 @@ describe('2_websockets_embedded_sanity', function() {
         //////////////////console.log(message);
 
         //we are looking at the event internals on the listener to ensure our event management is working - because we are only listening for 1
-        //instance of this event - the event listener should have been removed 
+        //instance of this event - the event listener should have been removed
         ////console.log('listenerclient.events');
         ////console.log(listenerclient.events);
         expect(listenerclient.events['/REMOVE@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me'].length).to.be(0);
@@ -926,7 +929,7 @@ describe('2_websockets_embedded_sanity', function() {
 
     listenerclient.onAll(function (eventData, meta) {
 
-      if (meta.action == '/REMOVE@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' || 
+      if (meta.action == '/REMOVE@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' ||
           meta.action == '/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
         caughtCount++;
 
@@ -998,5 +1001,7 @@ describe('2_websockets_embedded_sanity', function() {
       );
     });
   });
+
+  require('benchmarket').stop();
 
 });

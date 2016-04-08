@@ -1,5 +1,8 @@
 describe('a4_security_encryption.js', function () {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
@@ -121,5 +124,6 @@ describe('a4_security_encryption.js', function () {
 
   });
 
+  require('benchmarket').stop();
 
 });

@@ -1,5 +1,8 @@
 describe('7_websockets_security_benchmarks', function () {
 
+  require('benchmarket').start();
+  after(require('benchmarket').store());
+
   var expect = require('expect.js');
   var happn = require('../../lib/index');
   var service = happn.service;
@@ -13,19 +16,19 @@ describe('7_websockets_security_benchmarks', function () {
   var happnInstance = null;
 
   /*
-  This test demonstrates starting up the happn service - 
+  This test demonstrates starting up the happn service -
   the authentication service will use authTokenSecret to encrypt web tokens identifying
   the logon session. The utils setting will set the system to log non priority information
   */
 
   before('should initialize the service', function(callback) {
-    
+
     this.timeout(20000);
 
     try{
       service.create({
           secure:true,
-          mode:'embedded', 
+          mode:'embedded',
           services:{
             auth:{
               path:'./services/auth/service.js',
@@ -46,7 +49,7 @@ describe('7_websockets_security_benchmarks', function () {
             log_level:'info|error|warning',
             log_component:'prepare'
           }
-        }, 
+        },
         function(e, instance){
           if (e) return  callback(e);
           happnInstance = instance;
@@ -64,7 +67,7 @@ describe('7_websockets_security_benchmarks', function () {
   var publisherclient;
   var listenerclient;
   /*
-    We are initializing 2 clients to test saving data against the database, one client will push data into the 
+    We are initializing 2 clients to test saving data against the database, one client will push data into the
     database whilst another listens for changes.
   */
   it('should initialize the clients', function(callback) {
@@ -156,10 +159,10 @@ describe('7_websockets_security_benchmarks', function () {
     var  writeData = function() {
 
       if (receivedCount == expected) return;
-      
+
       publisherclient.set('/e2e_test1/testsubscribe/sequence3', {
         property1: receivedCount
-      }, {noStore: true},  
+      }, {noStore: true},
       function (e, result) {
         if (e)
           return callback(e);
@@ -169,7 +172,7 @@ describe('7_websockets_security_benchmarks', function () {
 
     //first listen for the change
     listenerclient.on('/e2e_test1/testsubscribe/sequence3', {event_type:'set', count:0}, function (message) {
- 
+
       receivedCount++;
 
       if (receivedCount == expected) {
@@ -214,10 +217,10 @@ describe('7_websockets_security_benchmarks', function () {
       stressTestClient.on('/e2e_test1/testsubscribe/sequence1', {event_type:'set', count:0}, function (message) {
 
         receivedCount++;
-       
+
         if (receivedCount == expected) {
           console.timeEnd(timerName);
-      
+
           callback();
         }
 
@@ -260,7 +263,7 @@ describe('7_websockets_security_benchmarks', function () {
          config:{username:'_ADMIN', password:'happn'},
          secure:true
       },function(e, stressTestClient) {
-      
+
       if (e) return callback(e);
       setTimeout(function () {
 
@@ -339,7 +342,7 @@ describe('7_websockets_security_benchmarks', function () {
          config:{username:'_ADMIN', password:'happn'},
          secure:true
       },function(e, stressTestClient) {
-      
+
       if (e) return callback(e);
       setTimeout(function () {
 
@@ -368,7 +371,7 @@ describe('7_websockets_security_benchmarks', function () {
           if (receivedCount == sent.length) {
             console.timeEnd('timeTest1');
             expect(Object.keys(received).length == expected).to.be(true);
-        
+
             callback();
           }
 
@@ -431,7 +434,7 @@ describe('7_websockets_security_benchmarks', function () {
         if (receivedCount == sent.length) {
           console.timeEnd('timeTest1');
           expect(Object.keys(received).length == expected).to.be(true);
-         
+
           callback();
         }
 
@@ -472,7 +475,7 @@ describe('7_websockets_security_benchmarks', function () {
          config:{username:'_ADMIN', password:'happn'},
          secure:true
       },function(e, stressTestClient) {
-      
+
       if (e) return callback(e);
       var count = 0;
       var expected = 1000;
@@ -685,5 +688,7 @@ it('should handle sequences of events by when the previous one is done', functio
         });
       });
   });
+
+  require('benchmarket').stop();
 
 });
