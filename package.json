@@ -57,7 +57,7 @@
     "coveralls": "^2.11.6",
     "expect.js": "*",
     "gulp": "^3.9.1",
-    "happn-random-activity-generator": "0.0.1",
+    "happn-random-activity-generator": "^0.2.0",
     "istanbul": "^0.4.1",
     "karma": "^0.13.15",
     "karma-chai": "^0.1.0",

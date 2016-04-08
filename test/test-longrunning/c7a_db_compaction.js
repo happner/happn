@@ -22,7 +22,6 @@ describe('c7a_db_compaction', function() {
   var test_file4 = __dirname + '/test-resources/c7a/test/' + test_id + '4.test';
   var test_file4a = __dirname + '/test-resources/c7a/test/' + test_id + '4a.test';
 
-
   var serviceConfig1 =  {
     secure:true,
     port:4444,
@@ -306,11 +305,11 @@ describe('c7a_db_compaction', function() {
 
             randomActivity4.generateActivityEnd("test", function(aggregatedLog){
 
-              testFiles.push(test_file4);
-              testFiles.push(test_file4a);
-
               var fileSizeAfterActivity4 = getFileSize(test_file4);
               var fileSizeAfterActivity4a = getFileSize(test_file4a);
+
+              testFiles.push(test_file4);
+              testFiles.push(test_file4a);
 
               expect(fileSizeAfterActivity4 > fileSizeInitial4).to.be(true);
               expect(fileSizeAfterActivity4a > fileSizeInitial4a).to.be(true);
@@ -327,9 +326,10 @@ describe('c7a_db_compaction', function() {
 
                 callback();
               });
+
             });
 
-          }, 3000);
+          }, 2000);
         });
 
       });
