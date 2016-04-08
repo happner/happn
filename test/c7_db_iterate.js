@@ -1,4 +1,4 @@
-describe('c7_db_iterate', function() {
+describe('c7_ds_iterate', function() {
 
   var expect = require('expect.js');
   var happn = require('../lib/index')
@@ -46,7 +46,7 @@ describe('c7_db_iterate', function() {
                 filename:test_file2
               },
               patterns:[
-                '/c7_db_iterate/' + test_id + '/2/*'
+                '/c7_ds_iterate/' + test_id + '/2/*'
               ]
             },
             {
@@ -55,7 +55,7 @@ describe('c7_db_iterate', function() {
                 filename:test_file2a
               },
               patterns:[
-                '/c7_db_iterate/' + test_id + '/2a/*'
+                '/c7_ds_iterate/' + test_id + '/2a/*'
               ]
             }
           ]
@@ -100,7 +100,7 @@ describe('c7_db_iterate', function() {
      happn_client.create(config, callback);
   }
 
-  before('it creates 2 test dbs', function(callback){
+  before('it creates 2 test dss', function(callback){
     getService(serviceConfig1, function(e, serviceInstance){
       if (e) return callback(e);
       serviceInstance1 = serviceInstance;
@@ -124,7 +124,7 @@ describe('c7_db_iterate', function() {
     });
   });
 
-  after('it shuts down the test dbs, and unlinks their file', function(callback){
+  after('it shuts down the test dss, and unlinks their file', function(callback){
     serviceInstance1.stop(function(e){
       fs.unlinkSync(test_file1);
        serviceInstance2.stop(function(e){
@@ -134,25 +134,25 @@ describe('c7_db_iterate', function() {
     });
   });
 
-  it('iterates over a single default db instance', function(callback){
+  it('iterates over a single default ds instance', function(callback){
 
-    serviceInstance1.services.data.__iterateDataStores(function(key, db, next){
+    serviceInstance1.services.data.__iterateDataStores(function(key, ds, next){
 
       expect(key).to.be("default");
-      expect(db['persistence']).to.not.be(null);
+      expect(ds.db['persistence']).to.not.be(null);
       next();
 
     }, callback)
   });
 
-  it('iterates over multiple db instances', function(callback){
+  it('iterates over multiple ds instances', function(callback){
 
     var keyCount = 0;
 
-    serviceInstance2.services.data.__iterateDataStores(function(key, db, next){
+    serviceInstance2.services.data.__iterateDataStores(function(key, ds, next){
 
       expect(['file2','file2a'].indexOf(key) > -1).to.be(true);
-      expect(db['persistence']).to.not.be(null);
+      expect(ds.db['persistence']).to.not.be(null);
 
       keyCount++;
       next();
@@ -162,7 +162,7 @@ describe('c7_db_iterate', function() {
     })
   });
 
-  it('iterates a specific db instance amongst multiple db instances', function(callback){
+  it('iterates a specific ds instance amongst multiple ds instances', function(callback){
 
     var keyCount = 0;
 
@@ -177,7 +177,7 @@ describe('c7_db_iterate', function() {
     })
   });
 
-  it('iterates another specific db instance amongst multiple db instances', function(callback){
+  it('iterates another specific ds instance amongst multiple ds instances', function(callback){
 
     var keyCount = 0;
 

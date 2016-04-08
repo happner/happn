@@ -1,7 +1,7 @@
 describe('c7a_db_compaction', function() {
 
   var expect = require('expect.js');
-  var happn = require('../lib/index')
+  var happn = require('../../lib/index')
   var service = happn.service;
   var happn_client = happn.client;
   var async = require('async');
@@ -9,11 +9,12 @@ describe('c7a_db_compaction', function() {
   var test_id = Date.now() + '_' + require('shortid').generate();
   var fs = require('fs');
 
-  this.timeout(20000);
+  this.timeout(30000);
 
   var initialFileSize = 0;
 
   var testFiles = [];
+  var testServices = [];
 
   var test_file1 = __dirname + '/test-resources/c7a/test/' + test_id + '1.test';
   var test_file2 = __dirname + '/test-resources/c7a/test/' + test_id + '2.test';
@@ -162,9 +163,11 @@ describe('c7a_db_compaction', function() {
     getService(serviceConfig1, function(e, serviceInstance){
       if (e) return callback(e);
       serviceInstance1 = serviceInstance;
+      testServices.push(serviceInstance1);
       getService(serviceConfig2, function(e, serviceInstance){
         if (e) return callback(e);
         serviceInstance2 = serviceInstance;
+        testServices.push(serviceInstance2);
         callback();
       });
     });
@@ -173,11 +176,9 @@ describe('c7a_db_compaction', function() {
   before('it creates 3 test clients', function(callback){
     getClient(clientConfig1, function(e, client){
       if (e) return callback(e);
-      console.log('client1 created:::');
       client1 = client;
       getClient(clientConfig2, function(e, client){
         if (e) return callback(e);
-        console.log('client2 created:::');
         client2 = client;
         callback();
       });
@@ -185,18 +186,33 @@ describe('c7a_db_compaction', function() {
   });
 
   after('it shuts down the test dbs, and unlinks their file', function(callback){
-    serviceInstance1.stop(function(e){
-      fs.unlinkSync(test_file1);
-       serviceInstance2.stop(function(e){
-          fs.unlinkSync(test_file2);
 
-          if (!serviceInstance3) return callback();
+    var afterErrors = [];
 
-          serviceInstance3.stop(function(e){
-            fs.unlinkSync(test_file3);
-            callback();
-          });
-        });
+    //stop services
+    async.eachSeries(testServices, function(service, next){
+      service.stop(next);
+    }, function(e){
+
+      if (e) {
+        afterErrors.push(e);
+        console.log("service failed to stop:::", service);
+      }
+
+      //unlink files
+      async.eachSeries(testFiles, function(filePath, next){
+         fs.unlinkSync(filePath);
+         next();
+      }, function(e){
+
+        if (e) afterErrors.push(e);
+
+        if (afterErrors.length > 0)
+          return callback(afterErrors);
+
+        callback();
+
+      });
     });
   });
 
@@ -219,6 +235,8 @@ describe('c7a_db_compaction', function() {
     randomActivity1.generateActivityStart("test", function(){
       setTimeout(function(){
         randomActivity1.generateActivityEnd("test", function(aggregatedLog){
+
+          testFiles.push(test_file1);
 
           fileSizeAfterActivity1 = getFileSize(test_file1);
           expect(fileSizeAfterActivity1 > fileSizeInitial).to.be(true);
@@ -253,6 +271,8 @@ describe('c7a_db_compaction', function() {
 
           if (e) return callback(e);
 
+          testFiles.push(test_file3);
+
           setTimeout(function(){
 
             var fileSizeAfterActivity3 = getFileSize(test_file3);
@@ -266,13 +286,13 @@ describe('c7a_db_compaction', function() {
     });
   });
 
-  xit('starts a db with 2 files, does some random activity, compacts the db, checks that both files have been compacted', function(callback){
+  it('starts a db with 2 files, does some random activity, compacts the db, checks that both files have been compacted', function(callback){
     getService(serviceConfig4, function(e, serviceInstance){
       if (e) return callback(e);
       serviceInstance4 = serviceInstance;
+      testServices.push(serviceInstance4);
       getClient(clientConfig4, function(e, client){
         if (e) return callback(e);
-        console.log('client4 created:::');
         client4 = client;
 
         randomActivity4 = new RandomActivityGenerator(client4, {pathPrefix:['/c7a_db_compaction/' + test_id + '/4/','/c7a_db_compaction/' + test_id + '/4a/']});
@@ -286,12 +306,11 @@ describe('c7a_db_compaction', function() {
 
             randomActivity4.generateActivityEnd("test", function(aggregatedLog){
 
-              console.log('aggregatedLog4:::', aggregatedLog);
+              testFiles.push(test_file4);
+              testFiles.push(test_file4a);
 
               var fileSizeAfterActivity4 = getFileSize(test_file4);
               var fileSizeAfterActivity4a = getFileSize(test_file4a);
-
-              console.log('after activity4:::', fileSizeAfterActivity4, fileSizeAfterActivity4a);
 
               expect(fileSizeAfterActivity4 > fileSizeInitial4).to.be(true);
               expect(fileSizeAfterActivity4a > fileSizeInitial4a).to.be(true);
@@ -303,8 +322,6 @@ describe('c7a_db_compaction', function() {
                 var fileSizeAfterCompact4 = getFileSize(test_file4);
                 var fileSizeAfterCompact4a = getFileSize(test_file4a);
 
-                console.log('after compact4:::', fileSizeAfterCompact4, fileSizeAfterCompact4a);
-
                 expect(fileSizeAfterCompact4 < fileSizeAfterActivity4).to.be(true);
                 expect(fileSizeAfterCompact4a < fileSizeAfterActivity4a).to.be(true);
 
@@ -312,33 +329,40 @@ describe('c7a_db_compaction', function() {
               });
             });
 
-          }, 2000);
+          }, 3000);
         });
 
       });
     });
   });
 
-  xit('starts compaction for every n seconds, then do random inserts and deletes, then verify the data', function(callback){
+  it('starts compaction for every n seconds, then do random inserts and deletes, then verify the data', function(callback){
+
     var fileSizeInitial = getFileSize(test_file2);
+    randomActivity2 = new RandomActivityGenerator(client2, {interval:3000, verbose:true});
 
-    randomActivity2 = new RandomActivityGenerator(client2);
-
-    randomActivity2.generateActivityStart();
-
-    var compactionCount = 0;
-
-    serviceInstance2.services.data.compact(1000, function(e){
-
+    randomActivity2.generateActivityStart("test", function(e){
       if (e) return callback(e);
 
-      compactionCount++;
+      var compactionCount = 0;
+      var verified = false;
+      testFiles.push(test_file2);
 
-      if (compactionCount == 3){//we have compacted 3 times
-        randomActivity2.generateActivityEnd();
-        //checks to see all the data that should be there exists and all the data that shouldnt be there doesnt
-        randomActivity2.verifyData(callback);
-      }
+      serviceInstance2.services.data.startCompacting(5000, function(e){
+        if (e) return callback(e);
+        //DO NADA
+      }, function(){
+        compactionCount++;
+        if (compactionCount == 2){//we have compacted 2 times
+          if (!verified){
+            verified = true;
+            randomActivity2.generateActivityEnd("test",function(aggregatedLog){
+              //checks to see all the data that should be there exists and all the data that shouldnt be there doesnt
+              randomActivity2.verify(callback);
+            });
+          }
+        }
+      });
 
     });
 
