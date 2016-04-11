@@ -1,5 +1,0 @@
-{"_id":"/_SYSTEM/_NETWORK/_SETTINGS/NAME","data":{"value":"foilcatcher_VkSMzdqTg"},"created":1458668276275,"modified":1458668276275}
-{"_id":"/_SYSTEM/_SECURITY/_SETTINGS/KEYPAIR","data":{"value":"{\"privateKey\":\"ShdawsG0cf9dhW0r0DVkoCyFg1rPzsJ5rCQfyF3YC4k=\",\"publicKey\":\"AhJh6Fea5AxUS0UCflBLvdNvLUvb20XVwuW3lfsE44jW\"}"},"created":1458668276316,"modified":1458668276316}
-{"_id":"/_SYSTEM/_SECURITY/_GROUP/_ADMIN","data":{"custom_data":{"description":"the default administration group for happn"},"name":"_ADMIN","permissions":{"*":{"actions":["*"]}}},"created":1458668276320,"modified":1458668276320}
-{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN","data":{"custom_data":{},"username":"_ADMIN","password":"pbkdf2$10000$4dab5203700d799fa9b72d07d7c8290570b0f3458dc978df65030b2da1250dfcbbbc2500d04651b0333d9b7e7ce1e7007d4b0dbf242ad142fb7f23158d6ee014$c953646dfd1f68690e11deca6a19a3d76e8000c786bc93909c69ae9c75958076716d1efb1a3dba4532dc348a55150cdc31830ee233d3fb4786fb00e84fd2fb1e"},"created":1458668276355,"modified":1458668276355}
-{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN/_USER_GROUP/_ADMIN","data":{},"created":1458668276357,"modified":1458668276357}

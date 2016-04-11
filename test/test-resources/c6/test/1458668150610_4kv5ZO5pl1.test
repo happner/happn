@@ -1,5 +1,0 @@
-{"_id":"/_SYSTEM/_NETWORK/_SETTINGS/NAME","data":{"value":"stellarfright_NJlwqb_96l"},"created":1458668150823,"modified":1458668150823}
-{"_id":"/_SYSTEM/_SECURITY/_SETTINGS/KEYPAIR","data":{"value":"{\"privateKey\":\"fHyy65zGGGaE0E69rGHPDoTRLBYEjgNkgxx/n1EoASg=\",\"publicKey\":\"AlFPzi1EIiHO4/Z3KoFDS+GZBz/E43NotoSIN6/GF03X\"}"},"created":1458668150867,"modified":1458668150867}
-{"_id":"/_SYSTEM/_SECURITY/_GROUP/_ADMIN","data":{"custom_data":{"description":"the default administration group for happn"},"name":"_ADMIN","permissions":{"*":{"actions":["*"]}}},"created":1458668150870,"modified":1458668150870}
-{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN","data":{"custom_data":{},"username":"_ADMIN","password":"pbkdf2$10000$5e65414d7c8da2f30080b8f649a99f973e13ad288ca6509a215c0dab22d73d20305c9cc8dd1ca7328dec39679cdb3a65df21dc1b1dafe13fc4c51c521939e872$846479264939840c7ea37cd8a2f3be7d28f9c13705ba76b4b293bee43559ba3c4be9fafbbce84e232aecb759431714fa8651db6d6c257b752317e0773682e75c"},"created":1458668150907,"modified":1458668150907}
-{"_id":"/_SYSTEM/_SECURITY/_USER/_ADMIN/_USER_GROUP/_ADMIN","data":{},"created":1458668150909,"modified":1458668150909}
