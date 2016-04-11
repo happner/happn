@@ -424,6 +424,61 @@ describe('1_eventemitter_embedded_sanity', function () {
 
   });
 
+  it('should search for a complex object by dates', function (callback) {
+
+    //////////////////////////console.log('DOING COMPLEX SEARCH');
+
+    var test_path_end = require('shortid').generate();
+
+    var complex_obj = {
+      regions: ['North', 'South'],
+      towns: ['North.Cape Town'],
+      categories: ['Action', 'History'],
+      subcategories: ['Action.angling', 'History.art'],
+      keywords: ['bass', 'Penny Siopis'],
+      field1: 'field1'
+    };
+
+    var from = Date.now();
+    var to;
+
+
+
+    publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function (e, put_result) {
+
+      expect(e == null).to.be(true);
+      to = Date.now();
+
+      var criteria = {
+        "_meta.created":{
+          $gte:from,
+          $lte:to
+        }
+      }
+
+      var options = {
+        fields: null,
+        sort: {"field1": 1},
+        limit: 2
+      }
+
+      console.log('doing search:::', criteria);
+       ////////////console.log('searching');
+        publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
+          criteria: criteria,
+          options: options
+        }, function (e, search_result) {
+
+          expect(e == null).to.be(true);
+          expect(search_result.length == 1).to.be(true);
+          callback();
+
+        });
+
+    });
+
+  });
+
 
   it('should delete some test data', function (callback) {
 
