@@ -47,11 +47,22 @@ describe('b8_security_https_websockets_sanity', function() {
 
   after(function(done) {
 
+    this.timeout(10000);
+    var timeout;
+
     publisherclient.disconnect()
     .then(listenerclient.disconnect()
     .then(happnInstance.stop()
-    .then(done)))
+    .then(function(){
+      clearTimeout(timeout);
+      done();
+    })))
     .catch(done);
+
+    timeout = setTimeout (function(){
+      console.warn('server shutdown timed out');
+      done();
+    }, 9000)
 
   });
 
