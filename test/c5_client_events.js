@@ -57,7 +57,7 @@ describe('c5_client_events', function() {
 
         console.log('client did a set - all good:::');
 
-        serviceInstance.stop(function(e){
+        serviceInstance.stop({reconnect: false}, function(e){
           if (e) return callback(e);
         });
 
