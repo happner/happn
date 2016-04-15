@@ -462,7 +462,6 @@ describe('1_eventemitter_embedded_sanity', function () {
         limit: 2
       }
 
-      console.log('doing search:::', criteria);
        ////////////console.log('searching');
         publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
           criteria: criteria,
