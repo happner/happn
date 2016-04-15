@@ -34,52 +34,57 @@ describe('c6_backward_compatible_db', function() {
 
     async.eachSeries(dbFiles, function(fileName, eachCallback){
 
-      if (fileName == 'test') return eachCallback();
+      if (fileName.indexOf('.test' == -1)) return eachCallback();
+      if (fileName.indexOf('.test.test' > -1)) return eachCallback();
 
       var testFile = __dirname + '/test-resources/c6/test/' + fileName + '.test';
 
-      fs.createReadStream(__dirname + '/test-resources/c6/' + fileName).pipe(fs.createWriteStream(testFile));
+      var testStream = fs.createReadStream(__dirname + '/test-resources/c6/' + fileName).pipe(fs.createWriteStream(testFile));
 
-      var config = {
-        secure:true,
-        services: {
-          data: {
-            path: './services/data_embedded/service.js',
-            config:{
-               filename:testFile
+      testStream.on('finish', function () {
+
+        var config = {
+          secure:true,
+          services: {
+            data: {
+              path: './services/data_embedded/service.js',
+              config:{
+                 filename:testFile
+              }
             }
           }
         }
-      }
 
-      console.log('creating service from db file:' + fileName);
+        console.log('creating service from db file:' + fileName);
 
-      createService(config, function(e, service){
-
-        if (e) {
-          fs.unlinkSync(testFile);
-          return eachCallback(e)
-        };
-
-        service.stop(function(e){
+        createService(config, function(e, service){
 
           if (e) {
             fs.unlinkSync(testFile);
             return eachCallback(e)
           };
 
-          createService(config, function(e, restartedService){
-               if (e) {
-                fs.unlinkSync(testFile);
-                return eachCallback(e)
-              };
+          service.stop(function(e){
 
-              restartedService.stop(function(e){
-                fs.unlinkSync(testFile);
-                eachCallback();
-              });
+            if (e) {
+              fs.unlinkSync(testFile);
+              return eachCallback(e)
+            };
 
-          });//start it again after modifications may have happened
+            createService(config, function(e, restartedService){
+                 if (e) {
+                  fs.unlinkSync(testFile);
+                  return eachCallback(e)
+                };
+
+                restartedService.stop(function(e){
+                  fs.unlinkSync(testFile);
+                  eachCallback();
+                });
+
+            });//start it again after modifications may have happened
+
+          });
 
         });
 

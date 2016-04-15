@@ -7,5 +7,5 @@ THINGS WE WANT TO DO
 
 OPTIMISATIONS/ISSUES
 ====================
-
+1. usage og bigint in the data ie. {bigint:"0.77blahblahblah"}, so items that are linked to financial transactions dont do any odd rounding
 

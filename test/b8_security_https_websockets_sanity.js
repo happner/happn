@@ -12,8 +12,9 @@ describe('b8_security_https_websockets_sanity', function() {
   var test_secret = 'test_secret';
   var mode = "embedded";
   var default_timeout = 4000;
-    var happnInstance = null;
-    var test_id;
+  var happnInstance = null;
+  var test_id;
+
   /*
   This test demonstrates starting up the happn service -
   the authentication service will use authTokenSecret to encrypt web tokens identifying
@@ -44,6 +45,8 @@ describe('b8_security_https_websockets_sanity', function() {
   });
 
   after(function(done) {
+
+    this.timeout(20000);
 
     publisherclient.disconnect()
     .then(listenerclient.disconnect()
