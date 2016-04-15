@@ -11,9 +11,10 @@ describe('b8_security_https_websockets_sanity', function() {
 
   var test_secret = 'test_secret';
   var mode = "embedded";
-  var default_timeout = 4000;
   var happnInstance = null;
   var test_id;
+
+  this.timeout(60000);
 
   /*
   This test demonstrates starting up the happn service -
@@ -23,7 +24,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   before('should initialize the service', function(callback) {
 
-    this.timeout(20000);
+
 
     test_id = Date.now() + '_' + require('shortid').generate();
 
@@ -46,8 +47,6 @@ describe('b8_security_https_websockets_sanity', function() {
 
   after(function(done) {
 
-    this.timeout(20000);
-
     publisherclient.disconnect()
     .then(listenerclient.disconnect()
     .then(happnInstance.stop()
@@ -64,7 +63,7 @@ describe('b8_security_https_websockets_sanity', function() {
     database whilst another listens for changes.
   */
   before('should initialize the clients', function(callback) {
-      this.timeout(default_timeout);
+
 
       try {
         happn_client.create({config:{protocol:'https', allowSelfSignedCerts:true}},function(e, instance) {
@@ -90,7 +89,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('the listener should pick up a single wildcard event', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -133,7 +132,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('the publisher should get null for unfound data, exact path', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     var test_path_end = require('shortid').generate();
     publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/unfound/exact/' + test_path_end, null, function (e, results) {
@@ -151,7 +150,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('the publisher should set new data', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
       var test_path_end = require('shortid').generate();
@@ -179,7 +178,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
 
-    this.timeout(default_timeout);
+
     var timesCount = 10;
 
     try {
@@ -221,7 +220,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('should set data, and then merge a new document into the data without overwriting old fields', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -381,7 +380,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('should delete some test data', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -414,7 +413,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('the publisher should set new data then update the data', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
       var test_path_end = require('shortid').generate();
@@ -522,7 +521,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('the listener should pick up a single published event', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -564,7 +563,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('the publisher should set new data ', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
       var test_path_end = require('shortid').generate();
@@ -599,7 +598,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('the publisher should set new data then update the data', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
       var test_path_end = require('shortid').generate();
@@ -637,7 +636,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('the publisher should push a sibling and get all siblings', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -676,7 +675,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('the listener should pick up a single published event', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -772,7 +771,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
   it('the listener should pick up a single delete event', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     //We put the data we want to delete into the database
     publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
