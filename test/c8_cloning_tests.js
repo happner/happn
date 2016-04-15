@@ -112,20 +112,77 @@ describe('c8_cloning_tests', function() {
 
   });
 
-  xit('tests deepcopy', function(callback){
+  it('tests deepcopy', function(callback){
+    var deepCopy = require('deep-copy');
+    var itemsArray = [];
+
+    console.time("tests deepcopy");
+
+    for (var i = 0;i < 1000;i++)
+      itemsArray.push(deepCopy(objToClone));
+
+    console.timeEnd("tests deepcopy");
+
+    checkRandomItem(itemsArray, callback);
+  });
+
+  it('tests lodash', function(callback){
+    var _ = require('lodash');
+    var itemsArray = [];
+
+    console.time("tests lodash");
+
+    for (var i = 0;i < 1000;i++)
+      itemsArray.push(_.cloneDeep(objToClone));
+
+    console.timeEnd("tests lodash");
+
+    checkRandomItem(itemsArray, callback);
+  });
+
+  it('tests structured-clone', function(callback){
+    var clone = require('structured-clone');
+    var itemsArray = [];
+
+    console.time("tests structured-clone");
+
+    for (var i = 0;i < 1000;i++)
+      itemsArray.push(clone(objToClone));
+
+    console.timeEnd("tests structured-clone");
+
+    checkRandomItem(itemsArray, callback);
+  });
+
+  it('tests structured-clone serialize once, deserialize multiple', function(callback){
+    var clone = require('structured-clone');
+    var itemsArray = [];
+
+    console.time("tests structured-clone serialize once, deserialize multiple");
+
+    var serialized = clone.serialize(objToClone);
+
+    for (var i = 0;i < 1000;i++)
+      itemsArray.push(clone.deserialize(serialized));
+
+    console.timeEnd("tests structured-clone serialize once, deserialize multiple");
+
+    checkRandomItem(itemsArray, callback);
 
   });
 
-  xit('tests Clone', function(callback){
+  it('tests clone', function(callback){
+    var clone = require('clone');
+    var itemsArray = [];
 
-  });
+    console.time("tests clone");
 
-  xit('tests structured-clone', function(callback){
+    for (var i = 0;i < 1000;i++)
+      itemsArray.push(clone(objToClone));
 
-  });
+    console.timeEnd("tests clone");
 
-  xit('tests structured-clone serialize once, deserialize multiple', function(callback){
-
+    checkRandomItem(itemsArray, callback);
   });
 
 
