@@ -54,7 +54,7 @@ describe('c3_websockets_embedded_sanity_encryptedpayloads', function() {
   after(function(done) {
      socketClient.disconnect()
     .then(eventEmitterClient.disconnect()
-    .then(happnInstance.stop()
+    .then(happnInstance.stop({reconnect:false})
     .then(done)))
     .catch(done);
   });

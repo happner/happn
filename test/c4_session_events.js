@@ -19,14 +19,18 @@ describe('c4_session_events', function() {
     }
 
     var serviceInstance;
+    var stopped = false;
 
     var checkAllEventsFired = function(cb){
 
       for (var eventName in eventsFired)
         if (!eventsFired[eventName]) return;
 
-      console.log('All events fired - sweet...');
-      serviceInstance.stop(callback);
+      if (!stopped){
+        console.log('All events fired - sweet...');
+        stopped = true;
+        serviceInstance.stop({reconnect:false}, callback);
+      }
 
     }
 
