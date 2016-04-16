@@ -11,9 +11,11 @@ describe('2_websockets_embedded_sanity', function() {
 
 	var test_secret = 'test_secret';
 	var mode = "embedded";
-	var default_timeout = 4000;
-  	var happnInstance = null;
-  	var test_id;
+  var happnInstance = null;
+  var test_id;
+
+  this.timeout(60000);
+
 	/*
 	This test demonstrates starting up the happn service -
 	the authentication service will use authTokenSecret to encrypt web tokens identifying
@@ -22,7 +24,7 @@ describe('2_websockets_embedded_sanity', function() {
 
 	before('should initialize the service', function(callback) {
 
-		this.timeout(20000);
+
 
 		test_id = Date.now() + '_' + require('shortid').generate();
 
@@ -79,7 +81,7 @@ describe('2_websockets_embedded_sanity', function() {
   	database whilst another listens for changes.
 	*/
 	before('should initialize the clients', function(callback) {
-	    this.timeout(default_timeout);
+
 
 	    try {
 	      happn_client.create(function(e, instance) {
@@ -105,7 +107,7 @@ describe('2_websockets_embedded_sanity', function() {
 
 	it('the listener should pick up a single wildcard event', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -148,7 +150,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('the publisher should get null for unfound data, exact path', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     var test_path_end = require('shortid').generate();
     publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/unfound/exact/' + test_path_end, null, function (e, results) {
@@ -166,7 +168,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('the publisher should set new data', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
       var test_path_end = require('shortid').generate();
@@ -194,7 +196,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
 
-    this.timeout(default_timeout);
+
     var timesCount = 10;
 
     try {
@@ -236,7 +238,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('should set data, and then merge a new document into the data without overwriting old fields', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -396,7 +398,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('should delete some test data', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -429,7 +431,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('the publisher should set new data then update the data', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
       var test_path_end = require('shortid').generate();
@@ -537,7 +539,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('the listener should pick up a single published event', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -579,7 +581,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('the publisher should set new data ', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
       var test_path_end = require('shortid').generate();
@@ -614,7 +616,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('the publisher should set new data then update the data', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
       var test_path_end = require('shortid').generate();
@@ -652,7 +654,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('the publisher should push a sibling and get all siblings', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -691,7 +693,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('the listener should pick up a single published event', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     try {
 
@@ -787,7 +789,7 @@ describe('2_websockets_embedded_sanity', function() {
 
   it('the listener should pick up a single delete event', function (callback) {
 
-    this.timeout(default_timeout);
+
 
     //We put the data we want to delete into the database
     publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
