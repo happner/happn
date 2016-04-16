@@ -174,3 +174,7 @@
 
 - Reconnect option can be now be passed into stop() to inform remotes to reconnect (defualt true), used by primus.destroy()
 
+2.5.20 2016-04-16
+-----------------
+
+- Optimize cloning
