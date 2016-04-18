@@ -49,7 +49,7 @@
     "ws": "1.0.1"
   },
   "devDependencies": {
-    "benchmarket": "0.0.9",
+    "benchmarket": "0.0.10",
     "chai": "^3.5.0",
     "coveralls": "^2.11.6",
     "expect.js": "*",
