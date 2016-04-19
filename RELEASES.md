@@ -178,3 +178,9 @@
 -----------------
 
 - Optimize cloning
+
+2.5.21 2016-04-16
+-----------------
+
+- Optimize cloning, modified to deepcopy on intra-process subscriptions
+- created timeout on Primus destroy, pass control back to happn server
