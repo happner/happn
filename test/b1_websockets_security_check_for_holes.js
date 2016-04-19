@@ -9,6 +9,8 @@ describe('b1_websockets_security_check_for_holes', function() {
   require('benchmarket').start();
   after(require('benchmarket').store());
 
+  this.timeout(60000);
+
   var getService = function(config, callback){
    happn.service.create(config,
       callback
