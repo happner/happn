@@ -30,7 +30,7 @@ describe('a5_eventemitter_security_groups', function () {
 
     var initializeMockServices = function (callback) {
 
-      var happnMock = {services:{}};
+      var happnMock = {config:{secure:true}, services:{}};
 
       happnMock.utils = require('../lib/utils');
 
