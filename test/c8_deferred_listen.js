@@ -9,8 +9,8 @@ describe('c8_deferred_listen', function () {
     var happn = require('../lib/index')
     var service = happn.service;
     var happn_client = happn.client;
-    var happnInstance = null;
-    var test_id;
+
+    this.timeout(120000);
 
     function doRequest(path, token, query, callback){
 
@@ -50,7 +50,6 @@ describe('c8_deferred_listen', function () {
 
     });
 
-    var serviceInstance;
     var happnInstance;
 
     it('should initialize the service without listening', function (callback) {
@@ -59,8 +58,8 @@ describe('c8_deferred_listen', function () {
             deferListen:true
         })
 
-        .then(function (serviceInst) {
-            serviceInstance = serviceInst;
+        .then(function (happnInst) {
+            happnInstance = happnInst;
             callback();
         })
 
@@ -70,12 +69,38 @@ describe('c8_deferred_listen', function () {
 
     });
 
-    xit('should connect to the service with an intra-proc client, perform a set, get and remove', function (callback) {
+    var intraProcClientInstance;
 
+    it('should connect to the service with an intra-proc client, perform a set, get and remove', function (callback) {
+        happn_client.create({
+            plugin: happn.client_plugins.intra_process,
+            context: happnInstance
+        }, function(e, instance) {
+            if (e) return callback(e);
+            intraProcClientInstance = instance;
+
+            intraProcClientInstance.set('/test/', {"test":"data"}, function(e, response){
+                if (e) return callback(e);
+
+                intraProcClientInstance.get('/test/', function(e, response){
+                    if (e) return callback(e);
+
+                    expect(response.test).to.be('data');
+
+                    intraProcClientInstance.remove('/test/', function(e, response){
+                        if (e) return callback(e);
+                        expect(response.removed).to.be(1);
+                        callback();
+                    });
+                })
+
+            });
+
+        });
     });
 
     it('should stop the service, even though it hasnt started listening', function (callback) {
-        serviceInstance.stop(callback);
+        happnInstance.stop(callback);
     });
 
     it('should initialize the service without listening again', function (callback) {
@@ -83,8 +108,8 @@ describe('c8_deferred_listen', function () {
                 deferListen:true
             })
 
-            .then(function (serviceInst) {
-                serviceInstance = serviceInst;
+            .then(function (happnInst) {
+                happnInstance = happnInst;
                 callback();
             })
 
@@ -93,8 +118,24 @@ describe('c8_deferred_listen', function () {
         ;
     });
 
-    xit('should try and start the service, but fail with EADDRINUSE, then kill the http server, then successfully retry', function (callback) {
+    it('should try and start the service, but fail with EADDRINUSE, then kill the http server, then successfully retry', function (callback) {
+        happnInstance.listen(function(e){
+            console.log('listen err:::', JSON.stringify(e));
+            expect(e).to.not.be(null);
+            httpServer.close();
+            setTimeout(function(){
 
+                console.log('trying again:::');
+
+                happnInstance.listen(function(e){
+                    console.log('trying again err:::', JSON.stringify(e));
+                    expect(e).to.be(null);
+                    callback();
+                });
+
+            }, 5000);
+
+        })
     });
 
     after(function(done) {
