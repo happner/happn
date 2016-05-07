@@ -1,5 +1,3 @@
-
-
 describe('c8_deferred_listen', function () {
 
     require('benchmarket').start();
@@ -12,30 +10,36 @@ describe('c8_deferred_listen', function () {
 
     this.timeout(120000);
 
-    function doRequest(path, token, query, callback){
+    function doRequest(path, token, query, callback, port) {
 
         var request = require('request');
 
+        if (!port) port = 55000;
+
+        if (path[0] != '/')
+            path = '/' + path
+
         var options = {
-            url: 'http://127.0.0.1:55000' + path,
+            url: 'http://127.0.0.1:' + port.toString() + path,
         };
 
-        if (token){
+        if (token) {
             if (!query)
                 options.headers = {'Cookie': ['happn_token=' + token]}
             else
                 options.url += '?happn_token=' + token;
         }
 
-        request(options, function(error, response, body){
+        request(options, function (error, response, body) {
             callback(body);
         });
 
     }
 
     var httpServer;
+    var connections = {};
 
-    before('it starts up a web server that uses port 55000', function(callback){
+    before('it starts up a web server that uses port 55000', function (callback) {
         var http = require('http');
 
         httpServer = http.createServer(function (req, res) {
@@ -43,7 +47,16 @@ describe('c8_deferred_listen', function () {
             res.end('TEST OUTPUT');
         }).listen(55000);
 
-        doRequest('/', null, null, function(body){
+        httpServer.on('connection', function (conn) {
+            var key = conn.remoteAddress + ':' + conn.remotePort;
+            connections[key] = conn;
+            conn.on('close', function () {
+                console.log('closed connection:::', key);
+                delete connections[key];
+            });
+        });
+
+        doRequest('/', null, null, function (body) {
             expect(body).to.be('TEST OUTPUT');
             callback();
         });
@@ -55,15 +68,15 @@ describe('c8_deferred_listen', function () {
     it('should initialize the service without listening', function (callback) {
 
         service.create({
-            deferListen:true
-        })
+                deferListen: true
+            })
 
-        .then(function (happnInst) {
-            happnInstance = happnInst;
-            callback();
-        })
+            .then(function (happnInst) {
+                happnInstance = happnInst;
+                callback();
+            })
 
-        .catch(callback)
+            .catch(callback)
 
         ;
 
@@ -75,19 +88,19 @@ describe('c8_deferred_listen', function () {
         happn_client.create({
             plugin: happn.client_plugins.intra_process,
             context: happnInstance
-        }, function(e, instance) {
+        }, function (e, instance) {
             if (e) return callback(e);
             intraProcClientInstance = instance;
 
-            intraProcClientInstance.set('/test/', {"test":"data"}, function(e, response){
+            intraProcClientInstance.set('/test/', {"test": "data"}, function (e, response) {
                 if (e) return callback(e);
 
-                intraProcClientInstance.get('/test/', function(e, response){
+                intraProcClientInstance.get('/test/', function (e, response) {
                     if (e) return callback(e);
 
                     expect(response.test).to.be('data');
 
-                    intraProcClientInstance.remove('/test/', function(e, response){
+                    intraProcClientInstance.remove('/test/', function (e, response) {
                         if (e) return callback(e);
                         expect(response.removed).to.be(1);
                         callback();
@@ -105,7 +118,7 @@ describe('c8_deferred_listen', function () {
 
     it('should initialize the service without listening again', function (callback) {
         service.create({
-                deferListen:true
+                deferListen: true
             })
 
             .then(function (happnInst) {
@@ -119,26 +132,35 @@ describe('c8_deferred_listen', function () {
     });
 
     it('should try and start the service, but fail with EADDRINUSE, then kill the http server, then successfully retry', function (callback) {
-        happnInstance.listen(function(e){
-            console.log('listen err:::', JSON.stringify(e));
-            expect(e).to.not.be(null);
+        happnInstance.listen(function (e) {
+
+            //cannot listen
+            expect(e.code).to.be("EADDRINUSE");
+
+            for (var key in connections) {
+                connections[key].destroy();
+            }
+
             httpServer.close();
-            setTimeout(function(){
 
-                console.log('trying again:::');
-
-                happnInstance.listen(function(e){
-                    console.log('trying again err:::', JSON.stringify(e));
+            setTimeout(function () {
+                happnInstance.listen(function (e) {
                     expect(e).to.be(null);
-                    callback();
+
+                    doRequest('version', null, null, function (body) {
+                        console.log('GOT BODY:::', body);
+                        expect(body.version).to.not.be(null)
+                        callback();
+                    });
+
                 });
 
-            }, 5000);
+            }, 2000);
 
         })
     });
 
-    after(function(done) {
+    after(function (done) {
 
         require('benchmarket').stop();
 
