@@ -185,7 +185,7 @@
 - Optimize cloning, modified to deepcopy on intra-process subscriptions
 - created timeout on Primus destroy, pass control back to happn server
 
-2.5.22 2016-05-07
+2.6.0 2016-05-09
 -----------------
 
 - delayed listen
