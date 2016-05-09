@@ -14,7 +14,7 @@ describe('2_websockets_embedded_sanity', function() {
   var happnInstance = null;
   var test_id;
 
-  this.timeout(60000);
+  this.timeout(5000);
 
 	/*
 	This test demonstrates starting up the happn service -
