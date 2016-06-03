@@ -300,6 +300,9 @@ describe('9_eventemitter_meta.js', function () {
       expect(result._meta.modified).to.not.be(null);
       expect(result._meta.modified).to.not.be(undefined);
 
+      expect(result._meta.path).to.not.be(null);
+      expect(result._meta.path).to.not.be(undefined);
+
       expect(result._meta.modified.toString()).to.be(result._meta.created.toString());
 
       var firstCreated = result._meta.created;
@@ -320,6 +323,9 @@ describe('9_eventemitter_meta.js', function () {
           expect(result._meta.modified).to.not.be(null);
           expect(result._meta.modified).to.not.be(undefined);
 
+          expect(result._meta.path).to.not.be(null);
+          expect(result._meta.path).to.not.be(undefined);
+
           publisherclient.get(test_path_created_modified_update, function(e, result){
 
             expect(result._meta.created).to.not.be(null);
@@ -327,6 +333,9 @@ describe('9_eventemitter_meta.js', function () {
 
             expect(result._meta.modified).to.not.be(null);
             expect(result._meta.modified).to.not.be(undefined);
+
+            expect(result._meta.path).to.not.be(null);
+            expect(result._meta.path).to.not.be(undefined);
 
             expect(result._meta.modified > result._meta.created).to.be(true);
             callback();
@@ -356,6 +365,9 @@ describe('9_eventemitter_meta.js', function () {
       expect(result._meta.modified).to.not.be(null);
       expect(result._meta.modified).to.not.be(undefined);
 
+      expect(result._meta.path).to.not.be(null);
+      expect(result._meta.path).to.not.be(undefined);
+
       var firstCreated = result._meta.created;
 
       expect(result._meta.modified.toString()).to.be(result._meta.created.toString());
@@ -374,6 +386,9 @@ describe('9_eventemitter_meta.js', function () {
           expect(result._meta.modified).to.not.be(null);
           expect(result._meta.modified).to.not.be(undefined);
 
+          expect(result._meta.path).to.not.be(null);
+          expect(result._meta.path).to.not.be(undefined);
+
           expect(result._meta.created.toString()).to.be(firstCreated.toString());
 
           publisherclient.get(test_path_created_modified_update_notmerge, function(e, result){
@@ -383,6 +398,9 @@ describe('9_eventemitter_meta.js', function () {
 
             expect(result._meta.modified).to.not.be(null);
             expect(result._meta.modified).to.not.be(undefined);
+
+            expect(result._meta.path).to.not.be(null);
+            expect(result._meta.path).to.not.be(undefined);
 
             expect(result._meta.modified > result._meta.created).to.be(true);
             callback();
