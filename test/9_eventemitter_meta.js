@@ -282,6 +282,98 @@ describe('9_eventemitter_meta.js', function () {
     });
   });
 
+  it('tests created and modified dates for an update, merge', function (callback) {
+
+    publisherclient.set(test_path_created_modified, {
+      property1: 'property1',
+      property2: 'property2',
+      property3: 'property3'
+    }, {}, function (e, result) {
+
+      if (e) return callback(e);
+
+      expect(result._meta.created).to.not.be(null);
+      expect(result._meta.created).to.not.be(undefined);
+
+      expect(result._meta.modified).to.not.be(null);
+      expect(result._meta.modified).to.not.be(undefined);
+
+      expect(result._meta.modified.toString()).to.be(result._meta.created.toString());
+
+      setTimeout(function(){
+
+        publisherclient.set(test_path_created_modified, {
+          property4: 'property4'
+        }, {merge:true}, function (e, result) {
+
+          if (e) return callback(e);
+
+          publisherclient.get(test_path_created_modified, function(e, result){
+
+            expect(result._meta.created).to.not.be(null);
+            expect(result._meta.created).to.not.be(undefined);
+
+            expect(result._meta.modified).to.not.be(null);
+            expect(result._meta.modified).to.not.be(undefined);
+
+            expect(result._meta.modified > result._meta.created).to.be(true);
+            callback();
+
+          });
+
+        })
+
+      }, 1000);
+
+    });
+  });
+
+  it('tests created and modified dates for an update, not merge', function (callback) {
+
+    publisherclient.set(test_path_created_modified_notmerge, {
+      property1: 'property1',
+      property2: 'property2',
+      property3: 'property3'
+    }, {}, function (e, result) {
+
+      if (e) return callback(e);
+
+      expect(result._meta.created).to.not.be(null);
+      expect(result._meta.created).to.not.be(undefined);
+
+      expect(result._meta.modified).to.not.be(null);
+      expect(result._meta.modified).to.not.be(undefined);
+
+      expect(result._meta.modified.toString()).to.be(result._meta.created.toString());
+
+      setTimeout(function(){
+
+        publisherclient.set(test_path_created_modified_notmerge, {
+          property4: 'property4'
+        }, {}, function (e, result) {
+
+          if (e) return callback(e);
+
+          publisherclient.get(test_path_created_modified_notmerge, function(e, result){
+
+            expect(result._meta.created).to.not.be(null);
+            expect(result._meta.created).to.not.be(undefined);
+
+            expect(result._meta.modified).to.not.be(null);
+            expect(result._meta.modified).to.not.be(undefined);
+
+            expect(result._meta.modified > result._meta.created).to.be(true);
+            callback();
+
+          });
+
+        })
+
+      }, 1000);
+
+    });
+  });
+
   it('searches by timestamps', function (callback) {
 
     this.timeout(5000);
