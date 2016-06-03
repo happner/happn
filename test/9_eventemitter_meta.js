@@ -112,6 +112,8 @@ describe('9_eventemitter_meta.js', function () {
   var test_path_created_modified = '/test/meta/created_modified' + require('shortid').generate();
   var test_path_created_modified_notmerge = '/test/meta/created_modified_notmerge' + require('shortid').generate();
   var test_path_timestamp = '/test/meta/test_path_timestamp' + require('shortid').generate();
+  var test_path_created_modified_update = '/test/meta/test_path_created_modified_update' + require('shortid').generate();
+  var test_path_created_modified_update_notmerge = '/test/meta/test_path_created_modified_update_notmerge' + require('shortid').generate();
 //	We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 
   it('tests the set meta data', function (callback) {
@@ -284,7 +286,7 @@ describe('9_eventemitter_meta.js', function () {
 
   it('tests created and modified dates for an update, merge', function (callback) {
 
-    publisherclient.set(test_path_created_modified, {
+    publisherclient.set(test_path_created_modified_update, {
       property1: 'property1',
       property2: 'property2',
       property3: 'property3'
@@ -300,15 +302,25 @@ describe('9_eventemitter_meta.js', function () {
 
       expect(result._meta.modified.toString()).to.be(result._meta.created.toString());
 
+      var firstCreated = result._meta.created;
+
       setTimeout(function(){
 
-        publisherclient.set(test_path_created_modified, {
+        publisherclient.set(test_path_created_modified_update, {
           property4: 'property4'
         }, {merge:true}, function (e, result) {
 
           if (e) return callback(e);
 
-          publisherclient.get(test_path_created_modified, function(e, result){
+          expect(result._meta.created.toString()).to.be(firstCreated.toString());
+
+          expect(result._meta.created).to.not.be(null);
+          expect(result._meta.created).to.not.be(undefined);
+
+          expect(result._meta.modified).to.not.be(null);
+          expect(result._meta.modified).to.not.be(undefined);
+
+          publisherclient.get(test_path_created_modified_update, function(e, result){
 
             expect(result._meta.created).to.not.be(null);
             expect(result._meta.created).to.not.be(undefined);
@@ -330,7 +342,7 @@ describe('9_eventemitter_meta.js', function () {
 
   it('tests created and modified dates for an update, not merge', function (callback) {
 
-    publisherclient.set(test_path_created_modified_notmerge, {
+    publisherclient.set(test_path_created_modified_update_notmerge, {
       property1: 'property1',
       property2: 'property2',
       property3: 'property3'
@@ -344,17 +356,27 @@ describe('9_eventemitter_meta.js', function () {
       expect(result._meta.modified).to.not.be(null);
       expect(result._meta.modified).to.not.be(undefined);
 
+      var firstCreated = result._meta.created;
+
       expect(result._meta.modified.toString()).to.be(result._meta.created.toString());
 
       setTimeout(function(){
 
-        publisherclient.set(test_path_created_modified_notmerge, {
+        publisherclient.set(test_path_created_modified_update_notmerge, {
           property4: 'property4'
         }, {}, function (e, result) {
 
           if (e) return callback(e);
 
-          publisherclient.get(test_path_created_modified_notmerge, function(e, result){
+          expect(result._meta.created).to.not.be(null);
+          expect(result._meta.created).to.not.be(undefined);
+
+          expect(result._meta.modified).to.not.be(null);
+          expect(result._meta.modified).to.not.be(undefined);
+
+          expect(result._meta.created.toString()).to.be(firstCreated.toString());
+
+          publisherclient.get(test_path_created_modified_update_notmerge, function(e, result){
 
             expect(result._meta.created).to.not.be(null);
             expect(result._meta.created).to.not.be(undefined);
