@@ -196,3 +196,4 @@
 
 - fixed _meta issue
 - updated happn-nedb to version 1.8.1
+- stabilised dependancies

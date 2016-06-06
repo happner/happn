@@ -55,8 +55,6 @@ describe('c5_client_events', function() {
       clientInstance.set('/setting/data/before/end', {test:"data"}, function(e, response){
         if (e) return callback(e);
 
-        console.log('client did a set - all good:::');
-
         serviceInstance.stop({reconnect: false}, function(e){
           if (e) return callback(e);
         });
@@ -94,19 +92,15 @@ describe('c5_client_events', function() {
       clientInstance.set('/setting/data/before/reconnect', {test:"data"}, function(e, response){
         if (e) return callback(e);
 
-        console.log('client did a set - all good, killing connections:::');
-
         for (var key in serviceInstance.connections)
             serviceInstance.connections[key].destroy();
 
         if (e) return callback(e);
-        console.log('the server stopped:::');
 
         setTimeout(function(){
 
           if (e) return callback(e);
-          console.log('the server restarted:::');
-
+          
           clientInstance.set('/setting/data/after/reconnect', {test:"data"}, function(e, response){
 
             if (e) return callback(e);

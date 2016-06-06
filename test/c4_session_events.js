@@ -27,7 +27,6 @@ describe('c4_session_events', function() {
         if (!eventsFired[eventName]) return;
 
       if (!stopped){
-        console.log('All events fired - sweet...');
         stopped = true;
         serviceInstance.stop({reconnect:false}, callback);
       }
