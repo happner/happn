@@ -51,7 +51,6 @@ describe('c8_deferred_listen', function () {
       var key = conn.remoteAddress + ':' + conn.remotePort;
       connections[key] = conn;
       conn.on('close', function () {
-        console.log('closed connection:::', key);
         delete connections[key];
       });
     });
@@ -148,7 +147,6 @@ describe('c8_deferred_listen', function () {
           expect(e).to.be(null);
 
           doRequest('version', null, null, function (body) {
-            console.log('GOT BODY:::', body);
             expect(body.version).to.not.be(null)
             callback();
           });

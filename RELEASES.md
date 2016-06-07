@@ -190,3 +190,10 @@
 
 - delayed listen
 - scope modifications on happn.create
+
+2.6.2 2016-06-01
+-----------------
+
+- fixed _meta issue
+- updated happn-nedb to version 1.8.1
+- stabilised dependancies
