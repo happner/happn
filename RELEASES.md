@@ -197,3 +197,8 @@
 - fixed _meta issue
 - updated happn-nedb to version 1.8.1
 - stabilised dependancies
+
+2.6.3 2016-06-09
+-----------------
+
+- removed moment dependancy
