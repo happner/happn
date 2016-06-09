@@ -376,20 +376,20 @@ describe('9_eventemitter_meta.js', function () {
 
         publisherclient.set(test_path_created_modified_update_notmerge, {
           property4: 'property4'
-        }, {}, function (e, result) {
+        }, {}, function (e, updateResult) {
 
           if (e) return callback(e);
 
-          expect(result._meta.created).to.not.be(null);
-          expect(result._meta.created).to.not.be(undefined);
+          expect(updateResult._meta.created).to.not.be(null);
+          expect(updateResult._meta.created).to.not.be(undefined);
 
-          expect(result._meta.modified).to.not.be(null);
-          expect(result._meta.modified).to.not.be(undefined);
+          expect(updateResult._meta.modified).to.not.be(null);
+          expect(updateResult._meta.modified).to.not.be(undefined);
 
-          expect(result._meta.path).to.not.be(null);
-          expect(result._meta.path).to.not.be(undefined);
+          expect(updateResult._meta.path).to.not.be(null);
+          expect(updateResult._meta.path).to.not.be(undefined);
 
-          expect(result._meta.created.toString()).to.be(firstCreated.toString());
+          expect(updateResult._meta.created.toString()).to.be(firstCreated.toString());
 
           publisherclient.get(test_path_created_modified_update_notmerge, function(e, result){
 
