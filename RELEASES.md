@@ -202,3 +202,8 @@
 -----------------
 
 - removed moment dependancy
+
+2.6.4 2016-06-20
+----------------
+
+- Fix web socket client offListener
