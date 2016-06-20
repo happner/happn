@@ -800,7 +800,7 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
       subscribeToPath: function subscribeToPath(path) {
         return new Promise(function (resolve, reject) {
           publisherclient.on(path, {event_type: 'set', count: 0}, function () {
-          },function(err,handle) {
+          }, function (err, handle) {
             if (err) return reject(err);
             resolve(handle);
           });
@@ -814,12 +814,21 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
       },
       unsubscribeFromHandle: function unsubscribeFromHandle(handle) {
         return new Promise(function (resolve) {
-          publisherclient.off(handle,resolve);
+          publisherclient.off(handle, resolve);
         });
+      },
+      checkResults: function checkResults() {
+        return new Promise(function (resolve) {
+          // path 1 should have no listeners
+          expect(publisherclient.events['/SET@' + path1].length).to.equal(0);
+          // path 2 should still have its listener
+          expect(publisherclient.events['/SET@' + path2].length).to.equal(1);
+          resolve();
+        })
       }
     }
 
-    utils.subscribeToPath(path1)
+    return utils.subscribeToPath(path1)
       .then(utils.storeHandle1)
       .then(function () {
         return utils.subscribeToPath(path2);
@@ -828,16 +837,12 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
       .then(function () {
         return utils.unsubscribeFromHandle(handle1);
       })
+      .then(utils.checkResults)
       .then(function () {
-        // path 1 should have no listeners
-        expect(publisherclient.events['/SET@'+path1].length).to.equal(0);
-        // path 2 should still have its listener
-        expect(publisherclient.events['/SET@'+path2].length).to.equal(1);
-        callback();
+        return utils.unsubscribeFromHandle(handle2);
       })
+      .then(callback)
       .catch(callback);
-
-
   });
 
   require('benchmarket').stop();
