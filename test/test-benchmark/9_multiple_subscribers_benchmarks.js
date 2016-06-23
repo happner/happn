@@ -67,9 +67,16 @@ describe(name, function() {
     });
 
     before('subscribe to event1', function(done) {
+      this.events = 0;
+      var _this = this;
       Promise.resolve(this.subscribers).map(function(client) {
-        client.on('/some/path/event1', function handler() {
-          console.log('handler');
+        return client.on('/some/path/*', function handler(data, meta) {
+          _this.events++;
+          console.log('handling ' + meta.path + ', seq:' + _this.events);
+          if (_this.events === 20000) { // only end test after last handler runs
+            _this.endTest();
+            delete _this.endTest;
+          }
         });
       }).then(function() {
         done();
@@ -77,7 +84,13 @@ describe(name, function() {
     });
 
     it('emits 1000 events', function(done) {
-      done();
+      this.endTest = done;
+      for(var i = 0; i < 1000; i++) {
+        // if any events go missing (not emitted to subscribers this
+        // test will time out because it only emits just enough events
+        // to satisfy the required total where/when endTest() is run
+        this.publisher.set('/some/path/event' + i % 10, {da: 'ta'});
+      }
     });
 
   });
