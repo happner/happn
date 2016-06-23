@@ -55,7 +55,7 @@ describe('c7a_db_compaction', function() {
         path: './services/data_embedded/service.js',
         config:{
            filename:test_file3,
-           compactInterval:5000//compact every 2 seconds
+           compactInterval:5000//compact every 5 seconds
         }
       }
     }

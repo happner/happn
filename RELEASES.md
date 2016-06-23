@@ -207,3 +207,8 @@
 ----------------
 
 - Fix web socket client offListener
+
+2.6.5 2016-06-23
+----------------
+
+- Fixed bug with inMemoryOnly nedb compaction
