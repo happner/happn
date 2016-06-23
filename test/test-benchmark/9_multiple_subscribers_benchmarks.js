@@ -60,8 +60,18 @@ describe(name, function() {
           })
         }, {concurrency: 20}
       ).then(function(subscribersArray) {
-        this.subscribers = subscribersArray;
-        this.publisher = subscribersArray[0]; // first subscriber also publisher
+        _this.subscribers = subscribersArray;
+        _this.publisher = subscribersArray[0]; // first subscriber also publisher
+        done();
+      }).catch(done);
+    });
+
+    before('subscribe to event1', function(done) {
+      Promise.resolve(this.subscribers).map(function(client) {
+        client.on('/some/path/event1', function handler() {
+          console.log('handler');
+        });
+      }).then(function() {
         done();
       }).catch(done);
     });
