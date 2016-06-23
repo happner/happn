@@ -10,9 +10,6 @@ var Promise = require('bluebird');
 
 describe(name, function() {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
-
   function testMultipleSubscribers(subscriberCount, eventCount, emitCount) {
 
     // subscriberCount - how many subscribers to to include in test
@@ -80,6 +77,9 @@ describe(name, function() {
     });
 
   }
+
+  require('benchmarket').start();
+  after(require('benchmarket').store());
 
   context('with no cache and 20 subscribers', function() {
 
