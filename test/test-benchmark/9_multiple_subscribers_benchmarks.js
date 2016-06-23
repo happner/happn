@@ -71,7 +71,7 @@ describe(name, function() {
       for(var i = 0; i < emitCount; i++) {
         // if any events go missing (not emitted to subscribers this
         // test will time out because it only emits just enough events
-        // to satisfy the required total where/when endTest() is run
+        // to satisfy the required total (endAt) where/when endTest() is run
         this.publisher.set('/some/path/event' + i % eventCount, {da: 'ta'});
       }
     });
@@ -79,7 +79,7 @@ describe(name, function() {
   }
 
   require('benchmarket').start();
-  after(require('benchmarket').store());
+  // after(require('benchmarket').store());
 
   context('with no cache and 20 subscribers', function() {
 
@@ -91,7 +91,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 200 subscribers', function() {
+  xcontext('with no cache and 200 subscribers', function() {
 
     subscriberCount = 200;
     eventCount = 10;
