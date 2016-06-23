@@ -57,7 +57,7 @@ describe(name, function() {
       Promise.resolve(this.subscribers).map(function(client) {
         return client.on('/some/path/*', function handler(data, meta) {
           events++;
-          console.log('handling ' + meta.path + ', seq:' + events);
+          // console.log('handling ' + meta.path + ', seq:' + events);
           if (events === endAt) { // only end test after last handler runs
             _this.endTest();
             delete _this.endTest;
@@ -68,7 +68,8 @@ describe(name, function() {
       }).catch(done);
     });
 
-    it('emits 1000 events', function(done) {
+    it('emits ' + emitCount + ' events', function(done) {
+      this.timeout(subscriberCount * emitCount / 10);
       this.endTest = done;
       for(var i = 0; i < emitCount; i++) {
         // if any events go missing (not emitted to subscribers this
@@ -80,7 +81,7 @@ describe(name, function() {
 
   }
 
-  context('with no cache and 20 subscriptions', function() {
+  context('with no cache and 20 subscribers', function() {
 
     subscriberCount = 20;
     eventCount = 10;
@@ -90,9 +91,13 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 200 subscriptions', function() {
+  context('with no cache and 200 subscribers', function() {
 
-    it('emits 1000 events');
+    subscriberCount = 200;
+    eventCount = 10;
+    emitCount = 1000;
+
+    testMultipleSubscribers(subscriberCount, eventCount, emitCount)
 
   });
 
