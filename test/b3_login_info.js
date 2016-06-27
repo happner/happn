@@ -133,20 +133,23 @@ context('b3_login_info', function() {
           username: '_ADMIN',
           password: 'secret',
         },
-        info: {KEY: 'VALUE'}
+        info: {"KEY": "VALUE"}
       }).then(function(client) {
         // TODO!: client.logout()
         client.disconnect();
       }).catch(done);
 
       setTimeout(function RunAfterClientHasLoggedInAndOut() {
+
+        console.log('events:::', events);
+
         expect(events).to.eql({
           'authentic': {
             info: {
               happn:{
                 name:service2Name
               },
-              KEY: 'VALUE',
+              "KEY": "VALUE",
               _browser: false,
               _local: false,
             },
@@ -157,7 +160,7 @@ context('b3_login_info', function() {
               happn:{
                 name:service2Name
               },
-              KEY: 'VALUE',
+              "KEY": "VALUE",
               _browser: false,
               _local: false,
             },
