@@ -29,34 +29,10 @@ describe('7_eventemitter_listeners', function () {
     this.timeout(20000);
 
     try {
-      service.create({
-          mode: 'embedded',
-          services: {
-            auth: {
-              path: './services/auth/service.js',
-              config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
-              }
-            },
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
-            },
-            pubsub: {
-              path: './services/pubsub/service.js',
-              config: {}
-            }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
+      service.create({},
         function (e, happnInst) {
           if (e)
             return callback(e);
-
           happnInstance = happnInst;
           callback();
         });
@@ -69,40 +45,25 @@ describe('7_eventemitter_listeners', function () {
   var publisherclient;
   var listenerclient;
 
-  /*
-   We are initializing 2 clients to test saving data against the database, one client will push data into the
-   database whilst another listens for changes.
-   */
-  before('should initialize the clients', function (callback) {
-    this.timeout(default_timeout);
-
+  before('should initialize the clients', function(callback) {
     try {
-
-      happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      }, function (e, instance) {
+      happn_client.create(function(e, instance) {
 
         if (e) return callback(e);
 
         publisherclient = instance;
-
-        happn_client.create({
-          plugin: happn.client_plugins.intra_process,
-          context: happnInstance
-        }, function (e, instance) {
+        happn_client.create(function(e, instance) {
 
           if (e) return callback(e);
           listenerclient = instance;
           callback();
 
         });
-
       });
-
     } catch (e) {
       callback(e);
     }
+
   });
 
   it('the listener should pick up a single wildcard event', function (callback) {
@@ -111,7 +72,7 @@ describe('7_eventemitter_listeners', function () {
 
     try {
       //first listen for the change
-      listenerclient.on('/e2e_test1/testsubscribe/data/event/*', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/e2e_test1/testsubscribe/data/event/*', {event_type: 'set', count: 1}, function (message, meta) {
 
         expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event/*'].length).to.be(0);
         callback();
@@ -381,7 +342,9 @@ describe('7_eventemitter_listeners', function () {
           return callback(e);
         }
       });
+
     });
+
   });
 
   it('should subscribe and get initial values on the callback', function (callback) {
@@ -435,6 +398,7 @@ describe('7_eventemitter_listeners', function () {
             expect(message.test).to.be("data1");
             callback();
           }
+
 
         }, function(e){
           if (e) return callback(e);

@@ -4,7 +4,7 @@ var expect = require('expect.js');
 var service1Name;
 var service2Name;
 
-context('login info for application layer', function() {
+context('b3_login_info', function() {
 
   require('benchmarket').start();
   after(require('benchmarket').store());
