@@ -240,6 +240,65 @@ my_client_instance.onAll(function(//your listener event handler
 
 ```
 
+EVENT DATA
+----------------------------
+
+* you can grab the data you are listening for immediately either by causing the events to be emitted immediately on successful subscription or you can have the data returned as part of the subscription callback using the initialCallback and initialEmit options respectively*
+
+```javascript
+//get the data back as part of the subscription callback
+listenerclient.on('/e2e_test1/testsubscribe/data/values_on_callback_test/*', 
+  {"event_type": "set", 
+  "initialCallback":true //set to true, causes data to be passed back
+  }, function (message) {
+
+          expect(message.updated).to.be(true);
+          callback();
+
+        }, function(e, reference, response){
+          if (e) return callback(e);
+          try{
+
+            //the response is your data, ordered by modified - will always be in an array even if only one or none is found
+
+            expect(response.length).to.be(2);
+            expect(response[0].test).to.be('data');
+            expect(response[1].test).to.be('data1');
+
+            listenerclient.set('/e2e_test1/testsubscribe/data/values_on_callback_test/1', {"test":"data", "updated":true}, function(e){
+              if (e) return callback(e);
+            });
+
+          }catch(e){
+            return callback(e);
+          }
+        });
+
+```
+
+```javascript
+//get the data emitted back immediately
+
+listenerclient.on('/e2e_test1/testsubscribe/data/values_emitted_test/*', 
+  {"event_type": "set", 
+  "initialEmit":true //set to true causes emit to happen on successful subscription
+  }, function (message, meta) {
+          //this emit handler runs immediately
+          caughtEmitted++;
+
+          if (caughtEmitted == 2){
+            expect(message.test).to.be("data1");
+            callback();
+          }
+
+
+        }, function(e){
+          if (e) return callback(e);
+        });
+
+```
+
+
 TAGGING
 ----------------------------
 

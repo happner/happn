@@ -4,7 +4,7 @@ var expect = require('expect.js');
 var service1Name;
 var service2Name;
 
-context('login info for application layer', function() {
+context('b3_login_info', function() {
 
   require('benchmarket').start();
   after(require('benchmarket').store());
@@ -133,20 +133,23 @@ context('login info for application layer', function() {
           username: '_ADMIN',
           password: 'secret',
         },
-        info: {KEY: 'VALUE'}
+        info: {"KEY": "VALUE"}
       }).then(function(client) {
         // TODO!: client.logout()
         client.disconnect();
       }).catch(done);
 
       setTimeout(function RunAfterClientHasLoggedInAndOut() {
+
+        console.log('events:::', events);
+
         expect(events).to.eql({
           'authentic': {
             info: {
               happn:{
                 name:service2Name
               },
-              KEY: 'VALUE',
+              "KEY": "VALUE",
               _browser: false,
               _local: false,
             },
@@ -157,7 +160,7 @@ context('login info for application layer', function() {
               happn:{
                 name:service2Name
               },
-              KEY: 'VALUE',
+              "KEY": "VALUE",
               _browser: false,
               _local: false,
             },

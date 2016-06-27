@@ -212,3 +212,9 @@
 ----------------
 
 - Fixed bug with inMemoryOnly nedb compaction
+
+2.7.0 2016-06-27
+----------------
+
+- get initial value on subscribe
+
