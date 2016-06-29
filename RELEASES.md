@@ -218,3 +218,8 @@
 
 - get initial value on subscribe
 - removed browser_primus.js re-save with every server startup
+
+2.7.1 2016-06-29
+----------------
+
+- fixed test b3

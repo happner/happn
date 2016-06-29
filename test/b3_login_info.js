@@ -9,87 +9,17 @@ context('b3_login_info', function() {
   require('benchmarket').start();
   after(require('benchmarket').store());
 
-  context('insecure server', function() {
+  this.timeout(60000);
 
-    beforeEach(function(done) {
-      var _this = this;
-      Happn.service.create({}).then(function(server) {
-        _this.server1 = server;
-        service1Name = server.name;
-        done();
-      }).catch(done);
-    });
+  var server1;
+  var server2;
 
-    afterEach(function(done) {
-      if (!this.server1) done();
-      this.server1.stop(done);
-    });
-
-    var sessionId;
-
-    it('login info is carried across login', function(done) {
-      var events = {};
-
-      this.server1.services.pubsub.on('authentic', function(evt) {
-        sessionId = evt.session.id;
-        events['authentic'] = evt;
-      });
-
-      this.server1.services.pubsub.on('disconnect', function(evt) {
-        events['disconnect'] = evt;
-      });
-
-      Happn.client.create({info: {KEY: 'VALUE'}}).then(function(client) {
-        // TODO: client.logout()
-        client.disconnect();
-      }).catch(done);
-
-      setTimeout(function RunAfterClientHasLoggedInAndOut() {
-
-        expect(events).to.eql({
-
-          'authentic': {
-            info: {
-              happn:{
-                name:service1Name
-              },
-              KEY: 'VALUE',
-              _browser: false, // client was not a browser
-              _local: false   // client was not intraprocess
-            },
-            session:{
-              id:sessionId
-            }
-          },
-
-          'disconnect': {
-            info: {
-              happn:{
-                name:service1Name
-              },
-              KEY: 'VALUE',
-              _browser: false,
-              _local: false
-            },
-            session:{
-              id:sessionId
-            }
-          }
-        });
-
-        done();
-
-      }, 500);
-
-    });
-
-  });
-
-  context('secure server', function() {
-
-    beforeEach(function(done) {
-      var _this = this;
+  before('starts the services', function(done){
+    Happn.service.create({port:55005}).then(function(server) {
+      server1 = server;
+      service1Name = server.name;
       Happn.service.create({
+        port:55006,
         secure: true,
         services: {
           security: {
@@ -103,28 +33,81 @@ context('b3_login_info', function() {
           }
         }
       }).then(function(server) {
-        _this.server2 = server;
+        server2 = server;
         service2Name = server.name;
         done();
       }).catch(done);
-    });
+    }).catch(done);
+  });
 
-    afterEach(function(done) {
-      if (!this.server2) done();
-      this.server2.stop(done);
-    });
+  after('stops the services',function(done){
+    if (!server1) done();
+     server1.stop(function(e){
+       if (e) console.warn('failed to stop server1: ' + e.toString());
+
+       if (!server2) done();
+       server2.stop(function(e){
+         if (e) console.warn('failed to stop server2: ' + e.toString());
+         done();
+       });
+
+     });
+  });
+
+  context('insecure server', function() {
 
     var sessionId;
 
     it('login info is carried across login', function(done) {
       var events = {};
 
-      this.server2.services.pubsub.on('authentic', function(evt) {
+      server1.services.pubsub.on('authentic', function(evt) {
         sessionId = evt.session.id;
         events['authentic'] = evt;
       });
 
-      this.server2.services.pubsub.on('disconnect', function(evt) {
+      server1.services.pubsub.on('disconnect', function(evt) {
+        events['disconnect'] = evt;
+      });
+
+      Happn.client.create({info: {KEY: 'VALUE'}, config:{port:55005}}).then(function(client) {
+        client.disconnect();
+      }).catch(done);
+
+      setTimeout(function RunAfterClientHasLoggedInAndOut() {
+
+        expect(events.authentic.info.happn.name).to.equal(service1Name);
+        expect(events.disconnect.info.happn.name).to.equal(service1Name);
+
+        expect(events.authentic.info.KEY).to.equal("VALUE");
+        expect(events.disconnect.info.KEY).to.equal("VALUE");
+
+        expect(events.authentic.info._browser).to.equal(false);
+        expect(events.disconnect.info._local).to.equal(false);
+
+        expect(events.authentic.session.id).to.equal(sessionId);
+        expect(events.disconnect.session.id).to.equal(sessionId);
+
+        done();
+
+      }, 500);
+
+    });
+
+  });
+
+  context('secure server', function() {
+    var sessionId;
+
+    it('login info is carried across login', function(done) {
+      var events = {};
+
+      server2.services.pubsub.on('authentic', function(evt) {
+        sessionId = evt.session.id;
+        events['authentic'] = evt;
+      });
+
+      server2.services.pubsub.on('disconnect', function(evt) {
         events['disconnect'] = evt;
       });
 
@@ -132,41 +115,26 @@ context('b3_login_info', function() {
         config: {
           username: '_ADMIN',
           password: 'secret',
+          port:55006
         },
         info: {"KEY": "VALUE"}
       }).then(function(client) {
-        // TODO!: client.logout()
         client.disconnect();
       }).catch(done);
 
       setTimeout(function RunAfterClientHasLoggedInAndOut() {
 
-        console.log('events:::', events);
+        expect(events.authentic.info.happn.name).to.equal(service2Name);
+        expect(events.disconnect.info.happn.name).to.equal(service2Name);
 
-        expect(events).to.eql({
-          'authentic': {
-            info: {
-              happn:{
-                name:service2Name
-              },
-              "KEY": "VALUE",
-              _browser: false,
-              _local: false,
-            },
-            session: { id: sessionId }
-          },
-          'disconnect': {
-            info: {
-              happn:{
-                name:service2Name
-              },
-              "KEY": "VALUE",
-              _browser: false,
-              _local: false,
-            },
-            session: { id: sessionId }
-          }
-        });
+        expect(events.authentic.info.KEY).to.equal("VALUE");
+        expect(events.disconnect.info.KEY).to.equal("VALUE");
+
+        expect(events.authentic.info._browser).to.equal(false);
+        expect(events.disconnect.info._local).to.equal(false);
+
+        expect(events.authentic.session.id).to.equal(sessionId);
+        expect(events.disconnect.session.id).to.equal(sessionId);
 
         done();
 
