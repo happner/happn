@@ -3,7 +3,7 @@ var expect = require('expect.js');
 
 var service1Name;
 var service2Name;
-
+//checks info is stored next to login
 context('b3_login_info', function() {
 
   require('benchmarket').start();
