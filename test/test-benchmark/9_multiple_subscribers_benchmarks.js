@@ -168,7 +168,7 @@ describe(name, function() {
   // require('benchmarket').start();
   // after(require('benchmarket').store());
 
-  context('with no cache and 20 wildcard subscribers', function() {
+  context('with no cache and 20 same wildcard subscribers', function() {
 
     subscriberCount = 20;
     eventCount = 10;
@@ -178,7 +178,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 200 wildcard subscribers', function() {
+  context('with no cache and 200 same wildcard subscribers', function() {
 
     subscriberCount = 200;
     eventCount = 10;
