@@ -14,6 +14,7 @@ describe(name, function() {
   function createServerAndSubscribers(subscriberCount) {
 
     before('start happn server', function(done) {
+      this.timeout(0);
       var _this = this;
       service.create({
         utils: {
@@ -26,6 +27,7 @@ describe(name, function() {
     });
 
     after('stop happn server', function(done) {
+      this.timeout(0);
       if (this.happnServer) {
         return this.happnServer.stop(done);
       }
@@ -33,6 +35,7 @@ describe(name, function() {
     });
 
     before('start subscribers', function(done) {
+      this.timeout(0);
       var _this = this;
       Promise.resolve(new Array(   subscriberCount   )).map(
         function() {
@@ -59,6 +62,7 @@ describe(name, function() {
     createServerAndSubscribers(subscriberCount);
 
     before('subscribe to events', function(done) {
+      this.timeout(0);
       var events = 0;
       var endAt = subscriberCount * emitCount;
       var _this = this;
@@ -77,11 +81,11 @@ describe(name, function() {
     });
 
     it('emits ' + emitCount + ' events', function(done) {
-      this.timeout(subscriberCount * emitCount / 10);
+      this.timeout(0);
       this.endTest = done;
       for(var i = 0; i < emitCount; i++) {
         // if any events go missing (not emitted to subscribers this
-        // test will time out because it only emits just enough events
+        // test go on forever because it only emits just enough events
         // to satisfy the required total (endAt) where/when endTest() is run
         this.publisher.set('/some/path/event' + i % eventCount, {da: 'ta'});
       }
@@ -90,12 +94,23 @@ describe(name, function() {
   }
 
 
-  function testMultipleDifferentWildcardSubscribers(subscriberCount, eventCount, emitCount) {
+  function testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount) {
 
     // subscriberCount - how many subscribers to to include in test
     //                   all subscribing to different wildcard paths
     // eventCount - how man different events to send (event0, event1, event2)
-    // emitCount - total events to send as the test
+    // emitCount - total events to send as the test where the emitted paths repeat
+
+    createServerAndSubscribers(subscriberCount);
+
+  }
+
+  function testMultipleDifferentWildcardSubscribersNotRepeating(subscriberCount, eventCount, emitCount) {
+
+    // subscriberCount - how many subscribers to to include in test
+    //                   all subscribing to different wildcard paths
+    // eventCount - how man different events to send (event0, event1, event2)
+    // emitCount - total events to send as the test where the emitted paths do not repeat
 
     createServerAndSubscribers(subscriberCount);
 
@@ -114,6 +129,7 @@ describe(name, function() {
     createServerAndSubscribers(subscriberCount);
 
     before('subscribe to events', function(done) {
+      this.timeout(0);
       var events = 0;
       var endAt = 1;
       var _this = this;
@@ -138,6 +154,7 @@ describe(name, function() {
     });
 
     it('emits ' + 1 + ' event', function(done) {
+      this.timeout(0);
       debug('XXX -- START TEST -- calling set()');
       this.happnServer.log.info('XXX -- START TEST -- calling set()');
       this.timeout(subscriberCount * emitCount / 10);
@@ -171,23 +188,43 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 20 different wildcard subscribers', function() {
+  context('with no cache and 20 different wildcard subscribers repeating', function() {
 
     subscriberCount = 20;
     eventCount = 10;
     emitCount = 1000;
 
-    testMultipleDifferentWildcardSubscribers(subscriberCount, eventCount, emitCount);
+    testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount);
 
   });
 
-  context('with no cache and 200 different wildcard subscribers', function() {
+  context('with no cache and 200 different wildcard subscribers repeating', function() {
 
     subscriberCount = 200;
     eventCount = 10;
     emitCount = 1000;
 
-    testMultipleDifferentWildcardSubscribers(subscriberCount, eventCount, emitCount);
+    testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount);
+
+  });
+
+  context('with no cache and 20 different wildcard subscribers not repeating', function() {
+
+    subscriberCount = 20;
+    eventCount = 10;
+    emitCount = 1000;
+
+    testMultipleDifferentWildcardSubscribersNotRepeating(subscriberCount, eventCount, emitCount);
+
+  });
+
+  context('with no cache and 200 different wildcard subscribers not repeating', function() {
+
+    subscriberCount = 200;
+    eventCount = 10;
+    emitCount = 1000;
+
+    testMultipleDifferentWildcardSubscribersNotRepeating(subscriberCount, eventCount, emitCount);
 
   });
 
