@@ -7,6 +7,7 @@ var happn = require('../../lib/index');
 var service = happn.service;
 var client = happn.client;
 var Promise = require('bluebird');
+var debug = require('debug')('TEST');
 
 describe(name, function() {
 
@@ -132,8 +133,12 @@ describe(name, function() {
           events++;
           // console.log('handling ' + meta.path + ', seq:' + events);
           if (events === endAt) { // only end test after last handler runs
-            _this.endTest();
-            delete _this.endTest;
+            process.nextTick(function() {
+              debug('XXX -- END TEST -- received emit()');
+              _this.happnServer.log.info('XXX -- END TEST -- received emit()');
+              _this.endTest();
+              delete _this.endTest;
+            });
           }
         });
       }).then(function() {
@@ -146,14 +151,17 @@ describe(name, function() {
     });
 
     it('emits ' + 1 + ' event', function(done) {
+      debug('XXX -- START TEST -- calling set()');
+      this.happnServer.log.info('XXX -- START TEST -- calling set()');
       this.timeout(subscriberCount * emitCount / 10);
       this.endTest = done;
       this.publisher.set('/some/path/0', {da: 'ta'});
+      this.publisher.set('/some/path/0', {da: 'ta'}, {noStore: true});
     });
 
   }
 
-  require('benchmarket').start();
+  // require('benchmarket').start();
   // after(require('benchmarket').store());
 
   xcontext('with no cache and 20 wildcard subscribers', function() {
@@ -176,15 +184,6 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 2000 separate subscribers on 2000 separate events', function() {
-
-    subscriberCount = 2000;
-    eventCount = 2000;
-
-    testMultipleSeparateSubscribers(subscriberCount, eventCount);
-
-  });
-
   context('with no cache and 20 separate subscribers on 20 separate events', function() {
 
     subscriberCount = 20;
@@ -194,7 +193,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 200 separate subscribers on 200 separate events', function() {
+  xcontext('with no cache and 200 separate subscribers on 200 separate events', function() {
 
     subscriberCount = 200;
     eventCount = 200;
@@ -203,7 +202,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 1 separate subscribers on 200 separate events', function() {
+  xcontext('with no cache and 1 separate subscribers on 200 separate events', function() {
 
     subscriberCount = 1;
     eventCount = 200;
@@ -212,6 +211,15 @@ describe(name, function() {
 
   });
 
-  require('benchmarket').stop();
+  context('with no cache and 2000 separate subscribers on 2000 separate events', function() {
+
+    subscriberCount = 2000;
+    eventCount = 2000;
+
+    testMultipleSeparateSubscribers(subscriberCount, eventCount);
+
+  });
+
+  // require('benchmarket').stop();
 
 });
