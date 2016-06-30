@@ -79,7 +79,7 @@ describe(name, function() {
 
   }
 
-  function testMultipleSeparateSubscribers(subscriberCount, eventCount) {
+  function testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount) {
 
     // many separate subscriptions on different paths
     // emit to only one of them
@@ -184,21 +184,21 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 20 separate subscribers on 20 separate events', function() {
+  xcontext('with no cache and 20 separate subscribers on 20 separate events', function() {
 
     subscriberCount = 20;
     eventCount = 20;
 
-    testMultipleSeparateSubscribers(subscriberCount, eventCount);
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
 
   });
 
-  xcontext('with no cache and 200 separate subscribers on 200 separate events', function() {
+  xcontext('with no cache and 1 separate subscribers on 20 separate events', function() {
 
-    subscriberCount = 200;
-    eventCount = 200;
+    subscriberCount = 1;
+    eventCount = 20;
 
-    testMultipleSeparateSubscribers(subscriberCount, eventCount);
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
 
   });
 
@@ -207,7 +207,34 @@ describe(name, function() {
     subscriberCount = 1;
     eventCount = 200;
 
-    testMultipleSeparateSubscribers(subscriberCount, eventCount);
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
+
+  });
+
+  xcontext('with no cache and 1 separate subscribers on 2000 separate events', function() {
+
+    subscriberCount = 1;
+    eventCount = 2000;
+
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
+
+  });
+
+  context('with no cache and 20 separate subscribers on 20 separate events', function() {
+
+    subscriberCount = 20;
+    eventCount = 20;
+
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
+
+  });
+
+  context('with no cache and 200 separate subscribers on 200 separate events', function() {
+
+    subscriberCount = 200;
+    eventCount = 200;
+
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
 
   });
 
@@ -216,7 +243,7 @@ describe(name, function() {
     subscriberCount = 2000;
     eventCount = 2000;
 
-    testMultipleSeparateSubscribers(subscriberCount, eventCount);
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
 
   });
 
