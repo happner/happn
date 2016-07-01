@@ -284,47 +284,4 @@ describe(name, function() {
 
   // require('benchmarket').stop();
 
-  context('discover', function() {
-
-    createServerAndSubscribers(1, 'info');
-
-    before('subscribe to events', function(done) {
-      var _this = this;
-      var client = this.subscribers[0];
-
-      // client.onAll(
-      //   function handler(data, meta) {
-      //     process.nextTick(function() {
-      //       debug('XXX -- END TEST -- received emit()');
-      //       _this.endTest();
-      //     });
-      //   },
-      //   function ok() {
-      //     done();
-      //   }
-      // );
-
-      // client.on('*', function handler(data, meta) {
-      // client.on('/some/path', function handler(data, meta) {
-      client.on('/some/*', function handler(data, meta) {
-      // client.on('/some/*', {event_type: 'set'}, function handler(data, meta) {
-        process.nextTick(function() {
-          debug('XXX -- END TEST -- received emit()');
-          _this.endTest();
-        });
-      }).then(function(){
-        done();
-      }).catch(done);
-    });
-
-    it('emits 1 event', function(done) {
-
-      debug('XXX -- START TEST -- calling set()');
-      this.endTest = done;
-      this.publisher.set('/some/path', {da: 'ta'});
-
-    });
-
-  });
-
 });
