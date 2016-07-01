@@ -11,14 +11,14 @@ var debug = require('debug')('TEST');
 
 describe(name, function() {
 
-  function createServerAndSubscribers(subscriberCount) {
+  function createServerAndSubscribers(subscriberCount, loglevel) {
 
     before('start happn server', function(done) {
       this.timeout(0);
       var _this = this;
       service.create({
         utils: {
-          logLevel: 'warn'
+          logLevel: loglevel || 'warn'
         }
       }).then(function(server) {
         _this.happnServer = server;
@@ -168,7 +168,7 @@ describe(name, function() {
   // require('benchmarket').start();
   // after(require('benchmarket').store());
 
-  context('with no cache and 20 same wildcard subscribers', function() {
+  xcontext('with no cache and 20 same wildcard subscribers', function() {
 
     subscriberCount = 20;
     eventCount = 10;
@@ -178,7 +178,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 200 same wildcard subscribers', function() {
+  xcontext('with no cache and 200 same wildcard subscribers', function() {
 
     subscriberCount = 200;
     eventCount = 10;
@@ -188,7 +188,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 20 different wildcard subscribers repeating', function() {
+  xcontext('with no cache and 20 different wildcard subscribers repeating', function() {
 
     subscriberCount = 20;
     eventCount = 10;
@@ -198,7 +198,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 200 different wildcard subscribers repeating', function() {
+  xcontext('with no cache and 200 different wildcard subscribers repeating', function() {
 
     subscriberCount = 200;
     eventCount = 10;
@@ -208,7 +208,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 20 different wildcard subscribers not repeating', function() {
+  xcontext('with no cache and 20 different wildcard subscribers not repeating', function() {
 
     subscriberCount = 20;
     eventCount = 10;
@@ -218,7 +218,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 200 different wildcard subscribers not repeating', function() {
+  xcontext('with no cache and 200 different wildcard subscribers not repeating', function() {
 
     subscriberCount = 200;
     eventCount = 10;
@@ -228,7 +228,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 1 separate subscribers on 20 separate events', function() {
+  xcontext('with no cache and 1 separate subscribers on 20 separate events', function() {
 
     subscriberCount = 1;
     eventCount = 20;
@@ -237,7 +237,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 1 separate subscribers on 200 separate events', function() {
+  xcontext('with no cache and 1 separate subscribers on 200 separate events', function() {
 
     subscriberCount = 1;
     eventCount = 200;
@@ -246,7 +246,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 1 separate subscribers on 2000 separate events', function() {
+  xcontext('with no cache and 1 separate subscribers on 2000 separate events', function() {
 
     subscriberCount = 1;
     eventCount = 2000;
@@ -255,7 +255,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 20 separate subscribers on 20 separate events', function() {
+  xcontext('with no cache and 20 separate subscribers on 20 separate events', function() {
 
     subscriberCount = 20;
     eventCount = 20;
@@ -264,7 +264,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 200 separate subscribers on 200 separate events', function() {
+  xcontext('with no cache and 200 separate subscribers on 200 separate events', function() {
 
     subscriberCount = 200;
     eventCount = 200;
@@ -273,7 +273,7 @@ describe(name, function() {
 
   });
 
-  context('with no cache and 2000 separate subscribers on 2000 separate events', function() {
+  xcontext('with no cache and 2000 separate subscribers on 2000 separate events', function() {
 
     subscriberCount = 2000;
     eventCount = 2000;
@@ -283,5 +283,46 @@ describe(name, function() {
   });
 
   // require('benchmarket').stop();
+
+  context('discover', function() {
+
+    createServerAndSubscribers(1, 'info');
+
+    before('subscribe to events', function(done) {
+      var _this = this;
+      var client = this.subscribers[0];
+
+      // client.onAll(
+      //   function handler(data, meta) {
+      //     process.nextTick(function() {
+      //       debug('XXX -- END TEST -- received emit()');
+      //       _this.endTest();
+      //     });
+      //   },
+      //   function ok() {
+      //     done();
+      //   }
+      // );
+
+      client.on('*', function handler(data, meta) {
+      // client.on('/some/*', {event_type: 'set'}, function handler(data, meta) {
+        process.nextTick(function() {
+          debug('XXX -- END TEST -- received emit()');
+          _this.endTest();
+        });
+      }).then(function(){
+        done();
+      }).catch(done);
+    });
+
+    it('emits 1 event', function(done) {
+
+      debug('XXX -- START TEST -- calling set()');
+      this.endTest = done;
+      this.publisher.set('/some/path', {da: 'ta'});
+
+    });
+
+  });
 
 });
