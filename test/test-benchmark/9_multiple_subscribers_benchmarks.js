@@ -59,7 +59,7 @@ describe(name, function() {
     // eventCount - how man different events to send (event0, event1, event2)
     // emitCount - total events to send as the test
 
-    createServerAndSubscribers(subscriberCount);
+    createServerAndSubscribers(subscriberCount, 'warn');
 
     before('subscribe to events', function(done) {
       this.timeout(0);
@@ -304,8 +304,9 @@ describe(name, function() {
       //   }
       // );
 
-      client.on('*', function handler(data, meta) {
-      // client.on('/some/*', {event_type: 'set'}, function handler(data, meta) {
+      // client.on('*', function handler(data, meta) {
+      // client.on('/some/path', function handler(data, meta) {
+      client.on('/some/*', {event_type: 'set'}, function handler(data, meta) {
         process.nextTick(function() {
           debug('XXX -- END TEST -- received emit()');
           _this.endTest();
