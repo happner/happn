@@ -17,14 +17,14 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
       socketClient.disconnect(done)
     }
     else done();
-    
+
   });
 
   var socketClient;
   var default_timeout = 10000;
 
   /*
-    We are initializing 2 clients to test saving data against the database, one client will push data into the 
+    We are initializing 2 clients to test saving data against the database, one client will push data into the
     database whilst another listens for changes.
   */
   before('should initialize the client', function(callback) {
@@ -36,11 +36,13 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
             username:'_ADMIN',
             password:'happn',
             keyPair:{
-              publicKey:'AjN7wyfbEdI2LzWyFo6n31hvOrlYvkeHad9xGqOXTm1K', 
+              publicKey:'AjN7wyfbEdI2LzWyFo6n31hvOrlYvkeHad9xGqOXTm1K',
               privateKey:'y5RTfdnn21OvbQrnBMiKBP9DURduo0aijMIGyLJFuJQ='
             }
           }
         }, function(e, instance) {
+
+          console.log('created client:::', e, instance);
 
           if (e) return callback(e);
 
@@ -57,7 +59,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
   //  We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 
   it('the listener should pick up a single published event, eventemitter listening', function(callback) {
-    
+
     this.timeout(default_timeout);
 
     try{
@@ -91,7 +93,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
   });
 
   it('the listener should pick up a single published event, eventemitter publishing', function(callback) {
-    
+
     this.timeout(default_timeout);
 
     try{
@@ -126,14 +128,14 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
   });
 
   it('the publisher should set new data ', function(callback) {
-    
+
     this.timeout(default_timeout);
 
     try{
       var test_path_end = '1';
 
       socketClient.set('e2e_test1/testsubscribe/data/' + test_path_end, {property1:'property1',property2:'property2',property3:'property3'}, {noPublish:true}, function(e, result){
-      
+
         ////////////console.log('set happened');
         ////////////console.log([e, result]);
 
@@ -157,7 +159,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
   });
 
   it('should set data, and then merge a new document into the data without overwriting old fields', function(callback) {
-    
+
     this.timeout(default_timeout);
 
     try{
@@ -165,7 +167,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
       var test_path_end = '2';
 
       socketClient.set('e2e_test1/testsubscribe/data/merge/' + test_path_end, {property1:'property1',property2:'property2',property3:'property3'}, null, function(e, result){
-      
+
         if (e)
           return callback(e);
 
@@ -190,13 +192,13 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
 
             expect(results.property4).to.equal('property4');
             expect(results.property1).to.equal('property1');
-            
+
             callback();
 
-          });  
+          });
 
         });
-        
+
       });
 
     }catch(e){
@@ -219,10 +221,10 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
       field1:'field1'
     };
 
-    
+
     var criteria1 = {
-        $or: [ {"regions": { $in: ['North','South','East','West'] }}, 
-             {"towns": { $in: ['North.Cape Town', 'South.East London'] }}, 
+        $or: [ {"regions": { $in: ['North','South','East','West'] }},
+             {"towns": { $in: ['North.Cape Town', 'South.East London'] }},
              {"categories": { $in: ["Action","History" ] }}],
         "keywords": {$in: ["bass", "Penny Siopis" ]}}
 
@@ -231,7 +233,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
       limit:1}
 
     var criteria2 = null;
-        
+
     var options2 = {fields:null,
       sort:{"field1":1},
       limit:2}
@@ -282,10 +284,10 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
 
           ////////////////////console.log('DELETE RESULT');
           ////////////////////console.log(result);
-          
+
           callback();
         });
-          
+
       });
 
     }catch(e){
@@ -295,14 +297,14 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
   });
 
   it('the publisher should set new data then update the data', function(callback) {
-    
+
     this.timeout(default_timeout);
 
     try{
       var test_path_end = '4';
 
       socketClient.set('e2e_test1/testsubscribe/data/' + test_path_end, {property1:'property1',property2:'property2',property3:'property3'}, {noPublish:true}, function(e, insertResult){
-      
+
         expect(e).to.equal(null);
 
         socketClient.set('e2e_test1/testsubscribe/data/' + test_path_end, {property1:'property1',property2:'property2',property3:'property3', property4:'property4'}, {noPublish:true}, function(e, updateResult){
@@ -324,14 +326,14 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
   //We are testing setting data at a specific path
 
   it('the publisher should set new data ', function(callback) {
-    
+
     this.timeout(default_timeout);
 
     try{
       var test_path_end = '5';
 
       socketClient.set('e2e_test1/testsubscribe/data/' + test_path_end, {property1:'property1',property2:'property2',property3:'property3'}, null, function(e, result){
-      
+
         if (!e){
           socketClient.get('e2e_test1/testsubscribe/data/' + test_path_end, null, function(e, results){
             ////////////////////////console.log('new data results');
@@ -356,14 +358,14 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
 
 
   it('the publisher should set new data then update the data', function(callback) {
-    
+
     this.timeout(default_timeout);
 
     try{
       var test_path_end = '6';
 
       socketClient.set('e2e_test1/testsubscribe/data/' + test_path_end, {property1:'property1',property2:'property2',property3:'property3'}, null, function(e, insertResult){
-      
+
         expect(e == null).to.equal(true);
 
         socketClient.set('e2e_test1/testsubscribe/data/' + test_path_end, {property1:'property1',property2:'property2',property3:'property3', property4:'property4'}, null, function(e, updateResult){
@@ -386,12 +388,12 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
   //We are testing pushing a specific value to a path which will actually become an array in the database
 
   it('the publisher should push a sibling and get all siblings', function(callback) {
-    
+
     this.timeout(default_timeout);
 
     try{
 
-      var test_path_end = '7';  
+      var test_path_end = '7';
 
       socketClient.setSibling('e2e_test1/siblings/' + test_path_end, {property1:'sib_post_property1',property2:'sib_post_property2'}, function(e, results){
 
@@ -420,7 +422,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
 //  We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 
   it('the listener should pick up a single published event', function(callback) {
-    
+
     this.timeout(default_timeout);
 
     try{
@@ -462,9 +464,9 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
       expect(e == null).to.equal(true);
       socketClient.set('e2e_test1/testwildcard/' + test_path_end + '/1', {property1:'property1',property2:'property2',property3:'property3'}, null, function(e, insertResult){
         expect(e == null).to.equal(true);
-      
+
         socketClient.get('e2e_test1/testwildcard/' + test_path_end + '*', null, function(e, results){
-          
+
           expect(results.length == 2).to.equal(true);
 
           socketClient.getPaths('e2e_test1/testwildcard/' + test_path_end + '*', function(e, results){
@@ -479,7 +481,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
   });
 
   it('the listener should pick up a single delete event', function(callback) {
-    
+
     this.timeout(default_timeout);
 
     try{
@@ -496,7 +498,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
             //////////////////console.log(message);
 
             //we are looking at the event internals on the listener to ensure our event management is working - because we are only listening for 1
-            //instance of this event - the event listener should have been removed 
+            //instance of this event - the event listener should have been removed
             ////console.log('socketClient.events');
             ////console.log(socketClient.events);
             expect(socketClient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me'].length).to.equal(0);
@@ -524,11 +526,11 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
               //We perform the actual delete
               socketClient.remove('/e2e_test1/testsubscribe/data/delete_me', null, function(e, result){
 
-                
+
                   //////////////////console.log('REMOVE HAPPENED!!!');
                   //////////////////console.log(e);
                   //////////////////console.log(result);
-                
+
 
                 ////////////////////////////console.log('put happened - listening for result');
               });
@@ -537,7 +539,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
           });
         });
 
-      
+
 
     }catch(e){
       callback(e);
@@ -557,7 +559,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
         if (e)
           return callback(new Error(e));
 
-        socketClient.on('/e2e_test1/testsubscribe/data/on_off_test', {event_type:'set', count:0}, 
+        socketClient.on('/e2e_test1/testsubscribe/data/on_off_test', {event_type:'set', count:0},
         function(message){
 
           ////console.log('ON RAN');
@@ -572,7 +574,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
 
           });
 
-        }, 
+        },
         function(e, listenerId){
           if (e) return callback(new Error(e));
 
@@ -586,7 +588,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
           });
 
         });
-        
+
       });
 
     }, function(e, listenerId){
@@ -606,10 +608,10 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
     var caught = {};
 
     this.timeout(10000);
-    
+
     socketClient.onAll(function(eventData, meta){
 
-      if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
+      if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' ||
               meta.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
           caughtCount++;
 
@@ -619,11 +621,11 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
     }, function(e){
 
       if (e) return callback(e);
-      
+
       socketClient.set('/e2e_test1/testsubscribe/data/catch_all', {property1:'property1',property2:'property2',property3:'property3'}, null, function(e, put_result){
 
         //console.log('put_result', put_result);
-      
+
         socketClient.remove('/e2e_test1/testsubscribe/data/catch_all', null, function(e, del_result){
           //console.log('del_result', del_result);
         });
@@ -647,12 +649,12 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
     }, function(e){
 
       if (e) return callback(e);
-      
-      socketClient.on('/e2e_test1/testsubscribe/data/off_all_test', {event_type:'set', count:0}, 
+
+      socketClient.on('/e2e_test1/testsubscribe/data/off_all_test', {event_type:'set', count:0},
         function(message){
           onHappened = true;
           callback(new Error('this wasnt meant to happen'));
-        }, 
+        },
         function(e){
           if (e) return callback(e);
 
