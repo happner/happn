@@ -306,7 +306,8 @@ describe(name, function() {
 
       // client.on('*', function handler(data, meta) {
       // client.on('/some/path', function handler(data, meta) {
-      client.on('/some/*', {event_type: 'set'}, function handler(data, meta) {
+      client.on('/some/*', function handler(data, meta) {
+      // client.on('/some/*', {event_type: 'set'}, function handler(data, meta) {
         process.nextTick(function() {
           debug('XXX -- END TEST -- received emit()');
           _this.endTest();
