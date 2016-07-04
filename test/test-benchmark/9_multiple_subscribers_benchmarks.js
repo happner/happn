@@ -52,14 +52,14 @@ describe(name, function() {
     });
   }
 
-  function testMultipleSameWildcardSubscribers(subscriberCount, eventCount, emitCount) {
+  function testMultipleSameWildcardSubscribers(subscriberCount, eventCount, emitCount, loglevel) {
 
-    // subscriberCount - how many subscribers to to include in test
+    // subscriberCount - how many subscribers to include in test
     //                   all subscribing to the same wildcard path
     // eventCount - how man different events to send (event0, event1, event2)
     // emitCount - total events to send as the test
 
-    createServerAndSubscribers(subscriberCount, 'warn');
+    createServerAndSubscribers(subscriberCount, loglevel);
 
     before('subscribe to events', function(done) {
       this.timeout(0);
@@ -94,39 +94,76 @@ describe(name, function() {
   }
 
 
-  function testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount) {
+  function testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount, loglevel) {
 
-    // subscriberCount - how many subscribers to to include in test
+    // subscriberCount - how many subscribers to include in test
     //                   all subscribing to different wildcard paths
     // eventCount - how man different events to send (event0, event1, event2)
     // emitCount - total events to send as the test where the emitted paths repeat
 
-    createServerAndSubscribers(subscriberCount);
+    createServerAndSubscribers(subscriberCount, loglevel);
+
+    before('subscribe to events', function(done) {
+      this.timeout(0);
+      var _this = this;
+      var events = 0;
+      var endAt = emitCount;
+      Promise.resolve(new Array( eventCount )).map(function(__, i) {
+        var path = '/some/path/' + i + '/*';
+        var client = _this.subscribers[i % subscriberCount];
+        return client.on(path, function handler(data, meta) {
+          events++;
+          // console.log('handling ' + meta.path + ', seq:' + events);
+          if (events === endAt) {
+            process.nextTick(function() {
+              debug('XXX -- END TEST -- received emit()');
+              _this.happnServer.log.info('XXX -- END TEST -- received emit()');
+              _this.endTest();
+              delete _this.endTest;
+            });
+          }
+        });
+      }).then(function() {
+        done();
+      }).catch(done);
+    });
+
+
+    it('emits ' + emitCount + ' events', function(done) {
+      this.timeout(0);
+      debug('XXX -- START TEST -- calling set()');
+      this.happnServer.log.info('XXX -- START TEST -- calling set()');
+      this.endTest = done;
+      for (var i = 0; i < emitCount; i++) {            // repeating...
+        var path = '/some/path/' + (i % eventCount) + '/x';
+        this.publisher.set(path, {da: 'ta'});
+      }
+    });
 
   }
 
-  function testMultipleDifferentWildcardSubscribersNotRepeating(subscriberCount, eventCount, emitCount) {
+  function testMultipleDifferentWildcardSubscribersNotRepeating(subscriberCount, eventCount, emitCount, loglevel) {
 
-    // subscriberCount - how many subscribers to to include in test
+    // subscriberCount - how many subscribers to include in test
     //                   all subscribing to different wildcard paths
     // eventCount - how man different events to send (event0, event1, event2)
     // emitCount - total events to send as the test where the emitted paths do not repeat
 
-    createServerAndSubscribers(subscriberCount);
+    createServerAndSubscribers(subscriberCount, loglevel);
 
   }
 
 
 
-  function testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount) {
+  function testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount, loglevel) {
 
     // many separate subscriptions on different paths
     // emit to only one of them
 
-    // subscriberCount - how many subscribers to to include in test
+    // subscriberCount - how many subscribers to include in test
     // eventCount - how many different events to subscribe to
 
-    createServerAndSubscribers(subscriberCount);
+    createServerAndSubscribers(subscriberCount, loglevel);
 
     before('subscribe to events', function(done) {
       this.timeout(0);
@@ -157,7 +194,6 @@ describe(name, function() {
       this.timeout(0);
       debug('XXX -- START TEST -- calling set()');
       this.happnServer.log.info('XXX -- START TEST -- calling set()');
-      this.timeout(subscriberCount * emitCount / 10);
       this.endTest = done;
       this.publisher.set('/some/path/0', {da: 'ta'});
       // this.publisher.set('/some/path/0', {da: 'ta'}, {noStore: true});
@@ -173,8 +209,9 @@ describe(name, function() {
     subscriberCount = 20;
     eventCount = 10;
     emitCount = 1000;
+    loglevel = 'warn';
 
-    testMultipleSameWildcardSubscribers(subscriberCount, eventCount, emitCount);
+    testMultipleSameWildcardSubscribers(subscriberCount, eventCount, emitCount, loglevel);
 
   });
 
@@ -183,18 +220,20 @@ describe(name, function() {
     subscriberCount = 200;
     eventCount = 10;
     emitCount = 1000;
+    loglevel = 'warn';
 
-    testMultipleSameWildcardSubscribers(subscriberCount, eventCount, emitCount);
+    testMultipleSameWildcardSubscribers(subscriberCount, eventCount, emitCount, loglevel);
 
   });
 
-  xcontext('with no cache and 20 different wildcard subscribers repeating', function() {
+  context('with no cache and 20 different wildcard subscribers repeating', function() {
 
     subscriberCount = 20;
     eventCount = 10;
     emitCount = 1000;
+    loglevel = 'warn';
 
-    testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount);
+    testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount, loglevel);
 
   });
 
@@ -203,8 +242,9 @@ describe(name, function() {
     subscriberCount = 200;
     eventCount = 10;
     emitCount = 1000;
+    loglevel = 'warn';
 
-    testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount);
+    testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount, loglevel);
 
   });
 
@@ -213,8 +253,9 @@ describe(name, function() {
     subscriberCount = 20;
     eventCount = 10;
     emitCount = 1000;
+    loglevel = 'warn';
 
-    testMultipleDifferentWildcardSubscribersNotRepeating(subscriberCount, eventCount, emitCount);
+    testMultipleDifferentWildcardSubscribersNotRepeating(subscriberCount, eventCount, emitCount, loglevel);
 
   });
 
@@ -223,8 +264,9 @@ describe(name, function() {
     subscriberCount = 200;
     eventCount = 10;
     emitCount = 1000;
+    loglevel = 'warn';
 
-    testMultipleDifferentWildcardSubscribersNotRepeating(subscriberCount, eventCount, emitCount);
+    testMultipleDifferentWildcardSubscribersNotRepeating(subscriberCount, eventCount, emitCount, loglevel);
 
   });
 
@@ -232,8 +274,9 @@ describe(name, function() {
 
     subscriberCount = 1;
     eventCount = 20;
+    loglevel = 'warn';
 
-    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount, loglevel);
 
   });
 
@@ -241,8 +284,9 @@ describe(name, function() {
 
     subscriberCount = 1;
     eventCount = 200;
+    loglevel = 'warn';
 
-    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount, loglevel);
 
   });
 
@@ -250,8 +294,9 @@ describe(name, function() {
 
     subscriberCount = 1;
     eventCount = 2000;
+    loglevel = 'warn';
 
-    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount, loglevel);
 
   });
 
@@ -259,8 +304,9 @@ describe(name, function() {
 
     subscriberCount = 20;
     eventCount = 20;
+    loglevel = 'warn';
 
-    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount, loglevel);
 
   });
 
@@ -268,8 +314,9 @@ describe(name, function() {
 
     subscriberCount = 200;
     eventCount = 200;
+    loglevel = 'warn';
 
-    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount, loglevel);
 
   });
 
@@ -277,8 +324,9 @@ describe(name, function() {
 
     subscriberCount = 2000;
     eventCount = 2000;
+    loglevel = 'warn';
 
-    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount);
+    testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount, loglevel);
 
   });
 
