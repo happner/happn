@@ -207,7 +207,7 @@ describe(name, function() {
   // require('benchmarket').start();
   // after(require('benchmarket').store());
 
-  xcontext('with no cache and 20 same wildcard subscribers', function() {
+  context('with no cache and 20 same wildcard subscribers', function() {
 
     subscriberCount = 20;
     eventCount = 10;
@@ -218,7 +218,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 200 same wildcard subscribers', function() {
+  context('with no cache and 200 same wildcard subscribers', function() {
 
     subscriberCount = 200;
     eventCount = 10;
@@ -233,8 +233,8 @@ describe(name, function() {
 
     subscriberCount = 20;
     eventCount = 10;
-    emitCount = 1000;
-    loglevel = 'info';
+    emitCount = 10000;
+    loglevel = 'warn';
     wildcardCache = {};
 
     testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount, loglevel, wildcardCache);
@@ -245,11 +245,11 @@ describe(name, function() {
 
     subscriberCount = 20;
     eventCount = 10;
-    emitCount = 1000;
-    loglevel = 'info';
+    emitCount = 10000;
+    loglevel = 'warn';
     wildcardCache = {
       config: {
-        max: 100
+        max: 1000
       }
     };
 
