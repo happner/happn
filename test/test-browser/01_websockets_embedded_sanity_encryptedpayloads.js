@@ -42,8 +42,6 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function() {
           }
         }, function(e, instance) {
 
-          console.log('created client:::', e, instance);
-
           if (e) return callback(e);
 
           socketClient = instance;

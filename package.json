@@ -32,7 +32,7 @@
     "deep-copy": "1.1.2",
     "happn-logger": "0.0.2",
     "happn-nedb": "1.8.1",
-    "happn-util-crypto": "0.0.6",
+    "happn-util-crypto": "0.1.0",
     "jwt-simple": "0.2.0",
     "lru-cache": "4.0.0",
     "node-uuid": "1.4.7",
