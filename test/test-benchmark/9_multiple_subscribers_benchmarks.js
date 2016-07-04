@@ -11,7 +11,7 @@ var debug = require('debug')('TEST');
 
 describe(name, function() {
 
-  function createServerAndSubscribers(subscriberCount, loglevel) {
+  function createServerAndSubscribers(subscriberCount, loglevel, wildcardCache) {
 
     before('start happn server', function(done) {
       this.timeout(0);
@@ -19,6 +19,9 @@ describe(name, function() {
       service.create({
         utils: {
           logLevel: loglevel || 'warn'
+        },
+        services: {
+          wildcardCache: wildcardCache
         }
       }).then(function(server) {
         _this.happnServer = server;
@@ -94,14 +97,14 @@ describe(name, function() {
   }
 
 
-  function testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount, loglevel) {
+  function testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount, loglevel, wildcardCache) {
 
     // subscriberCount - how many subscribers to include in test
     //                   all subscribing to different wildcard paths
     // eventCount - how man different events to send (event0, event1, event2)
     // emitCount - total events to send as the test where the emitted paths repeat
 
-    createServerAndSubscribers(subscriberCount, loglevel);
+    createServerAndSubscribers(subscriberCount, loglevel, wildcardCache);
 
     before('subscribe to events', function(done) {
       this.timeout(0);
@@ -231,9 +234,26 @@ describe(name, function() {
     subscriberCount = 20;
     eventCount = 10;
     emitCount = 1000;
-    loglevel = 'warn';
+    loglevel = 'info';
+    wildcardCache = {};
 
-    testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount, loglevel);
+    testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount, loglevel, wildcardCache);
+
+  });
+
+  context('with cache and 20 different wildcard subscribers repeating', function() {
+
+    subscriberCount = 20;
+    eventCount = 10;
+    emitCount = 1000;
+    loglevel = 'info';
+    wildcardCache = {
+      config: {
+        max: 100
+      }
+    };
+
+    testMultipleDifferentWildcardSubscribersRepeating(subscriberCount, eventCount, emitCount, loglevel, wildcardCache);
 
   });
 
