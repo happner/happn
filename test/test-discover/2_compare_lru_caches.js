@@ -1,7 +1,7 @@
 var path = require('path');
 var name = path.basename(__filename);
 var LRU = require('lru-cache');
-var MKC = require('mkc');
+// var MKC = require('mkc');
 var expect = require('expect.js');
 
 var customLRUCache = function(max) {
@@ -59,7 +59,8 @@ describe(name, function() {
   });
 
 
-  context('multiple keys with multikey-cache', function() {
+  xcontext('multiple keys with multikey-cache', function() {
+    // slower than lru-cache (not using it)
 
     before('create cache', function() {
       this.cache = new MKC({max: 100});
@@ -83,6 +84,7 @@ describe(name, function() {
 
 
   context('multiple keys with customLRUCache', function() {
+    // slower than lru-cache (not using it)
 
     before('create cache', function() {
       this.cache = customLRUCache(100);
