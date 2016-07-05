@@ -223,3 +223,9 @@
 ----------------
 
 - fixed test b3
+
+2.8.0 2016-06-29
+----------------
+
+- crypto library only loaded on browser when payload encryption set on server
+- fixed browser tests, double checked encrypted payloads work on the browser
