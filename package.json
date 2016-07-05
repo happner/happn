@@ -51,6 +51,7 @@
     "benchmarket": "0.0.11",
     "chai": "^3.5.0",
     "coveralls": "^2.11.6",
+    "debug": "^2.2.0",
     "expect.js": "*",
     "gulp": "^3.9.1",
     "happn-random-activity-generator": "^0.2.0",
