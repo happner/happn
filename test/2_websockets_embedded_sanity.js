@@ -866,7 +866,7 @@ describe('2_websockets_embedded_sanity', function() {
 
       //we detach all listeners from the path here
       ////console.log('ABOUT OFF PATH');
-      listenerclient.off('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', function (e) {
+      listenerclient.offPath('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', function (e) {
 
         if (e)
           return callback(new Error(e));

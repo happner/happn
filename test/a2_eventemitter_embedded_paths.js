@@ -933,7 +933,7 @@ describe('a2_eventemitter_embedded_paths', function () {
 
       //we detach all listeners from the path here
       ////console.log('ABOUT OFF PATH');
-      listenerclient.off('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/on_off_test', function (e) {
+      listenerclient.offPath('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/on_off_test', function (e) {
 
         if (e)
           return callback(new Error(e));
