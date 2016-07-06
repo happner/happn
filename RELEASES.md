@@ -229,3 +229,12 @@
 
 - crypto library only loaded on browser when payload encryption set on server
 - fixed browser tests, double checked encrypted payloads work on the browser
+
+
+2.9.0 2016-07-06
+----------------
+
+- offPath, off and offAll updated, added deprecation warning on off with path
+- _meta is now non iterable via defineProperty
+- fixed issue with off when an invalid or old subscription handle is passed in
+- updated docs

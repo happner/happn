@@ -13,20 +13,25 @@ A paid for alternative to happn would be [firebase](https://www.firebase.com)
 
 Technologies used:
 Happn uses [Primus](https://github.com/primus/primus) to power websockets for its pub/sub framework and mongo or nedb depending on the mode it is running in as its data store, the API uses [connect](https://github.com/senchalabs/connect).
+[nedb](https://github.com/louischatriot/nedb) as the embedded database, although we have forked it happn's purposes [here](https://github.com/happner/happn-nedb)
 
 Getting started
 ---------------------------
 
+```bash
+npm install happn
+```
+
 You need NodeJS and NPM of course, you also need to know how node works (as my setup instructions are pretty minimal)
+To run the tests, clone the repo, npm install then npm test: 
 
-You need to install mocha to run the tests, ie: sudo npm install mocha -g --save
-
-then run "npm install happn"
-
-You could just clone this repository, then run "npm install" and then run "mocha test" to see how things work, there are over 180 tests there that execute against happn service running in embedded mode.
+```bash
+git clone https://github.com/happner/happn.git
+npm install
+npm test
+```
 
 But if you want to run your own service do the following:
-
 Create a directory you want to run your happn in, create a node application in it - with some kind of main.js and a package.json
 
 *In node_modules/happn/test in your folder, the e2e_test.js script demonstrates the server and client interactions shown in the following code snippets*
@@ -298,6 +303,71 @@ listenerclient.on('/e2e_test1/testsubscribe/data/values_emitted_test/*',
 
 ```
 
+UNSUBSCRIBING FROM EVENTS
+----------------------------
+
+//use the .off method to unsubscribe from a specific event (the handle is returned by the .on callback) or the .offPath method to unsubscribe from all listeners on a path:
+
+```javascript
+
+ var currentListenerId;
+    var onRan = false;
+    var pathOnRan = false;
+
+    listenerclient.on('/e2e_test1/testsubscribe/data/on_off_test', {event_type: 'set', count: 0}, function (message) {
+
+      if (pathOnRan) return callback(new Error('subscription was not removed by path'));
+      else pathOnRan = true;
+
+      //NB - unsubscribing by path
+      listenerclient.offPath('/e2e_test1/testsubscribe/data/on_off_test', function (e) {
+
+        if (e)
+          return callback(new Error(e));
+
+        listenerclient.on('/e2e_test1/testsubscribe/data/on_off_test', {event_type: 'set', count: 0},
+          function (message) {
+            if (onRan) return callback(new Error('subscription was not removed'));
+            else {
+              onRan = true;
+              //NB - unsubscribing by listener handle
+              listenerclient.off(currentListenerId, function (e) {
+                if (e)
+                  return callback(new Error(e));
+
+                publisherclient.set('/e2e_test1/testsubscribe/data/on_off_test', {"test":"data"}, function (e, setresult) {
+                  if (e) return callback(new Error(e));
+                  setTimeout(callback, 2000);
+                });
+              });
+            }
+          },
+          function (e, listenerId) {
+          
+            //NB - listener id is passed in on the .on callback
+          
+            if (e) return callback(new Error(e));
+
+            currentListenerId = listenerId;
+
+            publisherclient.set('/e2e_test1/testsubscribe/data/on_off_test', {"test":"data"}, function (e, setresult) {
+              if (e) return callback(new Error(e));
+            });
+          });
+      });
+
+    }, function (e, listenerId) {
+      if (e) return callback(new Error(e));
+
+      currentListenerId = listenerId;
+
+      publisherclient.set('/e2e_test1/testsubscribe/data/on_off_test', {"test":"data"}, function (e) {
+        if (e) return callback(new Error(e));
+      });
+
+    });
+
+```
 
 TAGGING
 ----------------------------
