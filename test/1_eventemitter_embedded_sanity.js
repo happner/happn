@@ -945,7 +945,7 @@ describe('1_eventemitter_embedded_sanity', function() {
 
       //we detach all listeners from the path here
       ////console.log('ABOUT OFF PATH');
-      listenerclient.off('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', function(e) {
+      listenerclient.offPath('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', function(e) {
 
         if (e)
           return callback(new Error(e));
@@ -1105,7 +1105,7 @@ describe('1_eventemitter_embedded_sanity', function() {
       expect(e).to.not.be.ok();
 
       timeout = setTimeout(function() {
-        listenerclient.off('/1_eventemitter_embedded_sanity/' + test_id + '/testNoPublish', function() {
+        listenerclient.offPath('/1_eventemitter_embedded_sanity/' + test_id + '/testNoPublish', function() {
           done();
         })
       }, 1000);
