@@ -1,4 +1,3 @@
-
 // ?? https://github.com/happner/happner/issues/115
 
 var path = require('path');
@@ -9,24 +8,24 @@ var client = happn.client;
 var Promise = require('bluebird');
 var debug = require('debug')('TEST');
 
-describe(name, function() {
+describe(name, function () {
 
   function createServerAndSubscribers(subscriberCount, loglevel) {
 
-    before('start happn server', function(done) {
+    before('start happn server', function (done) {
       this.timeout(0);
       var _this = this;
       service.create({
         utils: {
           logLevel: loglevel || 'warn'
         }
-      }).then(function(server) {
+      }).then(function (server) {
         _this.happnServer = server;
         done();
       }).catch(done);
     });
 
-    after('stop happn server', function(done) {
+    after('stop happn server', function (done) {
       this.timeout(0);
       if (this.happnServer) {
         return this.happnServer.stop(done);
@@ -34,17 +33,17 @@ describe(name, function() {
       done();
     });
 
-    before('start subscribers', function(done) {
+    before('start subscribers', function (done) {
       this.timeout(0);
       var _this = this;
-      Promise.resolve(new Array(   subscriberCount   )).map(
-        function() {
+      Promise.resolve(new Array(subscriberCount)).map(
+        function () {
           return client.create({
             plugin: happn.client_plugins.intra_process,
             context: _this.happnServer
           })
         }
-      ).then(function(subscribersArray) {
+      ).then(function (subscribersArray) {
         _this.subscribers = subscribersArray;
         _this.publisher = subscribersArray[0]; // first subscriber also publisher
         done();
@@ -61,12 +60,12 @@ describe(name, function() {
 
     createServerAndSubscribers(subscriberCount, 'warn');
 
-    before('subscribe to events', function(done) {
+    before('subscribe to events', function (done) {
       this.timeout(0);
       var events = 0;
       var endAt = subscriberCount * emitCount;
       var _this = this;
-      Promise.resolve(this.subscribers).map(function(client) {
+      Promise.resolve(this.subscribers).map(function (client) {
         return client.on('/some/path/*', function handler(data, meta) {
           events++;
           // console.log('handling ' + meta.path + ', seq:' + events);
@@ -75,15 +74,15 @@ describe(name, function() {
             delete _this.endTest;
           }
         });
-      }).then(function() {
+      }).then(function () {
         done();
       }).catch(done);
     });
 
-    it('emits ' + emitCount + ' events', function(done) {
+    it('emits ' + emitCount + ' events', function (done) {
       this.timeout(0);
       this.endTest = done;
-      for(var i = 0; i < emitCount; i++) {
+      for (var i = 0; i < emitCount; i++) {
         // if any events go missing (not emitted to subscribers this
         // test go on forever because it only emits just enough events
         // to satisfy the required total (endAt) where/when endTest() is run
@@ -117,7 +116,6 @@ describe(name, function() {
   }
 
 
-
   function testMultipleSeparateSubscribersOneEmit(subscriberCount, eventCount) {
 
     // many separate subscriptions on different paths
@@ -128,19 +126,19 @@ describe(name, function() {
 
     createServerAndSubscribers(subscriberCount);
 
-    before('subscribe to events', function(done) {
+    before('subscribe to events', function (done) {
       this.timeout(0);
       var events = 0;
       var endAt = 1;
       var _this = this;
-      Promise.resolve(new Array( eventCount )).map(function(__, i) {
+      Promise.resolve(new Array(eventCount)).map(function (__, i) {
         var path = '/some/path/' + i;
         var client = _this.subscribers[i % subscriberCount];
         return client.on(path, function handler(data, meta) {
           events++;
           // console.log('handling ' + meta.path + ', seq:' + events);
           if (events === endAt) { // only end test after last handler runs
-            process.nextTick(function() {
+            process.nextTick(function () {
               debug('XXX -- END TEST -- received emit()');
               _this.happnServer.log.info('XXX -- END TEST -- received emit()');
               _this.endTest();
@@ -148,12 +146,12 @@ describe(name, function() {
             });
           }
         });
-      }).then(function() {
+      }).then(function () {
         done();
       }).catch(done);
     });
 
-    it('emits ' + 1 + ' event', function(done) {
+    it('emits ' + 1 + ' event', function (done) {
       this.timeout(0);
       debug('XXX -- START TEST -- calling set()');
       this.happnServer.log.info('XXX -- START TEST -- calling set()');
@@ -168,7 +166,7 @@ describe(name, function() {
   // require('benchmarket').start();
   // after(require('benchmarket').store());
 
-  xcontext('with no cache and 20 same wildcard subscribers', function() {
+  xcontext('with no cache and 20 same wildcard subscribers', function () {
 
     subscriberCount = 20;
     eventCount = 10;
@@ -178,7 +176,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 200 same wildcard subscribers', function() {
+  xcontext('with no cache and 200 same wildcard subscribers', function () {
 
     subscriberCount = 200;
     eventCount = 10;
@@ -188,7 +186,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 20 different wildcard subscribers repeating', function() {
+  xcontext('with no cache and 20 different wildcard subscribers repeating', function () {
 
     subscriberCount = 20;
     eventCount = 10;
@@ -198,7 +196,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 200 different wildcard subscribers repeating', function() {
+  xcontext('with no cache and 200 different wildcard subscribers repeating', function () {
 
     subscriberCount = 200;
     eventCount = 10;
@@ -208,7 +206,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 20 different wildcard subscribers not repeating', function() {
+  xcontext('with no cache and 20 different wildcard subscribers not repeating', function () {
 
     subscriberCount = 20;
     eventCount = 10;
@@ -218,7 +216,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 200 different wildcard subscribers not repeating', function() {
+  xcontext('with no cache and 200 different wildcard subscribers not repeating', function () {
 
     subscriberCount = 200;
     eventCount = 10;
@@ -228,7 +226,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 1 separate subscribers on 20 separate events', function() {
+  xcontext('with no cache and 1 separate subscribers on 20 separate events', function () {
 
     subscriberCount = 1;
     eventCount = 20;
@@ -237,7 +235,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 1 separate subscribers on 200 separate events', function() {
+  xcontext('with no cache and 1 separate subscribers on 200 separate events', function () {
 
     subscriberCount = 1;
     eventCount = 200;
@@ -246,7 +244,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 1 separate subscribers on 2000 separate events', function() {
+  xcontext('with no cache and 1 separate subscribers on 2000 separate events', function () {
 
     subscriberCount = 1;
     eventCount = 2000;
@@ -255,7 +253,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 20 separate subscribers on 20 separate events', function() {
+  xcontext('with no cache and 20 separate subscribers on 20 separate events', function () {
 
     subscriberCount = 20;
     eventCount = 20;
@@ -264,7 +262,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 200 separate subscribers on 200 separate events', function() {
+  xcontext('with no cache and 200 separate subscribers on 200 separate events', function () {
 
     subscriberCount = 200;
     eventCount = 200;
@@ -273,7 +271,7 @@ describe(name, function() {
 
   });
 
-  xcontext('with no cache and 2000 separate subscribers on 2000 separate events', function() {
+  xcontext('with no cache and 2000 separate subscribers on 2000 separate events', function () {
 
     subscriberCount = 2000;
     eventCount = 2000;
@@ -284,11 +282,11 @@ describe(name, function() {
 
   // require('benchmarket').stop();
 
-  context('discover', function() {
+  context('discover', function () {
 
     createServerAndSubscribers(1, 'info');
 
-    before('subscribe to events', function(done) {
+    before('subscribe to events', function (done) {
       var _this = this;
       var client = this.subscribers[0];
 
@@ -307,17 +305,17 @@ describe(name, function() {
       // client.on('*', function handler(data, meta) {
       // client.on('/some/path', function handler(data, meta) {
       client.on('/some/*', function handler(data, meta) {
-      // client.on('/some/*', {event_type: 'set'}, function handler(data, meta) {
-        process.nextTick(function() {
+        // client.on('/some/*', {event_type: 'set'}, function handler(data, meta) {
+        process.nextTick(function () {
           debug('XXX -- END TEST -- received emit()');
           _this.endTest();
         });
-      }).then(function(){
+      }).then(function () {
         done();
       }).catch(done);
     });
 
-    it('emits 1 event', function(done) {
+    it('emits 1 event', function (done) {
 
       debug('XXX -- START TEST -- calling set()');
       this.endTest = done;

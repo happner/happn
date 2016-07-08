@@ -1,4 +1,4 @@
-describe('c4_session_events', function() {
+describe('c4_session_events', function () {
 
   require('benchmarket').start();
   after(require('benchmarket').store());
@@ -9,38 +9,38 @@ describe('c4_session_events', function() {
   var happn_client = happn.client;
   var async = require('async');
 
-  var sessionEventsTest = function(serviceConfig, callback){
+  var sessionEventsTest = function (serviceConfig, callback) {
 
     var eventsFired = {
-      "authentic-eventemitter":false,
-      "disconnect-eventemitter":false,
-      "authentic-socket":false,
-      "disconnect-socket":false
+      "authentic-eventemitter": false,
+      "disconnect-eventemitter": false,
+      "authentic-socket": false,
+      "disconnect-socket": false
     }
 
     var serviceInstance;
     var stopped = false;
 
-    var checkAllEventsFired = function(cb){
+    var checkAllEventsFired = function (cb) {
 
       for (var eventName in eventsFired)
         if (!eventsFired[eventName]) return;
 
-      if (!stopped){
+      if (!stopped) {
         stopped = true;
-        serviceInstance.stop({reconnect:false}, callback);
+        serviceInstance.stop({reconnect: false}, callback);
       }
 
     }
 
     service.create(serviceConfig,
-      function(e, happnInst){
+      function (e, happnInst) {
         if (e)
           return callback(e);
 
         serviceInstance = happnInst;
 
-        happnInst.services.pubsub.on('authentic', function(data){
+        happnInst.services.pubsub.on('authentic', function (data) {
 
           if (data.info._local)
             eventsFired['authentic-eventemitter'] = true;
@@ -51,7 +51,7 @@ describe('c4_session_events', function() {
 
         });
 
-        happnInst.services.pubsub.on('disconnect', function(data){
+        happnInst.services.pubsub.on('disconnect', function (data) {
 
           if (data.info._local)
             eventsFired['disconnect-eventemitter'] = true;
@@ -66,53 +66,53 @@ describe('c4_session_events', function() {
         var eventEmitterClient;
 
         happn_client.create({
-          config:{
-            username:'_ADMIN',
-            password:'happn'
+          config: {
+            username: '_ADMIN',
+            password: 'happn'
           }
-        },function(e, instance) {
+        }, function (e, instance) {
 
           if (e) return callback(e);
 
           socketClient = instance;
 
           happn.client.create({
-            config:{
-              username:'_ADMIN',
-              password:'happn'
-            },
-            plugin: happn.client_plugins.intra_process,
-            context: happnInst,
-            secure:true
-          })
+              config: {
+                username: '_ADMIN',
+                password: 'happn'
+              },
+              plugin: happn.client_plugins.intra_process,
+              context: happnInst,
+              secure: true
+            })
 
-          .then(function(clientInstance){
-            eventEmitterClient = clientInstance;
+            .then(function (clientInstance) {
+              eventEmitterClient = clientInstance;
 
-            socketClient.disconnect();
-            eventEmitterClient.disconnect();
+              socketClient.disconnect();
+              eventEmitterClient.disconnect();
 
-          })
+            })
 
-          .catch(function(e){
-            callback(e);
-          });
+            .catch(function (e) {
+              callback(e);
+            });
 
         });
 
-    });
+      });
 
   }
 
-  it('tests session events on an unsecured mesh', function(callback) {
+  it('tests session events on an unsecured mesh', function (callback) {
 
     sessionEventsTest({}, callback);
 
   });
 
-  it('tests session events on a secure mesh', function(callback) {
+  it('tests session events on a secure mesh', function (callback) {
 
-     sessionEventsTest({secure:true},callback);
+    sessionEventsTest({secure: true}, callback);
 
   });
 

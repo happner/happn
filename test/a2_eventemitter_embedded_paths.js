@@ -65,7 +65,7 @@ describe('a2_eventemitter_embedded_paths', function () {
     }
   });
 
-  after(function(done) {
+  after(function (done) {
     happnInstance.stop(done);
   });
 
@@ -73,7 +73,7 @@ describe('a2_eventemitter_embedded_paths', function () {
   var publisherclient;
   var listenerclient;
 
-   /*
+  /*
    We are initializing 2 clients to test saving data against the database, one client will push data into the
    database whilst another listens for changes.
    */
@@ -110,15 +110,17 @@ describe('a2_eventemitter_embedded_paths', function () {
   });
 
 
-
-   it('the listener should pick up a single wildcard event', function (callback) {
+  it('the listener should pick up a single wildcard event', function (callback) {
 
     this.timeout(default_timeout);
 
     try {
 
       //first listen for the change
-      listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/event/*', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/event/*', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/event/*'].length).to.be(0);
         callback();
@@ -172,7 +174,6 @@ describe('a2_eventemitter_embedded_paths', function () {
           publisherclient.get('a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
 
             if (e) return callback(e);
-
 
 
             // expect(results.payload.length == 1).to.be(true);
@@ -236,20 +237,20 @@ describe('a2_eventemitter_embedded_paths', function () {
     try {
 
       async.times(timesCount,
-      function(n, timesCallback){
+        function (n, timesCallback) {
 
-        var test_random_path2 = require('shortid').generate();
+          var test_random_path2 = require('shortid').generate();
 
-        publisherclient.set(testBasePath + '/' + test_random_path2, {
-          property1: 'property1',
-          property2: 'property2',
-          property3: 'property3'
-        }, {noPublish: true}, timesCallback);
+          publisherclient.set(testBasePath + '/' + test_random_path2, {
+            property1: 'property1',
+            property2: 'property2',
+            property3: 'property3'
+          }, {noPublish: true}, timesCallback);
 
-      },
-      function(e){
+        },
+        function (e) {
 
-        if (e) return callback(e);
+          if (e) return callback(e);
 
           listenerclient.get(testBasePath + '/' + '*', null, function (e, results) {
 
@@ -257,18 +258,18 @@ describe('a2_eventemitter_embedded_paths', function () {
 
             expect(results.length).to.be(timesCount);
 
-            results.every(function(result){
+            results.every(function (result) {
 
               /*
-              RESULT SHOULD LOOK LIKE THIS
-              { property1: 'property1',
-                property2: 'property2',
-                property3: 'property3',
-                _meta:
-                 { modified: 1443606046766,
-                   created: 1443606046766,
-                   path: '/a2_eventemitter_embedded_paths/1443606046555_VkyH6cE1l/set_multiple/E17kSpqE1l' } }
-              */
+               RESULT SHOULD LOOK LIKE THIS
+               { property1: 'property1',
+               property2: 'property2',
+               property3: 'property3',
+               _meta:
+               { modified: 1443606046766,
+               created: 1443606046766,
+               path: '/a2_eventemitter_embedded_paths/1443606046555_VkyH6cE1l/set_multiple/E17kSpqE1l' } }
+               */
 
               expect(result._meta.path.indexOf(testBasePath) == 0).to.be(true);
 
@@ -280,14 +281,13 @@ describe('a2_eventemitter_embedded_paths', function () {
 
           });
 
-      });
+        });
 
 
     } catch (e) {
       callback(e);
     }
   });
-
 
 
   it('should set data, and then merge a new document into the data without overwriting old fields', function (callback) {
@@ -342,7 +342,7 @@ describe('a2_eventemitter_embedded_paths', function () {
     }
   });
 
-   it('should contain the same payload between 2 non-merging consecutive stores', function (done) {
+  it('should contain the same payload between 2 non-merging consecutive stores', function (done) {
     var object = {param1: 10, param2: 20};
     var firstTime;
 
@@ -610,7 +610,10 @@ describe('a2_eventemitter_embedded_paths', function () {
     try {
 
       //first listen for the change
-      listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/event', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
@@ -764,7 +767,10 @@ describe('a2_eventemitter_embedded_paths', function () {
     try {
 
       //first listen for the change
-      listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/event', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
@@ -922,14 +928,16 @@ describe('a2_eventemitter_embedded_paths', function () {
     });
 
 
-
   });
 
   it('should unsubscribe from an event', function (callback) {
 
     var currentListenerId;
 
-    listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0}, function (message) {
+    listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/on_off_test', {
+      event_type: 'set',
+      count: 0
+    }, function (message) {
 
       //we detach all listeners from the path here
       ////console.log('ABOUT OFF PATH');
@@ -938,7 +946,10 @@ describe('a2_eventemitter_embedded_paths', function () {
         if (e)
           return callback(new Error(e));
 
-        listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0},
+        listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/on_off_test', {
+            event_type: 'set',
+            count: 0
+          },
           function (message) {
 
             ////console.log('ON RAN');
@@ -999,7 +1010,7 @@ describe('a2_eventemitter_embedded_paths', function () {
     listenerclient.onAll(function (eventData, meta) {
 
       if (meta.action == '/REMOVE@/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/catch_all' ||
-          meta.action == '/SET@/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/catch_all')
+        meta.action == '/SET@/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/catch_all')
         caughtCount++;
 
       if (caughtCount == 2)
@@ -1041,7 +1052,10 @@ describe('a2_eventemitter_embedded_paths', function () {
 
       if (e) return callback(e);
 
-      listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/off_all_test', {event_type: 'set', count: 0},
+      listenerclient.on('/a2_eventemitter_embedded_paths/' + test_id + '/testsubscribe/data/off_all_test', {
+          event_type: 'set',
+          count: 0
+        },
         function (message) {
           onHappened = true;
           callback(new Error('this wasnt meant to happen'));

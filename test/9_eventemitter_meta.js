@@ -20,8 +20,8 @@ describe('9_eventemitter_meta.js', function () {
    the logon session. The utils setting will set the system to log non priority information
    */
 
-  after(function(done) {
-      happnInstance.stop(done);
+  after(function (done) {
+    happnInstance.stop(done);
   });
 
   before('should initialize the service', function (callback) {
@@ -188,7 +188,7 @@ describe('9_eventemitter_meta.js', function () {
       listenerclient.on(test_path_remove, {event_type: 'remove', count: 1}, function (data, meta) {
         expect(meta.path).to.be(test_path_remove);
         callback();
-      }, function(e){
+      }, function (e) {
 
         if (e) return callback(e);
 
@@ -196,11 +196,11 @@ describe('9_eventemitter_meta.js', function () {
           {},
           function (e, result) {
 
-          if (e) return callback(e);
+            if (e) return callback(e);
 
-          expect(result._meta.path).to.be('/REMOVE@' + test_path_remove);
+            expect(result._meta.path).to.be('/REMOVE@' + test_path_remove);
 
-        });
+          });
       });
     });
   });
@@ -223,20 +223,20 @@ describe('9_eventemitter_meta.js', function () {
 
       expect(result._meta.modified.toString()).to.be(result._meta.created.toString());
 
-      setTimeout(function(){
+      setTimeout(function () {
 
         publisherclient.set(test_path_created_modified, {
           property4: 'property4'
-        }, {merge:true}, function (e, result) {
+        }, {merge: true}, function (e, result) {
 
           if (e) return callback(e);
 
-           publisherclient.get(test_path_created_modified, function(e, result){
+          publisherclient.get(test_path_created_modified, function (e, result) {
 
             expect(result._meta.modified > result._meta.created).to.be(true);
             callback();
 
-           });
+          });
 
         })
 
@@ -263,7 +263,7 @@ describe('9_eventemitter_meta.js', function () {
 
       expect(result._meta.modified.toString()).to.be(result._meta.created.toString());
 
-      setTimeout(function(){
+      setTimeout(function () {
 
         publisherclient.set(test_path_created_modified_notmerge, {
           property4: 'property4'
@@ -271,12 +271,12 @@ describe('9_eventemitter_meta.js', function () {
 
           if (e) return callback(e);
 
-           publisherclient.get(test_path_created_modified_notmerge, function(e, result){
+          publisherclient.get(test_path_created_modified_notmerge, function (e, result) {
 
             expect(result._meta.modified > result._meta.created).to.be(true);
             callback();
 
-           });
+          });
 
         })
 
@@ -308,11 +308,11 @@ describe('9_eventemitter_meta.js', function () {
 
       var firstCreated = result._meta.created;
 
-      setTimeout(function(){
+      setTimeout(function () {
 
         publisherclient.set(test_path_created_modified_update, {
           property4: 'property4'
-        }, {merge:true}, function (e, result) {
+        }, {merge: true}, function (e, result) {
 
           if (e) return callback(e);
 
@@ -327,7 +327,7 @@ describe('9_eventemitter_meta.js', function () {
           expect(result._meta.path).to.not.be(null);
           expect(result._meta.path).to.not.be(undefined);
 
-          publisherclient.get(test_path_created_modified_update, function(e, result){
+          publisherclient.get(test_path_created_modified_update, function (e, result) {
 
             expect(result._meta.created).to.not.be(null);
             expect(result._meta.created).to.not.be(undefined);
@@ -373,7 +373,7 @@ describe('9_eventemitter_meta.js', function () {
 
       expect(result._meta.modified.toString()).to.be(result._meta.created.toString());
 
-      setTimeout(function(){
+      setTimeout(function () {
 
         publisherclient.set(test_path_created_modified_update_notmerge, {
           property4: 'property4'
@@ -392,7 +392,7 @@ describe('9_eventemitter_meta.js', function () {
 
           expect(updateResult._meta.created.toString()).to.be(firstCreated.toString());
 
-          publisherclient.get(test_path_created_modified_update_notmerge, function(e, result){
+          publisherclient.get(test_path_created_modified_update_notmerge, function (e, result) {
 
             expect(result._meta.created).to.not.be(null);
             expect(result._meta.created).to.not.be(undefined);
@@ -425,95 +425,95 @@ describe('9_eventemitter_meta.js', function () {
 
     //we save 10 items, with timestamp path, then do a search with modified, then a search created - ensure the counts are right
     async.eachSeries(itemIndexes,
-    function(index, eachCallback){
+      function (index, eachCallback) {
 
-      publisherclient.set(test_path_timestamp + index, {
+        publisherclient.set(test_path_timestamp + index, {
           property4: 'property4',
-          ind:index
-      }, eachCallback);
+          ind: index
+        }, eachCallback);
 
-    },
-    function(e){
+      },
+      function (e) {
 
-      if (e) return callback(e);
+        if (e) return callback(e);
 
-      //now set an 11th after a second
+        //now set an 11th after a second
 
-      setTimeout(function(){
+        setTimeout(function () {
 
-        var windowEnd = Date.now();
+          var windowEnd = Date.now();
 
-        publisherclient.set(test_path_timestamp + 10, {
+          publisherclient.set(test_path_timestamp + 10, {
             property4: 'property4',
-            ind:10
-        }, function(e, eleventhItem){
-
-          var searchCriteria = {
-            '_meta.created':{
-              '$gte':windowStart,
-              '$lt':windowEnd
-            }
-          }
-
-          publisherclient.get('*', {criteria:searchCriteria}, function(e, items){
-
-            if (e) return callback(e);
-            expect(items.length == 10).to.be(true);
+            ind: 10
+          }, function (e, eleventhItem) {
 
             var searchCriteria = {
-              '_meta.created':{
-                '$gte':windowEnd
+              '_meta.created': {
+                '$gte': windowStart,
+                '$lt': windowEnd
               }
             }
 
-            publisherclient.get('*', {criteria:searchCriteria}, function(e, items){
+            publisherclient.get('*', {criteria: searchCriteria}, function (e, items) {
 
               if (e) return callback(e);
+              expect(items.length == 10).to.be(true);
 
-              expect(items.length == 1).to.be(true);
-              expect(items[0].ind).to.be(10);
+              var searchCriteria = {
+                '_meta.created': {
+                  '$gte': windowEnd
+                }
+              }
 
-              setTimeout(function(){
+              publisherclient.get('*', {criteria: searchCriteria}, function (e, items) {
 
-                var lastModified = Date.now();
+                if (e) return callback(e);
 
-                publisherclient.set(test_path_timestamp + '0', {
-                  modifiedProperty:'modified'
-                }, {merge:true}, function(e, modifiedItem){
+                expect(items.length == 1).to.be(true);
+                expect(items[0].ind).to.be(10);
 
-                  if (e) return callback(e);
+                setTimeout(function () {
 
-                  var searchCriteria = {
-                    '_meta.modified':{
-                      '$gte':lastModified
-                    }
-                  }
+                  var lastModified = Date.now();
 
-                  publisherclient.get('*', {criteria:searchCriteria}, function(e, items){
+                  publisherclient.set(test_path_timestamp + '0', {
+                    modifiedProperty: 'modified'
+                  }, {merge: true}, function (e, modifiedItem) {
 
                     if (e) return callback(e);
 
-                    expect(items.length == 1).to.be(true);
-                    expect(items[0].ind).to.be(0);
+                    var searchCriteria = {
+                      '_meta.modified': {
+                        '$gte': lastModified
+                      }
+                    }
 
-                    callback();
+                    publisherclient.get('*', {criteria: searchCriteria}, function (e, items) {
+
+                      if (e) return callback(e);
+
+                      expect(items.length == 1).to.be(true);
+                      expect(items[0].ind).to.be(0);
+
+                      callback();
+
+                    });
 
                   });
 
-                });
+                }, 1000);
 
-              }, 1000);
+              });
 
             });
 
           });
 
-        });
 
+        }, 2000);
 
-      }, 2000);
-
-    });
+      });
 
   });
 
@@ -535,7 +535,7 @@ describe('9_eventemitter_meta.js', function () {
         expect(result._meta != null).to.be(true);
         expect(result._meta != undefined).to.be(true);
 
-        for (var propertyName in result){
+        for (var propertyName in result) {
           if (propertyName == '_meta')
             return callback(new Error('failed test, _meta was enumerated'));
         }

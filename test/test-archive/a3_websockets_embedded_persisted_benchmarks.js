@@ -15,71 +15,71 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
   var tempFile = __dirname + '/tmp/testdata_' + require('shortid').generate() + '.db';
 
   /*
-  should handle sequences of events by writing each one after each other asap, without storing
-  2330ms
-  2290ms
-  
-  2344ms
-  2387ms
-  */
+   should handle sequences of events by writing each one after each other asap, without storing
+   2330ms
+   2290ms
+
+   2344ms
+   2387ms
+   */
 
   /*
-  This test demonstrates starting up the happn service - 
-  the authentication service will use authTokenSecret to encrypt web tokens identifying
-  the logon session. The utils setting will set the system to log non priority information
-  */
+   This test demonstrates starting up the happn service - 
+   the authentication service will use authTokenSecret to encrypt web tokens identifying
+   the logon session. The utils setting will set the system to log non priority information
+   */
 
-  before('should initialize the service', function(callback) {
-    
+  before('should initialize the service', function (callback) {
+
     this.timeout(20000);
 
-    try{
+    try {
       service.create({
-          mode:'embedded', 
-          services:{
-            auth:{
-              path:'./services/auth/service.js',
-              config:{
-                authTokenSecret:'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret:test_secret
+          mode: 'embedded',
+          services: {
+            auth: {
+              path: './services/auth/service.js',
+              config: {
+                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
+                systemSecret: test_secret
               }
             },
-            data:{
-              path:'./services/data_embedded/service.js',
-              config:{
-                 dbfile:tempFile
+            data: {
+              path: './services/data_embedded/service.js',
+              config: {
+                dbfile: tempFile
               }
             },
-            pubsub:{
-              path:'./services/pubsub/service.js',
-              config:{}
+            pubsub: {
+              path: './services/pubsub/service.js',
+              config: {}
             }
           },
-          utils:{
-            log_level:'info|error|warning',
-            log_component:'prepare'
+          utils: {
+            log_level: 'info|error|warning',
+            log_component: 'prepare'
           }
         },
-        function(e, happn) {
+        function (e, happn) {
           if (e)
             return callback(e);
 
           happnInstance = happn;
           callback();
         });
-    }catch(e){
+    } catch (e) {
       callback(e);
     }
   });
 
-  after('should delete the temp data file', function(callback) {
+  after('should delete the temp data file', function (callback) {
 
     this.timeout(HAPPNER_STOP_DELAY + 5000);
-    
-    fs.unlink(tempFile, function(e){
+
+    fs.unlink(tempFile, function (e) {
       if (e) return callback(e);
-      happnInstance.stop(function(e){
-        setTimeout(function(){
+      happnInstance.stop(function (e) {
+        setTimeout(function () {
           callback(e);
         }, HAPPNER_STOP_DELAY)
       });
@@ -90,59 +90,58 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
   var publisherclient;
   var listenerclient;
   /*
-    We are initializing 2 clients to test saving data against the database, one client will push data into the 
-    database whilst another listens for changes.
-  */
-  it('should initialize the clients', function(callback) {
+   We are initializing 2 clients to test saving data against the database, one client will push data into the 
+   database whilst another listens for changes.
+   */
+  it('should initialize the clients', function (callback) {
 
-      this.timeout(default_timeout);
+    this.timeout(default_timeout);
 
-      try {
-        happn_client.create({config:{secret:test_secret}}, function(e, instance) {
+    try {
+      happn_client.create({config: {secret: test_secret}}, function (e, instance) {
+
+        if (e) return callback(e);
+
+        publisherclient = instance;
+        happn_client.create({config: {secret: test_secret}}, function (e, instance) {
 
           if (e) return callback(e);
-
-          publisherclient = instance;
-          happn_client.create({config:{secret:test_secret}}, function(e, instance) {
-
-            if (e) return callback(e);
-            listenerclient = instance;
-            callback();
-
-          });
+          listenerclient = instance;
+          callback();
 
         });
 
-      } catch (e) {
-        callback(e);
-      }
-   });
+      });
 
+    } catch (e) {
+      callback(e);
+    }
+  });
 
 
   it('should handle sequences of events by writing as soon as possible -slow?', function (callback) {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
-    if (e) return callback(e);
+    happn_client.create({config: {secret: test_secret}}, function (e, stressTestClient) {
+      if (e) return callback(e);
 
-    var count = 0;
-    var expected = 1000;
-    var receivedCount = 0;
-    var timerName = expected + 'Events - no wait';
+      var count = 0;
+      var expected = 1000;
+      var receivedCount = 0;
+      var timerName = expected + 'Events - no wait';
 
-    var writeData = function(){
-      if (count == expected) return;
+      var writeData = function () {
+        if (count == expected) return;
 
-      publisherclient.set('/e2e_test1/testsubscribe/sequence5', {
-        property1: count++
-      }, {excludeId: true}, function (e, result) {
-        writeData();
-      });
-    }
+        publisherclient.set('/e2e_test1/testsubscribe/sequence5', {
+          property1: count++
+        }, {excludeId: true}, function (e, result) {
+          writeData();
+        });
+      }
 
-    stressTestClient.on('/e2e_test1/testsubscribe/sequence5',{event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {event_type: 'set', count: 0}, function (message) {
 
         receivedCount++;
 
@@ -171,32 +170,32 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
     var receivedCount = 0;
     var timerName = expected + 'Events - no store';
 
-    var  writeData = function() {
+    var writeData = function () {
 
       if (receivedCount == expected) return;
-      
+
       //////////console.log('putting data: ', count);
       publisherclient.set('/e2e_test1/testsubscribe/sequence3', {
-        property1: receivedCount
-      }, {noStore: true},  
-      function (e, result) {
-        if (e)
-          return callback(e);
+          property1: receivedCount
+        }, {noStore: true},
+        function (e, result) {
+          if (e)
+            return callback(e);
 
-         ////////console.log('put data: ', result);
-      });
+          ////////console.log('put data: ', result);
+        });
     }
 //path, event_type, count, handler, done
     //first listen for the change
-    listenerclient.on('/e2e_test1/testsubscribe/sequence3', {event_type:'set', count:0}, function (message) {
- 
+    listenerclient.on('/e2e_test1/testsubscribe/sequence3', {event_type: 'set', count: 0}, function (message) {
+
       ////////console.log('Event happened', message);
       receivedCount++;
 
       if (receivedCount == expected) {
         console.timeEnd(timerName);
         callback();
-      }else
+      } else
         writeData();
 
     }, function (e) {
@@ -222,7 +221,7 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(50000);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create({config: {secret: test_secret}}, function (e, stressTestClient) {
 
       if (e) return callback(e);
 
@@ -232,7 +231,7 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
       var timerName = expected + 'Events - no wait - no store';
       //console.log('FILENAME: ', tempFile);
       //first listen for the change
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence1a3', {event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence1a3', {event_type: 'set', count: 0}, function (message) {
 
         receivedCount++;
 
@@ -286,8 +285,8 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
-      
+    happn_client.create({config: {secret: test_secret}}, function (e, stressTestClient) {
+
       if (e) return callback(e);
       setTimeout(function () {
 
@@ -307,7 +306,10 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
         //////////////console.log(sent);
 
         //first listen for the change
-        stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore', {event_type:'set', count:0}, function (message) {
+        stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore', {
+          event_type: 'set',
+          count: 0
+        }, function (message) {
 
           //////////////console.log('Event happened', message);
 
@@ -379,8 +381,8 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
-      
+    happn_client.create({config: {secret: test_secret}}, function (e, stressTestClient) {
+
       if (e) return callback(e);
       setTimeout(function () {
 
@@ -400,7 +402,10 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
         //////////////console.log(sent);
 
         //first listen for the change
-        stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore_fireforget', {event_type:'set', count:0}, function (message) {
+        stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore_fireforget', {
+          event_type: 'set',
+          count: 0
+        }, function (message) {
 
           receivedCount++;
 
@@ -458,8 +463,8 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
-    if (e) return callback(e);
+    happn_client.create({config: {secret: test_secret}}, function (e, stressTestClient) {
+      if (e) return callback(e);
 
       var count = 0;
       var expected = 1000;
@@ -476,7 +481,10 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
       //////////////console.log(sent);
 
       //first listen for the change
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {
+        event_type: 'set',
+        count: 0
+      }, function (message) {
 
         receivedCount++;
 
@@ -541,15 +549,15 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
-      
+    happn_client.create({config: {secret: test_secret}}, function (e, stressTestClient) {
+
       if (e) return callback(e);
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
       var timerName = expected + 'Events - no wait';
 
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence4', {event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence4', {event_type: 'set', count: 0}, function (message) {
 
         receivedCount++;
 
@@ -592,7 +600,7 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
     var receivedCount = 0;
     var timerName = expected + 'Events';
 
-    listenerclient.on('/e2e_test1/testsubscribe/sequence32', {event_type:'set', count:0}, function (message) {
+    listenerclient.on('/e2e_test1/testsubscribe/sequence32', {event_type: 'set', count: 0}, function (message) {
 
       receivedCount++;
 
@@ -627,7 +635,7 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-      happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create({config: {secret: test_secret}}, function (e, stressTestClient) {
       if (e) return callback(e);
 
       var count = 0;
@@ -635,7 +643,7 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
       var receivedCount = 0;
       var timerName = expected + 'Events - no wait';
 
-      var writeData = function(){
+      var writeData = function () {
         if (count == expected) return;
 
         publisherclient.set('/e2e_test1/testsubscribe/sequence5', {
@@ -645,7 +653,7 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
         });
       }
 
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {event_type: 'set', count: 0}, function (message) {
 
         receivedCount++;
 
@@ -667,7 +675,7 @@ describe('a3_websockets_embedded_persisted_benchmarks', function () {
 
   });
 
-it('should handle sequences of events by when the previous one is done', function (callback) {
+  it('should handle sequences of events by when the previous one is done', function (callback) {
 
     this.timeout(default_timeout);
 
@@ -676,7 +684,7 @@ it('should handle sequences of events by when the previous one is done', functio
     var receivedCount = 0;
     var timerName = expected + 'Events';
 
-    listenerclient.on('/e2e_test1/testsubscribe/sequence31', {event_type:'set', count:0}, function (message) {
+    listenerclient.on('/e2e_test1/testsubscribe/sequence31', {event_type: 'set', count: 0}, function (message) {
 
       receivedCount++;
 
@@ -712,7 +720,7 @@ it('should handle sequences of events by when the previous one is done', functio
 
     this.timeout(default_timeout);
 
-      happn_client.create({config:{secret:test_secret}}, function(e, stressTestClient) {
+    happn_client.create({config: {secret: test_secret}}, function (e, stressTestClient) {
       if (e) return callback(e);
 
       var count = 0;
@@ -720,7 +728,7 @@ it('should handle sequences of events by when the previous one is done', functio
       var receivedCount = 0;
       var timerName = expected + 'Events - no wait';
 
-      var writeData = function(){
+      var writeData = function () {
         if (count == expected) return;
 
         publisherclient.set('/e2e_test1/testsubscribe/sequence5', {
@@ -730,7 +738,7 @@ it('should handle sequences of events by when the previous one is done', functio
         });
       }
 
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {event_type: 'set', count: 0}, function (message) {
 
         receivedCount++;
 

@@ -17,10 +17,10 @@ describe('a1_eventemitter_listeners', function () {
    the logon session. The utils setting will set the system to log non priority information
    */
 
-  after(function(done) {
-      setTimeout(function(){
-        happnInstance.stop(done);
-      }, 5000)
+  after(function (done) {
+    setTimeout(function () {
+      happnInstance.stop(done);
+    }, 5000)
   });
 
   it('should initialize the service', function (callback) {
@@ -76,7 +76,7 @@ describe('a1_eventemitter_listeners', function () {
     this.timeout(default_timeout);
 
     try {
-     
+
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
@@ -367,8 +367,8 @@ describe('a1_eventemitter_listeners', function () {
 
     listenerclient.onAll(function (eventData, meta) {
 
-      if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' || 
-          meta.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
+      if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' ||
+        meta.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
         caughtCount++;
 
       if (caughtCount == 2)
@@ -385,7 +385,6 @@ describe('a1_eventemitter_listeners', function () {
         property3: 'property3'
       }, null, function (e, put_result) {
 
-       
 
         publisherclient.remove('/e2e_test1/testsubscribe/data/catch_all', null, function (e, del_result) {
 

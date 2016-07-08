@@ -23,7 +23,7 @@ describe('c9_unsubscribe_changes_eventemitter', function () {
    the logon session. The utils setting will set the system to log non priority information
    */
 
-  after(function(done) {
+  after(function (done) {
     happnInstance.stop(done);
   });
 
@@ -216,13 +216,13 @@ describe('c9_unsubscribe_changes_eventemitter', function () {
 
   it('tests various fail conditions', function (callback) {
 
-    listenerclient.off(null, function(e){
+    listenerclient.off(null, function (e) {
       expect(e.toString()).to.be('Error: handle or callback cannot be null');
 
-      listenerclient.off(undefined, function(e){
+      listenerclient.off(undefined, function (e) {
         expect(e.toString()).to.be('Error: handle or callback cannot be null');
         //doing off with non-existant path
-        listenerclient.offPath('some odd random path', function(e){
+        listenerclient.offPath('some odd random path', function (e) {
           if (e) return callback(e);
           //doing off with non-existant event handle
           listenerclient.off(187253849567, callback);

@@ -17,8 +17,8 @@ describe('a5_eventemitter_meta.js', function () {
    the logon session. The utils setting will set the system to log non priority information
    */
 
-  after(function(done) {
-      happnInstance.stop(done);
+  after(function (done) {
+    happnInstance.stop(done);
   });
 
   it('should initialize the service', function (callback) {
@@ -74,7 +74,7 @@ describe('a5_eventemitter_meta.js', function () {
     this.timeout(default_timeout);
 
     try {
-     
+
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
@@ -128,7 +128,7 @@ describe('a5_eventemitter_meta.js', function () {
         if (!e) {
 
           expect(listenerclient.events['/SET@' + test_path].length).to.be(1);
-        
+
           //then make the change
           publisherclient.set(test_path, {
             property1: 'property1',
@@ -181,34 +181,34 @@ describe('a5_eventemitter_meta.js', function () {
 
       if (e) return callback(e);
 
-     
+
       expect(result._meta.path).to.be(test_path_remove);
 
       listenerclient.on(test_path_remove, {event_type: 'remove', count: 1}, function (data, meta) {
-      
+
         console.log('REM-DATA: ', data, meta);
         expect(meta.path).to.be(test_path_remove);
 
         callback();
 
-      }, function(e){
+      }, function (e) {
 
         if (e) return callback(e);
 
-        publisherclient.remove(test_path_remove,  
-          {}, 
+        publisherclient.remove(test_path_remove,
+          {},
           function (e, result) {
 
-          if (e) return callback(e);
+            if (e) return callback(e);
 
-          expect(result._meta.path).to.be('/REMOVE@' + test_path_remove);
+            expect(result._meta.path).to.be('/REMOVE@' + test_path_remove);
 
-        });
+          });
       });
     });
   });
 
-   it('tests the all meta data', function (callback) {
+  it('tests the all meta data', function (callback) {
 
     this.timeout(default_timeout);
 
@@ -237,7 +237,7 @@ describe('a5_eventemitter_meta.js', function () {
           expect(result._meta.path).to.be(test_path_all);
 
         });
-       
+
       });
 
     } catch (e) {
