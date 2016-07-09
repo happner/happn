@@ -614,5 +614,5 @@ gulp --gulpfile test/test-browser/gulp-01.js
 
 OTHER PLACES WHERE HAPPN IS USED:
 ----------------------------------
-Watch this space :) - we are building an experimental application engine that uses happn for its nervous system, it is called happner, see: www.github.com/happner/happner
+HAPPNER - an experimental application engine that uses happn for its nervous system, see: www.github.com/happner/happner
 

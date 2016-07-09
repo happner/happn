@@ -238,3 +238,8 @@
 - _meta is now non iterable via defineProperty
 - fixed issue with off when an invalid or old subscription handle is passed in
 - updated docs
+
+2.9.1 2016-07-09
+----------------
+
+- refactored and neatened up code
