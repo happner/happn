@@ -243,3 +243,9 @@
 ----------------
 
 - refactored and neatened up code
+
+2.9.2 2016-07-10
+----------------
+
+- fixed issue where non-iterable _meta doesnt make it through to the client on websocket connections
+- made _meta non-enumerable for websockets and eventemitter

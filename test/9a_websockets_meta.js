@@ -1,4 +1,4 @@
-describe('9_eventemitter_meta.js', function () {
+describe('9a_websockets_meta.js', function () {
 
   require('benchmarket').start();
   after(require('benchmarket').store());
@@ -14,14 +14,28 @@ describe('9_eventemitter_meta.js', function () {
   var mode = "embedde d";
   var default_timeout = 10000;
   var happnInstance = null;
+
+  var publisherclient;
+
   /*
    This test demonstrates starting up the happn service -
    the authentication service will use authTokenSecret to encrypt web tokens identifying
    the logon session. The utils setting will set the system to log non priority information
    */
 
+  var disconnected = false;
+
   after(function (done) {
-    happnInstance.stop(done);
+  publisherclient.disconnect()
+    .then(listenerclient.disconnect()
+        .then(function () {
+          if (!disconnected){
+            happnInstance.stop(done);
+            disconnected = true;
+          }
+        }))
+    .catch(done);
+
   });
 
   before('should initialize the service', function (callback) {
@@ -29,31 +43,7 @@ describe('9_eventemitter_meta.js', function () {
     this.timeout(20000);
 
     try {
-      service.create({
-          mode: 'embedded',
-          services: {
-            auth: {
-              path: './services/auth/service.js',
-              config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
-              }
-            },
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
-            },
-            pubsub: {
-              path: './services/pubsub/service.js',
-              config: {}
-            }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
-        function (e, happnInst) {
+      service.create(function (e, happnInst) {
           if (e)
             return callback(e);
 
@@ -66,9 +56,6 @@ describe('9_eventemitter_meta.js', function () {
   });
 
 
-  var publisherclient;
-  var listenerclient;
-
   /*
    We are initializing 2 clients to test saving data against the database, one client will push data into the
    database whilst another listens for changes.
@@ -78,28 +65,19 @@ describe('9_eventemitter_meta.js', function () {
 
     try {
 
-      happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      }, function (e, instance) {
+      happn_client.create(function (e, instance) {
 
         if (e) return callback(e);
 
         publisherclient = instance;
-
-        happn_client.create({
-          plugin: happn.client_plugins.intra_process,
-          context: happnInstance
-        }, function (e, instance) {
+        happn_client.create(function (e, instance) {
 
           if (e) return callback(e);
           listenerclient = instance;
           callback();
 
         });
-
       });
-
     } catch (e) {
       callback(e);
     }
@@ -199,6 +177,7 @@ describe('9_eventemitter_meta.js', function () {
 
             if (e) return callback(e);
             expect(result._meta.path).to.be(test_path_remove);
+
           });
       });
     });
