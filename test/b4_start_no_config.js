@@ -1,5 +1,3 @@
-
-
 describe('b4_start_no_config', function () {
 
   require('benchmarket').start();
@@ -27,12 +25,12 @@ describe('b4_start_no_config', function () {
 
       service.create()
 
-      .then(function (happnInst) {
-        happnInstance = happnInst;
-        callback();
-      })
+        .then(function (happnInst) {
+          happnInstance = happnInst;
+          callback();
+        })
 
-      .catch(callback)
+        .catch(callback)
 
       ;
 
@@ -42,7 +40,7 @@ describe('b4_start_no_config', function () {
 
   });
 
-  after(function(done) {
+  after(function (done) {
     happnInstance.stop(done);
   });
 

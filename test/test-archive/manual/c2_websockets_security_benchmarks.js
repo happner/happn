@@ -1,4 +1,3 @@
-
 var expect = require('expect.js');
 var happn = require('../../lib/index');
 var service = happn.service;
@@ -14,97 +13,96 @@ describe('c2_websockets_security_benchmarks', function () {
   var happnInstance = null;
 
   /*
-  This test demonstrates starting up the happn service - 
-  the authentication service will use authTokenSecret to encrypt web tokens identifying
-  the logon session. The utils setting will set the system to log non priority information
-  */
+   This test demonstrates starting up the happn service - 
+   the authentication service will use authTokenSecret to encrypt web tokens identifying
+   the logon session. The utils setting will set the system to log non priority information
+   */
 
-  before('should initialize the service', function(callback) {
-    
+  before('should initialize the service', function (callback) {
+
     this.timeout(20000);
 
-    try{
+    try {
       service.create({
-          secure:true,
-          mode:'embedded', 
-          services:{
-            auth:{
-              path:'./services/auth/service.js',
-              config:{
-                authTokenSecret:'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret:test_secret
+          secure: true,
+          mode: 'embedded',
+          services: {
+            auth: {
+              path: './services/auth/service.js',
+              config: {
+                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
+                systemSecret: test_secret
               }
             },
-            data:{
-              path:'./services/data_embedded/service.js',
-              config:{}
+            data: {
+              path: './services/data_embedded/service.js',
+              config: {}
             },
-            pubsub:{
-              path:'./services/pubsub/service.js'
+            pubsub: {
+              path: './services/pubsub/service.js'
             }
           },
-          utils:{
-            log_level:'info|error|warning',
-            log_component:'prepare'
+          utils: {
+            log_level: 'info|error|warning',
+            log_component: 'prepare'
           }
-        }, 
-        function(e, instance){
-          if (e) return  callback(e);
+        },
+        function (e, instance) {
+          if (e) return callback(e);
           happnInstance = instance;
           callback();
         });
-    }catch(e){
+    } catch (e) {
       callback(e);
     }
   });
 
-  after(function(done) {
+  after(function (done) {
 
     this.timeout(HAPPNER_STOP_DELAY + 5000);
 
-     happnInstance.stop(function(e){
-       setTimeout(function(){
-          done(e);
-        }, HAPPNER_STOP_DELAY)
+    happnInstance.stop(function (e) {
+      setTimeout(function () {
+        done(e);
+      }, HAPPNER_STOP_DELAY)
     });
   });
 
   var publisherclient;
   var listenerclient;
   /*
-    We are initializing 2 clients to test saving data against the database, one client will push data into the 
-    database whilst another listens for changes.
-  */
-  it('should initialize the clients', function(callback) {
-      this.timeout(default_timeout);
+   We are initializing 2 clients to test saving data against the database, one client will push data into the 
+   database whilst another listens for changes.
+   */
+  it('should initialize the clients', function (callback) {
+    this.timeout(default_timeout);
 
-      try {
+    try {
+      happn_client.create({
+        config: {username: '_ADMIN', password: 'happn'},
+        secure: true
+      }, function (e, instance) {
+
+        if (e) return callback(e);
+
+        publisherclient = instance;
         happn_client.create({
-         config:{username:'_ADMIN', password:'happn'},
-         secure:true
-        },function(e, instance) {
+          config: {username: '_ADMIN', password: 'happn'},
+          secure: true
+        }, function (e, instance) {
 
           if (e) return callback(e);
-
-          publisherclient = instance;
-          happn_client.create({
-             config:{username:'_ADMIN', password:'happn'},
-             secure:true
-          },function(e, instance) {
-
-            if (e) return callback(e);
-            listenerclient = instance;
-            callback();
-
-          });
+          listenerclient = instance;
+          callback();
 
         });
 
-      } catch (e) {
-        callback(e);
-      }
-   });
+      });
 
+    } catch (e) {
+      callback(e);
+    }
+  });
 
 
   it('should handle sequences of events by writing as soon as possible -slow?', function (callback) {
@@ -112,27 +110,27 @@ describe('c2_websockets_security_benchmarks', function () {
     this.timeout(default_timeout);
 
     happn_client.create({
-       config:{username:'_ADMIN', password:'happn'},
-       secure:true
-    },function(e, stressTestClient) {
-    if (e) return callback(e);
+      config: {username: '_ADMIN', password: 'happn'},
+      secure: true
+    }, function (e, stressTestClient) {
+      if (e) return callback(e);
 
-    var count = 0;
-    var expected = 1000;
-    var receivedCount = 0;
-    var timerName = expected + 'Events - no wait';
+      var count = 0;
+      var expected = 1000;
+      var receivedCount = 0;
+      var timerName = expected + 'Events - no wait';
 
-    var writeData = function(){
-      if (count == expected) return;
+      var writeData = function () {
+        if (count == expected) return;
 
-      publisherclient.set('/e2e_test1/testsubscribe/sequence5', {
-        property1: count++
-      }, {excludeId: true}, function (e, result) {
-        writeData();
-      });
-    }
+        publisherclient.set('/e2e_test1/testsubscribe/sequence5', {
+          property1: count++
+        }, {excludeId: true}, function (e, result) {
+          writeData();
+        });
+      }
 
-    stressTestClient.on('/e2e_test1/testsubscribe/sequence5',{event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {event_type: 'set', count: 0}, function (message) {
 
         receivedCount++;
 
@@ -161,32 +159,32 @@ describe('c2_websockets_security_benchmarks', function () {
     var receivedCount = 0;
     var timerName = expected + 'Events - no store';
 
-    var  writeData = function() {
+    var writeData = function () {
 
       if (receivedCount == expected) return;
-      
+
       //////////console.log('putting data: ', count);
       publisherclient.set('/e2e_test1/testsubscribe/sequence3', {
-        property1: receivedCount
-      }, {noStore: true},  
-      function (e, result) {
-        if (e)
-          return callback(e);
+          property1: receivedCount
+        }, {noStore: true},
+        function (e, result) {
+          if (e)
+            return callback(e);
 
-         ////////console.log('put data: ', result);
-      });
+          ////////console.log('put data: ', result);
+        });
     }
 //path, event_type, count, handler, done
     //first listen for the change
-    listenerclient.on('/e2e_test1/testsubscribe/sequence3', {event_type:'set', count:0}, function (message) {
- 
+    listenerclient.on('/e2e_test1/testsubscribe/sequence3', {event_type: 'set', count: 0}, function (message) {
+
       ////////console.log('Event happened', message);
       receivedCount++;
 
       if (receivedCount == expected) {
         console.timeEnd(timerName);
         callback();
-      }else
+      } else
         writeData();
 
     }, function (e) {
@@ -213,9 +211,9 @@ describe('c2_websockets_security_benchmarks', function () {
     this.timeout(default_timeout);
 
     happn_client.create({
-         config:{username:'_ADMIN', password:'happn'},
-         secure:true
-      },function(e, stressTestClient) {
+      config: {username: '_ADMIN', password: 'happn'},
+      secure: true
+    }, function (e, stressTestClient) {
 
       if (e) return callback(e);
 
@@ -225,7 +223,7 @@ describe('c2_websockets_security_benchmarks', function () {
       var timerName = expected + 'Events - no wait - no store';
 
       //first listen for the change
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence1', {event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence1', {event_type: 'set', count: 0}, function (message) {
 
         receivedCount++;
         //////////////console.log('RCOUNT');
@@ -282,10 +280,10 @@ describe('c2_websockets_security_benchmarks', function () {
     this.timeout(default_timeout);
 
     happn_client.create({
-         config:{username:'_ADMIN', password:'happn'},
-         secure:true
-      },function(e, stressTestClient) {
-      
+      config: {username: '_ADMIN', password: 'happn'},
+      secure: true
+    }, function (e, stressTestClient) {
+
       if (e) return callback(e);
       setTimeout(function () {
 
@@ -305,7 +303,10 @@ describe('c2_websockets_security_benchmarks', function () {
         //////////////console.log(sent);
 
         //first listen for the change
-        stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore', {event_type:'set', count:0}, function (message) {
+        stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore', {
+          event_type: 'set',
+          count: 0
+        }, function (message) {
 
           //////////////console.log('Event happened', message);
 
@@ -378,10 +379,10 @@ describe('c2_websockets_security_benchmarks', function () {
     this.timeout(default_timeout);
 
     happn_client.create({
-         config:{username:'_ADMIN', password:'happn'},
-         secure:true
-      },function(e, stressTestClient) {
-      
+      config: {username: '_ADMIN', password: 'happn'},
+      secure: true
+    }, function (e, stressTestClient) {
+
       if (e) return callback(e);
       setTimeout(function () {
 
@@ -401,7 +402,10 @@ describe('c2_websockets_security_benchmarks', function () {
         //////////////console.log(sent);
 
         //first listen for the change
-        stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore_fireforget', {event_type:'set', count:0}, function (message) {
+        stressTestClient.on('/e2e_test1/testsubscribe/sequence_nostore_fireforget', {
+          event_type: 'set',
+          count: 0
+        }, function (message) {
 
           receivedCount++;
 
@@ -460,9 +464,9 @@ describe('c2_websockets_security_benchmarks', function () {
     this.timeout(default_timeout);
 
     happn_client.create({
-         config:{username:'_ADMIN', password:'happn'},
-         secure:true
-    },function(e, stressTestClient) {
+      config: {username: '_ADMIN', password: 'happn'},
+      secure: true
+    }, function (e, stressTestClient) {
       if (e) return callback(e);
 
       var count = 0;
@@ -480,7 +484,10 @@ describe('c2_websockets_security_benchmarks', function () {
       //////////////console.log(sent);
 
       //first listen for the change
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence_persist', {
+        event_type: 'set',
+        count: 0
+      }, function (message) {
 
         receivedCount++;
 
@@ -546,17 +553,17 @@ describe('c2_websockets_security_benchmarks', function () {
     this.timeout(default_timeout);
 
     happn_client.create({
-         config:{username:'_ADMIN', password:'happn'},
-         secure:true
-      },function(e, stressTestClient) {
-      
+      config: {username: '_ADMIN', password: 'happn'},
+      secure: true
+    }, function (e, stressTestClient) {
+
       if (e) return callback(e);
       var count = 0;
       var expected = 1000;
       var receivedCount = 0;
       var timerName = expected + 'Events - no wait';
 
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence4', {event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence4', {event_type: 'set', count: 0}, function (message) {
 
         receivedCount++;
 
@@ -599,7 +606,7 @@ describe('c2_websockets_security_benchmarks', function () {
     var receivedCount = 0;
     var timerName = expected + 'Events';
 
-    listenerclient.on('/e2e_test1/testsubscribe/sequence32', {event_type:'set', count:0}, function (message) {
+    listenerclient.on('/e2e_test1/testsubscribe/sequence32', {event_type: 'set', count: 0}, function (message) {
 
       receivedCount++;
 
@@ -634,10 +641,10 @@ describe('c2_websockets_security_benchmarks', function () {
 
     this.timeout(10000);
 
-      happn_client.create({
-         config:{username:'_ADMIN', password:'happn'},
-         secure:true
-      },function(e, stressTestClient) {
+    happn_client.create({
+      config: {username: '_ADMIN', password: 'happn'},
+      secure: true
+    }, function (e, stressTestClient) {
       if (e) return callback(e);
 
       var count = 0;
@@ -645,7 +652,7 @@ describe('c2_websockets_security_benchmarks', function () {
       var receivedCount = 0;
       var timerName = expected + 'Events - no wait';
 
-      var writeData = function(){
+      var writeData = function () {
         if (count == expected) return;
 
         publisherclient.set('/e2e_test1/testsubscribe/sequence5', {
@@ -655,7 +662,7 @@ describe('c2_websockets_security_benchmarks', function () {
         });
       }
 
-      stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {event_type:'set', count:0}, function (message) {
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {event_type: 'set', count: 0}, function (message) {
 
         receivedCount++;
 
@@ -677,7 +684,7 @@ describe('c2_websockets_security_benchmarks', function () {
 
   });
 
-it('should handle sequences of events by when the previous one is done', function (callback) {
+  it('should handle sequences of events by when the previous one is done', function (callback) {
 
     this.timeout(default_timeout);
 
@@ -686,7 +693,7 @@ it('should handle sequences of events by when the previous one is done', functio
     var receivedCount = 0;
     var timerName = expected + 'Events';
 
-    listenerclient.on('/e2e_test1/testsubscribe/sequence31', {event_type:'set', count:0}, function (message) {
+    listenerclient.on('/e2e_test1/testsubscribe/sequence31', {event_type: 'set', count: 0}, function (message) {
 
       receivedCount++;
 
@@ -722,45 +729,45 @@ it('should handle sequences of events by when the previous one is done', functio
 
     this.timeout(default_timeout);
 
-      happn_client.create({
-         config:{username:'_ADMIN', password:'happn'},
-         secure:true
-      },function(e, stressTestClient) {
-        if (e) return callback(e);
+    happn_client.create({
+      config: {username: '_ADMIN', password: 'happn'},
+      secure: true
+    }, function (e, stressTestClient) {
+      if (e) return callback(e);
 
-        var count = 0;
-        var expected = 1000;
-        var receivedCount = 0;
-        var timerName = expected + 'Events - no wait';
+      var count = 0;
+      var expected = 1000;
+      var receivedCount = 0;
+      var timerName = expected + 'Events - no wait';
 
-        var writeData = function(){
-          if (count == expected) return;
+      var writeData = function () {
+        if (count == expected) return;
 
-          publisherclient.set('/e2e_test1/testsubscribe/sequence5', {
-            property1: count++
-          }, {excludeId: true}, function (e, result) {
-            writeData();
-          });
+        publisherclient.set('/e2e_test1/testsubscribe/sequence5', {
+          property1: count++
+        }, {excludeId: true}, function (e, result) {
+          writeData();
+        });
+      }
+
+      stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {event_type: 'set', count: 0}, function (message) {
+
+        receivedCount++;
+
+        if (receivedCount == expected) {
+          console.timeEnd(timerName);
+          callback();
         }
 
-        stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {event_type:'set', count:0}, function (message) {
-
-          receivedCount++;
-
-          if (receivedCount == expected) {
-            console.timeEnd(timerName);
-            callback();
-          }
-
-        }, function (e) {
-          if (!e) {
-            console.time(timerName);
-            writeData();
-          }
-          else
-            callback(e);
-        });
+      }, function (e) {
+        if (!e) {
+          console.time(timerName);
+          writeData();
+        }
+        else
+          callback(e);
       });
+    });
   });
 
 });

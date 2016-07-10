@@ -15,13 +15,9 @@ describe('a4_security_encryption.js', function () {
 
   var testConfigs = {};
 
-  testConfigs.data = {
+  testConfigs.data = {}
 
-  }
-
-  testConfigs.crypto = {
-
-  }
+  testConfigs.crypto = {}
 
   var testServices = {};
 
@@ -30,17 +26,17 @@ describe('a4_security_encryption.js', function () {
 
   before('should initialize the service', function (callback) {
 
-    var happnMock = {services:{}};
+    var happnMock = {services: {}};
 
     happnMock.utils = require('../lib/utils');
 
-    async.eachSeries(['data', 'crypto'], function(serviceName, eachServiceCB){
+    async.eachSeries(['data', 'crypto'], function (serviceName, eachServiceCB) {
 
       testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;
 
-      testServices[serviceName].initialize(testConfigs[serviceName], function(e, instance){
-        if (e)  return  eachServiceCB(e);
+      testServices[serviceName].initialize(testConfigs[serviceName], function (e, instance) {
+        if (e)  return eachServiceCB(e);
 
         happnMock.services[serviceName] = testServices[serviceName];
 
@@ -109,12 +105,12 @@ describe('a4_security_encryption.js', function () {
   it('should encrypt and decrypt data using symmetric hashing in the security layer', function (callback) {
 
     var message = 'this is a secret';
-    var hashed = testServices.crypto.generateHash(message, function(e, hash){
-      if (e)  return  callback(e);
+    var hashed = testServices.crypto.generateHash(message, function (e, hash) {
+      if (e)  return callback(e);
 
-      var verified = testServices.crypto.verifyHash(message, hash, function(e, verified){
+      var verified = testServices.crypto.verifyHash(message, hash, function (e, verified) {
 
-        if (e)  return  callback(e);
+        if (e)  return callback(e);
         expect(verified).to.be(true);
         callback();
 

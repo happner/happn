@@ -62,7 +62,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
     }
   });
 
-  after(function(done) {
+  after(function (done) {
     happnInstance.stop(done);
   });
 
@@ -70,7 +70,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
   var publisherclient;
   var listenerclient;
 
-   /*
+  /*
    We are initializing 2 clients to test saving data against the database, one client will push data into the 
    database whilst another listens for changes.
    */
@@ -78,7 +78,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
     this.timeout(default_timeout);
 
     try {
-     
+
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
@@ -123,7 +123,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
           expect(result.value).to.be(test_string);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_string);
@@ -140,14 +140,14 @@ describe('a6_eventemitter_embedded_datatypes', function () {
     }
   });
 
- it('the publisher should set number data', function (callback) {
+  it('the publisher should set number data', function (callback) {
 
     this.timeout(default_timeout);
 
     try {
 
       var test_number = Math.random();
-      var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/set/number/' + test_number.toString().replace('.','');
+      var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/set/number/' + test_number.toString().replace('.', '');
 
       publisherclient.set(test_base_url, test_number, {noPublish: true}, function (e, result) {
 
@@ -158,7 +158,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
           expect(result.value).to.be(test_number);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_number);
@@ -176,7 +176,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
 
   });
 
-   it('the publisher should set boolean data', function (callback) {
+  it('the publisher should set boolean data', function (callback) {
 
     this.timeout(default_timeout);
 
@@ -194,7 +194,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
           expect(result.value).to.be(test_bool);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_bool);
@@ -211,7 +211,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
     }
   });
 
-    it('the publisher should set date data', function (callback) {
+  it('the publisher should set date data', function (callback) {
 
     this.timeout(default_timeout);
 
@@ -229,7 +229,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
           expect(result.value).to.be(test_date);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_date);
@@ -246,9 +246,9 @@ describe('a6_eventemitter_embedded_datatypes', function () {
     }
   });
 
-   it('the publisher should set null data', function (callback) {
+  it('the publisher should set null data', function (callback) {
 
-     this.timeout(default_timeout);
+    this.timeout(default_timeout);
 
     try {
 
@@ -264,7 +264,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
           expect(result.value).to.be(test_null);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_null);//YES. IT IS NOW UNDEFINED
@@ -281,7 +281,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
     }
   });
 
-it('the publisher should set undefined data', function (callback) {
+  it('the publisher should set undefined data', function (callback) {
 
     this.timeout(default_timeout);
 
@@ -299,7 +299,7 @@ it('the publisher should set undefined data', function (callback) {
           expect(result.value).to.be(test_undefined);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value).to.be(test_undefined);
@@ -322,7 +322,7 @@ it('the publisher should set undefined data', function (callback) {
 
     try {
 
-      var test_array = [0,1,2,3,4,5];
+      var test_array = [0, 1, 2, 3, 4, 5];
       var test_base_url = '/a6_eventemitter_embedded_datatypes/' + test_id + '/set/array';
 
       publisherclient.set(test_base_url, test_array, {noPublish: true}, function (e, result) {
@@ -334,7 +334,7 @@ it('the publisher should set undefined data', function (callback) {
           expect(result.value.length).to.be(6);
 
           publisherclient.get(test_base_url, null, function (e, result) {
-        
+
             if (e) return callback(e);
 
             expect(result.value.length).to.be(6);
@@ -342,7 +342,7 @@ it('the publisher should set undefined data', function (callback) {
             expect(result.value[5]).to.be(5);
 
             callback(e);
-            
+
           });
         }
         else
@@ -364,9 +364,9 @@ it('the publisher should set undefined data', function (callback) {
     try {
 
       //first listen for the change
-      listenerclient.on(test_base_url +  '/*', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on(test_base_url + '/*', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@' + test_base_url +  '/*'].length).to.be(0);
+        expect(listenerclient.events['/SET@' + test_base_url + '/*'].length).to.be(0);
 
         expect(message.value == "test string").to.be(true);
 
@@ -378,12 +378,11 @@ it('the publisher should set undefined data', function (callback) {
 
         if (!e) {
 
-          expect(listenerclient.events['/SET@' + test_base_url +  '/*'].length).to.be(1);
+          expect(listenerclient.events['/SET@' + test_base_url + '/*'].length).to.be(1);
           //////////////////console.log('on subscribed, about to publish');
 
           //then make the change
           publisherclient.set(test_base_url + '/' + test_path_end, "test string", null, function (e, result) {
-            
 
 
           });

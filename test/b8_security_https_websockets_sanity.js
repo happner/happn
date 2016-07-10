@@ -1,4 +1,4 @@
-describe('b8_security_https_websockets_sanity', function() {
+describe('b8_security_https_websockets_sanity', function () {
 
   require('benchmarket').start();
   after(require('benchmarket').store());
@@ -17,49 +17,48 @@ describe('b8_security_https_websockets_sanity', function() {
   this.timeout(60000);
 
   /*
-  This test demonstrates starting up the happn service -
-  the authentication service will use authTokenSecret to encrypt web tokens identifying
-  the logon session. The utils setting will set the system to log non priority information
-  */
+   This test demonstrates starting up the happn service -
+   the authentication service will use authTokenSecret to encrypt web tokens identifying
+   the logon session. The utils setting will set the system to log non priority information
+   */
 
-  before('should initialize the service', function(callback) {
-
+  before('should initialize the service', function (callback) {
 
 
     test_id = Date.now() + '_' + require('shortid').generate();
 
-    try{
+    try {
       service.create({
-          transport:{
-            mode:'https'
-          }
-        },function (e, happnInst) {
-              if (e)
-                return callback(e);
+        transport: {
+          mode: 'https'
+        }
+      }, function (e, happnInst) {
+        if (e)
+          return callback(e);
 
-              happnInstance = happnInst;
-              callback();
-            });
-    }catch(e){
+        happnInstance = happnInst;
+        callback();
+      });
+    } catch (e) {
       callback(e);
     }
   });
 
-  after(function(done) {
+  after(function (done) {
 
     this.timeout(10000);
     var timeout;
 
     publisherclient.disconnect()
-    .then(listenerclient.disconnect()
-    .then(happnInstance.stop()
-    .then(function(){
-      clearTimeout(timeout);
-      done();
-    })))
-    .catch(done);
+      .then(listenerclient.disconnect()
+        .then(happnInstance.stop()
+          .then(function () {
+            clearTimeout(timeout);
+            done();
+          })))
+      .catch(done);
 
-    timeout = setTimeout (function(){
+    timeout = setTimeout(function () {
       console.warn('server shutdown timed out');
       done();
     }, 9000)
@@ -70,42 +69,44 @@ describe('b8_security_https_websockets_sanity', function() {
   var listenerclient;
 
   /*
-    We are initializing 2 clients to test saving data against the database, one client will push data into the
-    database whilst another listens for changes.
-  */
-  before('should initialize the clients', function(callback) {
+   We are initializing 2 clients to test saving data against the database, one client will push data into the
+   database whilst another listens for changes.
+   */
+  before('should initialize the clients', function (callback) {
 
 
-      try {
-        happn_client.create({config:{protocol:'https', allowSelfSignedCerts:true}},function(e, instance) {
+    try {
+      happn_client.create({config: {protocol: 'https', allowSelfSignedCerts: true}}, function (e, instance) {
+
+        if (e) return callback(e);
+
+        publisherclient = instance;
+        happn_client.create({config: {protocol: 'https', allowSelfSignedCerts: true}}, function (e, instance) {
 
           if (e) return callback(e);
-
-          publisherclient = instance;
-          happn_client.create({config:{protocol:'https', allowSelfSignedCerts:true}},function(e, instance) {
-
-            if (e) return callback(e);
-            listenerclient = instance;
-            callback();
-
-          });
+          listenerclient = instance;
+          callback();
 
         });
 
-      } catch (e) {
-        callback(e);
-      }
+      });
 
-   });
+    } catch (e) {
+      callback(e);
+    }
+
+  });
 
   it('the listener should pick up a single wildcard event', function (callback) {
-
 
 
     try {
 
       //first listen for the change
-      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(0);
         callback();
@@ -144,7 +145,6 @@ describe('b8_security_https_websockets_sanity', function() {
   it('the publisher should get null for unfound data, exact path', function (callback) {
 
 
-
     var test_path_end = require('shortid').generate();
     publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/unfound/exact/' + test_path_end, null, function (e, results) {
       ////////////console.log('new data results');
@@ -160,7 +160,6 @@ describe('b8_security_https_websockets_sanity', function() {
 
 
   it('the publisher should set new data', function (callback) {
-
 
 
     try {
@@ -195,20 +194,20 @@ describe('b8_security_https_websockets_sanity', function() {
     try {
 
       async.times(timesCount,
-      function(n, timesCallback){
+        function (n, timesCallback) {
 
-        var test_random_path2 = require('shortid').generate();
+          var test_random_path2 = require('shortid').generate();
 
-        publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/set_multiple/' + test_random_path2, {
-          property1: 'property1',
-          property2: 'property2',
-          property3: 'property3'
-        }, {noPublish: true}, timesCallback);
+          publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/set_multiple/' + test_random_path2, {
+            property1: 'property1',
+            property2: 'property2',
+            property3: 'property3'
+          }, {noPublish: true}, timesCallback);
 
-      },
-      function(e){
+        },
+        function (e) {
 
-        if (e) return callback(e);
+          if (e) return callback(e);
 
           listenerclient.get('/2_websockets_embedded_sanity/' + test_id + '/set_multiple/*', null, function (e, results) {
 
@@ -219,7 +218,7 @@ describe('b8_security_https_websockets_sanity', function() {
 
           });
 
-      });
+        });
 
 
     } catch (e) {
@@ -228,9 +227,7 @@ describe('b8_security_https_websockets_sanity', function() {
   });
 
 
-
   it('should set data, and then merge a new document into the data without overwriting old fields', function (callback) {
-
 
 
     try {
@@ -272,7 +269,7 @@ describe('b8_security_https_websockets_sanity', function() {
     }
   });
 
-   it('should contain the same payload between 2 non-merging consecutive stores', function (done) {
+  it('should contain the same payload between 2 non-merging consecutive stores', function (done) {
     var object = {param1: 10, param2: 20};
     var firstTime;
 
@@ -392,7 +389,6 @@ describe('b8_security_https_websockets_sanity', function() {
   it('should delete some test data', function (callback) {
 
 
-
     try {
 
       //We put the data we want to delete into the database
@@ -423,7 +419,6 @@ describe('b8_security_https_websockets_sanity', function() {
   });
 
   it('the publisher should set new data then update the data', function (callback) {
-
 
 
     try {
@@ -533,11 +528,13 @@ describe('b8_security_https_websockets_sanity', function() {
   it('the listener should pick up a single published event', function (callback) {
 
 
-
     try {
 
       //first listen for the change
-      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
@@ -575,7 +572,6 @@ describe('b8_security_https_websockets_sanity', function() {
   it('the publisher should set new data ', function (callback) {
 
 
-
     try {
       var test_path_end = require('shortid').generate();
 
@@ -608,7 +604,6 @@ describe('b8_security_https_websockets_sanity', function() {
 
 
   it('the publisher should set new data then update the data', function (callback) {
-
 
 
     try {
@@ -646,7 +641,6 @@ describe('b8_security_https_websockets_sanity', function() {
 //We are testing pushing a specific value to a path which will actually become an array in the database
 
   it('the publisher should push a sibling and get all siblings', function (callback) {
-
 
 
     try {
@@ -687,11 +681,13 @@ describe('b8_security_https_websockets_sanity', function() {
   it('the listener should pick up a single published event', function (callback) {
 
 
-
     try {
 
       //first listen for the change
-      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
@@ -848,14 +844,16 @@ describe('b8_security_https_websockets_sanity', function() {
     });
 
 
-
   });
 
   it('should unsubscribe from an event', function (callback) {
 
     var currentListenerId;
 
-    listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0}, function (message) {
+    listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+      event_type: 'set',
+      count: 0
+    }, function (message) {
 
       //we detach all listeners from the path here
       ////console.log('ABOUT OFF PATH');
@@ -864,7 +862,10 @@ describe('b8_security_https_websockets_sanity', function() {
         if (e)
           return callback(new Error(e));
 
-        listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0},
+        listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+            event_type: 'set',
+            count: 0
+          },
           function (message) {
 
             ////console.log('ON RAN');
@@ -925,7 +926,7 @@ describe('b8_security_https_websockets_sanity', function() {
     listenerclient.onAll(function (eventData, meta) {
 
       if (meta.action == '/REMOVE@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' ||
-          meta.action == '/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
+        meta.action == '/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
         caughtCount++;
 
       if (caughtCount == 2)
@@ -966,7 +967,10 @@ describe('b8_security_https_websockets_sanity', function() {
 
       if (e) return callback(e);
 
-      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {event_type: 'set', count: 0},
+      listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {
+          event_type: 'set',
+          count: 0
+        },
         function (message) {
           onHappened = true;
           callback(new Error('this wasnt meant to happen'));

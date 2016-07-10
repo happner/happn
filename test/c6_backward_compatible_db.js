@@ -1,4 +1,4 @@
-describe('c6_backward_compatible_db', function() {
+describe('c6_backward_compatible_db', function () {
 
   require('benchmarket').start();
   after(require('benchmarket').store());
@@ -9,30 +9,30 @@ describe('c6_backward_compatible_db', function() {
   var happn_client = happn.client;
   var async = require('async');
 
-  var serviceConfig = {secure:true};
+  var serviceConfig = {secure: true};
   var serviceInstance;
 
   var fs = require('fs');
 
   this.timeout(10000);
 
-  function createService(config, callback){
+  function createService(config, callback) {
 
     service.create(config,
-    function(e, happnInst){
-      if (e)
-        return callback(e);
+      function (e, happnInst) {
+        if (e)
+          return callback(e);
 
-      callback(null, happnInst);
-    });
+        callback(null, happnInst);
+      });
 
   }
 
-  it('starts up all the dbs in the backwards compatable folder', function(callback) {
+  it('starts up all the dbs in the backwards compatable folder', function (callback) {
 
     var dbFiles = fs.readdirSync(__dirname + '/test-resources/c6');
 
-    async.eachSeries(dbFiles, function(fileName, eachCallback){
+    async.eachSeries(dbFiles, function (fileName, eachCallback) {
 
       if (fileName.indexOf('.test' == -1)) return eachCallback();
       if (fileName.indexOf('.test.test' > -1)) return eachCallback();
@@ -44,12 +44,12 @@ describe('c6_backward_compatible_db', function() {
       testStream.on('finish', function () {
 
         var config = {
-          secure:true,
+          secure: true,
           services: {
             data: {
               path: './services/data_embedded/service.js',
-              config:{
-                 filename:testFile
+              config: {
+                filename: testFile
               }
             }
           }
@@ -57,30 +57,33 @@ describe('c6_backward_compatible_db', function() {
 
         console.log('creating service from db file:' + fileName);
 
-        createService(config, function(e, service){
+        createService(config, function (e, service) {
 
           if (e) {
             fs.unlinkSync(testFile);
             return eachCallback(e)
-          };
+          }
+          ;
 
-          service.stop(function(e){
+          service.stop(function (e) {
 
             if (e) {
               fs.unlinkSync(testFile);
               return eachCallback(e)
-            };
+            }
+            ;
 
-            createService(config, function(e, restartedService){
-                 if (e) {
-                  fs.unlinkSync(testFile);
-                  return eachCallback(e)
-                };
+            createService(config, function (e, restartedService) {
+              if (e) {
+                fs.unlinkSync(testFile);
+                return eachCallback(e)
+              }
+              ;
 
-                restartedService.stop(function(e){
-                  fs.unlinkSync(testFile);
-                  eachCallback();
-                });
+              restartedService.stop(function (e) {
+                fs.unlinkSync(testFile);
+                eachCallback();
+              });
 
             });//start it again after modifications may have happened
 

@@ -20,7 +20,7 @@ describe('7_eventemitter_listeners', function () {
    the logon session. The utils setting will set the system to log non priority information
    */
 
-  after(function(done) {
+  after(function (done) {
     happnInstance.stop(done);
   });
 
@@ -358,26 +358,32 @@ describe('7_eventemitter_listeners', function () {
 
   it('should subscribe and get an initial value on the callback', function (callback) {
 
-    listenerclient.set('/e2e_test1/testsubscribe/data/value_on_callback_test', {"test":"data"}, function(e){
+    listenerclient.set('/e2e_test1/testsubscribe/data/value_on_callback_test', {"test": "data"}, function (e) {
       if (e) return callback(e);
 
-      listenerclient.on('/e2e_test1/testsubscribe/data/value_on_callback_test', {"event_type": "set", "initialCallback":true}, function (message) {
+      listenerclient.on('/e2e_test1/testsubscribe/data/value_on_callback_test', {
+        "event_type": "set",
+        "initialCallback": true
+      }, function (message) {
 
         expect(message.updated).to.be(true);
         callback();
 
-      }, function(e, reference, response){
+      }, function (e, reference, response) {
         if (e) return callback(e);
-        try{
+        try {
 
           expect(response.length).to.be(1);
           expect(response[0].test).to.be('data');
 
-          listenerclient.set('/e2e_test1/testsubscribe/data/value_on_callback_test', {"test":"data", "updated":true}, function(e){
+          listenerclient.set('/e2e_test1/testsubscribe/data/value_on_callback_test', {
+            "test": "data",
+            "updated": true
+          }, function (e) {
             if (e) return callback(e);
           });
 
-        }catch(e){
+        } catch (e) {
           return callback(e);
         }
       });
@@ -386,30 +392,36 @@ describe('7_eventemitter_listeners', function () {
 
   it('should subscribe and get initial values on the callback', function (callback) {
 
-    listenerclient.set('/e2e_test1/testsubscribe/data/values_on_callback_test/1', {"test":"data"}, function(e){
+    listenerclient.set('/e2e_test1/testsubscribe/data/values_on_callback_test/1', {"test": "data"}, function (e) {
       if (e) return callback(e);
 
-      listenerclient.set('/e2e_test1/testsubscribe/data/values_on_callback_test/2', {"test":"data1"}, function(e){
+      listenerclient.set('/e2e_test1/testsubscribe/data/values_on_callback_test/2', {"test": "data1"}, function (e) {
         if (e) return callback(e);
 
-        listenerclient.on('/e2e_test1/testsubscribe/data/values_on_callback_test/*', {"event_type": "set", "initialCallback":true}, function (message) {
+        listenerclient.on('/e2e_test1/testsubscribe/data/values_on_callback_test/*', {
+          "event_type": "set",
+          "initialCallback": true
+        }, function (message) {
 
           expect(message.updated).to.be(true);
           callback();
 
-        }, function(e, reference, response){
+        }, function (e, reference, response) {
           if (e) return callback(e);
-          try{
+          try {
 
             expect(response.length).to.be(2);
             expect(response[0].test).to.be('data');
             expect(response[1].test).to.be('data1');
 
-            listenerclient.set('/e2e_test1/testsubscribe/data/values_on_callback_test/1', {"test":"data", "updated":true}, function(e){
+            listenerclient.set('/e2e_test1/testsubscribe/data/values_on_callback_test/1', {
+              "test": "data",
+              "updated": true
+            }, function (e) {
               if (e) return callback(e);
             });
 
-          }catch(e){
+          } catch (e) {
             return callback(e);
           }
         });
@@ -421,22 +433,25 @@ describe('7_eventemitter_listeners', function () {
 
     var caughtEmitted = 0;
 
-    listenerclient.set('/e2e_test1/testsubscribe/data/values_emitted_test/1', {"test":"data"}, function(e){
+    listenerclient.set('/e2e_test1/testsubscribe/data/values_emitted_test/1', {"test": "data"}, function (e) {
       if (e) return callback(e);
 
-      listenerclient.set('/e2e_test1/testsubscribe/data/values_emitted_test/2', {"test":"data1"}, function(e){
+      listenerclient.set('/e2e_test1/testsubscribe/data/values_emitted_test/2', {"test": "data1"}, function (e) {
         if (e) return callback(e);
 
-        listenerclient.on('/e2e_test1/testsubscribe/data/values_emitted_test/*', {"event_type": "set", "initialEmit":true}, function (message, meta) {
+        listenerclient.on('/e2e_test1/testsubscribe/data/values_emitted_test/*', {
+          "event_type": "set",
+          "initialEmit": true
+        }, function (message, meta) {
 
           caughtEmitted++;
 
-          if (caughtEmitted == 2){
+          if (caughtEmitted == 2) {
             expect(message.test).to.be("data1");
             callback();
           }
 
-        }, function(e){
+        }, function (e) {
           if (e) return callback(e);
         });
       });
@@ -453,7 +468,7 @@ describe('7_eventemitter_listeners', function () {
     listenerclient.onAll(function (eventData, meta) {
 
       if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' ||
-          meta.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
+        meta.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
         caughtCount++;
 
       if (caughtCount == 2)
@@ -469,7 +484,6 @@ describe('7_eventemitter_listeners', function () {
         property2: 'property2',
         property3: 'property3'
       }, null, function (e, put_result) {
-
 
 
         publisherclient.remove('/e2e_test1/testsubscribe/data/catch_all', null, function (e, del_result) {
