@@ -50,7 +50,7 @@ describe('1-websockets-embedded-memory', function () {
 
   after(function (done) {
     this.timeout(10000);
-    publisherclient.disconnect(function() {
+    publisherclient.disconnect(function () {
       remote.kill();
       done();
     })

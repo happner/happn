@@ -1,4 +1,4 @@
-describe('1_eventemitter_embedded_sanity', function() {
+describe('1_eventemitter_embedded_sanity', function () {
 
   require('benchmarket').start();
   after(require('benchmarket').store());
@@ -22,7 +22,7 @@ describe('1_eventemitter_embedded_sanity', function() {
    the logon session. The utils setting will set the system to log non priority information
    */
 
-  before('should initialize the service', function(callback) {
+  before('should initialize the service', function (callback) {
 
     test_id = Date.now() + '_' + require('shortid').generate();
 
@@ -49,7 +49,7 @@ describe('1_eventemitter_embedded_sanity', function() {
             log_component: 'prepare'
           }
         },
-        function(e, happnInst) {
+        function (e, happnInst) {
           if (e)
             return callback(e);
 
@@ -62,7 +62,7 @@ describe('1_eventemitter_embedded_sanity', function() {
     }
   });
 
-  after(function(done) {
+  after(function (done) {
     happnInstance.stop(done);
   });
 
@@ -74,14 +74,14 @@ describe('1_eventemitter_embedded_sanity', function() {
    We are initializing 2 clients to test saving data against the database, one client will push data into the
    database whilst another listens for changes.
    */
-  before('should initialize the clients', function(callback) {
+  before('should initialize the clients', function (callback) {
 
     try {
 
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
-      }, function(e, instance) {
+      }, function (e, instance) {
 
         if (e) return callback(e);
 
@@ -90,7 +90,7 @@ describe('1_eventemitter_embedded_sanity', function() {
         happn_client.create({
           plugin: happn.client_plugins.intra_process,
           context: happnInstance
-        }, function(e, instance) {
+        }, function (e, instance) {
 
           if (e) return callback(e);
           listenerclient = instance;
@@ -106,7 +106,7 @@ describe('1_eventemitter_embedded_sanity', function() {
   });
 
 
-  it('the listener should pick up a single wildcard event', function(callback) {
+  it('the listener should pick up a single wildcard event', function (callback) {
 
     try {
 
@@ -114,12 +114,12 @@ describe('1_eventemitter_embedded_sanity', function() {
       listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/*', {
         event_type: 'set',
         count: 1
-      }, function(message) {
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(0);
         callback();
 
-      }, function(e) {
+      }, function (e) {
 
         if (!e) {
 
@@ -130,7 +130,7 @@ describe('1_eventemitter_embedded_sanity', function() {
             property1: 'property1',
             property2: 'property2',
             property3: 'property3'
-          }, null, function(e, result) {
+          }, null, function (e, result) {
 
           });
         } else
@@ -142,11 +142,11 @@ describe('1_eventemitter_embedded_sanity', function() {
     }
   });
 
-  it('the publisher should get null for unfound data, exact path', function(callback) {
+  it('the publisher should get null for unfound data, exact path', function (callback) {
 
 
     var test_path_end = require('shortid').generate();
-    publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/unfound/exact/' + test_path_end, null, function(e, results) {
+    publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/unfound/exact/' + test_path_end, null, function (e, results) {
       ////////////console.log('new data results');
 
       expect(e).to.be(null);
@@ -158,7 +158,7 @@ describe('1_eventemitter_embedded_sanity', function() {
 
   });
 
-  it('the publisher should set new data', function(callback) {
+  it('the publisher should set new data', function (callback) {
 
     try {
       var test_path_end = require('shortid').generate();
@@ -169,10 +169,10 @@ describe('1_eventemitter_embedded_sanity', function() {
         property3: 'property3'
       }, {
         noPublish: true
-      }, function(e, result) {
+      }, function (e, result) {
 
         if (!e) {
-          publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function(e, results) {
+          publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
 
             expect(results.property1 == 'property1').to.be(true);
 
@@ -190,7 +190,7 @@ describe('1_eventemitter_embedded_sanity', function() {
     }
   });
 
-  it('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function(callback) {
+  it('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
 
     var timesCount = 10;
 
@@ -199,7 +199,7 @@ describe('1_eventemitter_embedded_sanity', function() {
     try {
 
       async.times(timesCount,
-        function(n, timesCallback) {
+        function (n, timesCallback) {
 
           var test_random_path2 = require('shortid').generate();
 
@@ -212,17 +212,17 @@ describe('1_eventemitter_embedded_sanity', function() {
           }, timesCallback);
 
         },
-        function(e) {
+        function (e) {
 
           if (e) return callback(e);
 
-          listenerclient.get(testBasePath + '/' + '*', null, function(e, results) {
+          listenerclient.get(testBasePath + '/' + '*', null, function (e, results) {
 
             if (e) return callback(e);
 
             expect(results.length).to.be(timesCount);
 
-            results.every(function(result) {
+            results.every(function (result) {
 
               /*
                RESULT SHOULD LOOK LIKE THIS
@@ -253,7 +253,7 @@ describe('1_eventemitter_embedded_sanity', function() {
   });
 
 
-  it('should set data, and then merge a new document into the data without overwriting old fields', function(callback) {
+  it('should set data, and then merge a new document into the data without overwriting old fields', function (callback) {
 
     try {
 
@@ -263,7 +263,7 @@ describe('1_eventemitter_embedded_sanity', function() {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
-      }, null, function(e, result) {
+      }, null, function (e, result) {
 
         if (e)
           return callback(e);
@@ -272,12 +272,12 @@ describe('1_eventemitter_embedded_sanity', function() {
           property4: 'property4'
         }, {
           merge: true
-        }, function(e, result) {
+        }, function (e, result) {
 
           if (e)
             return callback(e);
 
-          publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, null, function(e, results) {
+          publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/merge/' + test_path_end, null, function (e, results) {
 
             if (e)
               return callback(e);
@@ -301,7 +301,7 @@ describe('1_eventemitter_embedded_sanity', function() {
     }
   });
 
-  it('should contain the same payload between 2 non-merging consecutive stores', function(done) {
+  it('should contain the same payload between 2 non-merging consecutive stores', function (done) {
     var object = {
       param1: 10,
       param2: 20
@@ -311,7 +311,7 @@ describe('1_eventemitter_embedded_sanity', function() {
     listenerclient.on('setTest/nonMergeConsecutive', {
       event_type: 'set',
       count: 2
-    }, function(message, meta) {
+    }, function (message, meta) {
 
       if (firstTimeNonMergeConsecutive === undefined) {
         firstTimeNonMergeConsecutive = message;
@@ -320,18 +320,18 @@ describe('1_eventemitter_embedded_sanity', function() {
         expect(message).to.eql(firstTimeNonMergeConsecutive);
         done();
       }
-    }, function(err) {
+    }, function (err) {
       expect(err).to.not.exist;
-      publisherclient.set('setTest/nonMergeConsecutive', object, {}, function(err) {
+      publisherclient.set('setTest/nonMergeConsecutive', object, {}, function (err) {
         expect(err).to.not.be.ok();
-        publisherclient.set('setTest/nonMergeConsecutive', object, {}, function(err) {
+        publisherclient.set('setTest/nonMergeConsecutive', object, {}, function (err) {
           expect(err).to.not.be.ok();
         });
       });
     })
   });
 
-  it('should contain the same payload between a merge and a normal store for first store', function(done) {
+  it('should contain the same payload between a merge and a normal store for first store', function (done) {
     var object = {
       param1: 10,
       param2: 20
@@ -341,22 +341,22 @@ describe('1_eventemitter_embedded_sanity', function() {
     listenerclient.on('mergeTest/object', {
       event_type: 'set',
       count: 2
-    }, function(message) {
+    }, function (message) {
       expect(message).to.eql(object);
       if (firstTime) {
         firstTime = false;
         return;
       }
       done();
-    }, function(err) {
+    }, function (err) {
       expect(err).to.not.be.ok();
       publisherclient.set('mergeTest/object', object, {
         merge: true
-      }, function(err) {
+      }, function (err) {
         expect(err).to.not.be.ok();
         publisherclient.set('mergeTest/object', object, {
           merge: true
-        }, function(err) {
+        }, function (err) {
           expect(err).to.not.be.ok();
         });
       });
@@ -364,7 +364,7 @@ describe('1_eventemitter_embedded_sanity', function() {
   });
 
 
-  it('should search for a complex object', function(callback) {
+  it('should search for a complex object', function (callback) {
 
     var test_path_end = require('shortid').generate();
 
@@ -417,17 +417,17 @@ describe('1_eventemitter_embedded_sanity', function() {
       limit: 2
     }
 
-    publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function(e, put_result) {
+    publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function (e, put_result) {
 
       expect(e == null).to.be(true);
-      publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end + '/1', complex_obj, null, function(e, put_result) {
+      publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end + '/1', complex_obj, null, function (e, put_result) {
         expect(e == null).to.be(true);
 
         ////////////console.log('searching');
         publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
           criteria: criteria1,
           options: options1
-        }, function(e, search_result) {
+        }, function (e, search_result) {
 
           expect(e == null).to.be(true);
           expect(search_result.length == 1).to.be(true);
@@ -435,7 +435,7 @@ describe('1_eventemitter_embedded_sanity', function() {
           publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
             criteria: criteria2,
             options: options2
-          }, function(e, search_result) {
+          }, function (e, search_result) {
             expect(e == null).to.be(true);
             expect(search_result.length == 2).to.be(true);
             callback(e);
@@ -449,7 +449,7 @@ describe('1_eventemitter_embedded_sanity', function() {
 
   });
 
-  it('should search for a complex object by dates', function(callback) {
+  it('should search for a complex object by dates', function (callback) {
 
     var test_path_end = require('shortid').generate();
 
@@ -465,7 +465,7 @@ describe('1_eventemitter_embedded_sanity', function() {
     var from = Date.now();
     var to;
 
-    publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function(e, put_result) {
+    publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function (e, put_result) {
 
       expect(e == null).to.be(true);
       to = Date.now();
@@ -489,7 +489,7 @@ describe('1_eventemitter_embedded_sanity', function() {
       publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
         criteria: criteria,
         options: options
-      }, function(e, search_result) {
+      }, function (e, search_result) {
 
         expect(e == null).to.be(true);
         expect(search_result.length == 1).to.be(true);
@@ -502,7 +502,7 @@ describe('1_eventemitter_embedded_sanity', function() {
   });
 
 
-  it('should delete some test data', function(callback) {
+  it('should delete some test data', function (callback) {
 
     try {
 
@@ -513,12 +513,12 @@ describe('1_eventemitter_embedded_sanity', function() {
         property3: 'property3'
       }, {
         noPublish: true
-      }, function(e, result) {
+      }, function (e, result) {
 
         //We perform the actual delete
         publisherclient.remove('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
           noPublish: true
-        }, function(e, result) {
+        }, function (e, result) {
 
           expect(e).to.be(null);
           expect(result._meta.status).to.be('ok');
@@ -537,7 +537,7 @@ describe('1_eventemitter_embedded_sanity', function() {
 
   });
 
-  it('the publisher should set new data then update the data', function(callback) {
+  it('the publisher should set new data then update the data', function (callback) {
 
     try {
       var test_path_end = require('shortid').generate();
@@ -548,7 +548,7 @@ describe('1_eventemitter_embedded_sanity', function() {
         property3: 'property3'
       }, {
         noPublish: true
-      }, function(e, insertResult) {
+      }, function (e, insertResult) {
 
         expect(e).to.be(null);
 
@@ -559,7 +559,7 @@ describe('1_eventemitter_embedded_sanity', function() {
           property4: 'property4'
         }, {
           noPublish: true
-        }, function(e, updateResult) {
+        }, function (e, updateResult) {
 
           expect(e).to.be(null);
           expect(updateResult._meta.id == insertResult._meta.id).to.be(true);
@@ -575,7 +575,7 @@ describe('1_eventemitter_embedded_sanity', function() {
   });
 
 
-  it('should tag some test data', function(callback) {
+  it('should tag some test data', function (callback) {
 
     var randomTag = require('shortid').generate();
 
@@ -585,7 +585,7 @@ describe('1_eventemitter_embedded_sanity', function() {
       property3: 'property3'
     }, {
       noPublish: true
-    }, function(e, result) {
+    }, function (e, result) {
 
       ////////////////////console.log('did set');
       ////////////////////console.log([e, result]);
@@ -596,7 +596,7 @@ describe('1_eventemitter_embedded_sanity', function() {
         tag: randomTag,
         merge: true,
         noPublish: true
-      }, function(e, result) {
+      }, function (e, result) {
 
         //console.log(e);
 
@@ -610,7 +610,7 @@ describe('1_eventemitter_embedded_sanity', function() {
         expect(result.data.property2).to.be('property2');
         expect(result.data.property3).to.be('property3');
 
-        publisherclient.get('/_TAGS/1_eventemitter_embedded_sanity/' + test_id + '/test/tag/*', null, function(e, results) {
+        publisherclient.get('/_TAGS/1_eventemitter_embedded_sanity/' + test_id + '/test/tag/*', null, function (e, results) {
 
           expect(e).to.be(null);
 
@@ -618,7 +618,7 @@ describe('1_eventemitter_embedded_sanity', function() {
 
           var found = false;
 
-          results.map(function(tagged) {
+          results.map(function (tagged) {
 
             if (found)
               return;
@@ -649,7 +649,7 @@ describe('1_eventemitter_embedded_sanity', function() {
 
   //  We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 
-  it('the listener should pick up a single published event', function(callback) {
+  it('the listener should pick up a single published event', function (callback) {
 
     try {
 
@@ -657,12 +657,12 @@ describe('1_eventemitter_embedded_sanity', function() {
       listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
         event_type: 'set',
         count: 1
-      }, function(message) {
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
 
-      }, function(e) {
+      }, function (e) {
 
         //////////////////console.log('ON HAS HAPPENED: ' + e);
 
@@ -676,7 +676,7 @@ describe('1_eventemitter_embedded_sanity', function() {
             property1: 'property1',
             property2: 'property2',
             property3: 'property3'
-          }, null, function(e, result) {
+          }, null, function (e, result) {
             ////////////////////////////console.log('put happened - listening for result');
           });
         } else
@@ -691,7 +691,7 @@ describe('1_eventemitter_embedded_sanity', function() {
 
   //We are testing setting data at a specific path
 
-  it('the publisher should set new data ', function(callback) {
+  it('the publisher should set new data ', function (callback) {
 
     try {
       var test_path_end = require('shortid').generate();
@@ -700,10 +700,10 @@ describe('1_eventemitter_embedded_sanity', function() {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
-      }, null, function(e, result) {
+      }, null, function (e, result) {
 
         if (!e) {
-          publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function(e, results) {
+          publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
             ////////////////////////console.log('new data results');
             ////////////////////////console.log(results);
             expect(results.property1 == 'property1').to.be(true);
@@ -723,7 +723,7 @@ describe('1_eventemitter_embedded_sanity', function() {
   });
 
 
-  it('the publisher should set new data then update the data', function(callback) {
+  it('the publisher should set new data then update the data', function (callback) {
 
     try {
       var test_path_end = require('shortid').generate();
@@ -732,7 +732,7 @@ describe('1_eventemitter_embedded_sanity', function() {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
-      }, null, function(e, insertResult) {
+      }, null, function (e, insertResult) {
 
         expect(e == null).to.be(true);
 
@@ -741,7 +741,7 @@ describe('1_eventemitter_embedded_sanity', function() {
           property2: 'property2',
           property3: 'property3',
           property4: 'property4'
-        }, null, function(e, updateResult) {
+        }, null, function (e, updateResult) {
 
           expect(e == null).to.be(true);
           expect(updateResult._meta._id == insertResult._meta._id).to.be(true);
@@ -759,7 +759,7 @@ describe('1_eventemitter_embedded_sanity', function() {
 
   //We are testing pushing a specific value to a path which will actually become an array in the database
 
-  it('the publisher should push a sibling and get all siblings', function(callback) {
+  it('the publisher should push a sibling and get all siblings', function (callback) {
 
     try {
 
@@ -768,19 +768,19 @@ describe('1_eventemitter_embedded_sanity', function() {
       publisherclient.setSibling('1_eventemitter_embedded_sanity/' + test_id + '/siblings/' + test_path_end, {
         property1: 'sib_post_property1',
         property2: 'sib_post_property2'
-      }, function(e, results) {
+      }, function (e, results) {
 
         expect(e == null).to.be(true);
 
         publisherclient.setSibling('1_eventemitter_embedded_sanity/' + test_id + '/siblings/' + test_path_end, {
           property1: 'sib_post_property1',
           property2: 'sib_post_property2'
-        }, function(e, results) {
+        }, function (e, results) {
 
           expect(e == null).to.be(true);
 
           //the child method returns a child in the collection with a specified id
-          publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/siblings/' + test_path_end + '/*', null, function(e, getresults) {
+          publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/siblings/' + test_path_end + '/*', null, function (e, getresults) {
             expect(e == null).to.be(true);
             expect(getresults.length == 2).to.be(true);
             callback(e);
@@ -796,7 +796,7 @@ describe('1_eventemitter_embedded_sanity', function() {
 
   //  We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 
-  it('the listener should pick up a single published event', function(callback) {
+  it('the listener should pick up a single published event', function (callback) {
 
     try {
 
@@ -804,12 +804,12 @@ describe('1_eventemitter_embedded_sanity', function() {
       listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
         event_type: 'set',
         count: 1
-      }, function(message) {
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
 
-      }, function(e) {
+      }, function (e) {
 
         if (!e) {
 
@@ -822,7 +822,7 @@ describe('1_eventemitter_embedded_sanity', function() {
             property1: 'property1',
             property2: 'property2',
             property3: 'property3'
-          }, null, function(e, result) {
+          }, null, function (e, result) {
             ////////////////////////////console.log('put happened - listening for result');
           });
         } else
@@ -835,7 +835,7 @@ describe('1_eventemitter_embedded_sanity', function() {
   });
 
 
-  it('should get using a wildcard', function(callback) {
+  it('should get using a wildcard', function (callback) {
 
     var test_path_end = require('shortid').generate();
 
@@ -843,16 +843,16 @@ describe('1_eventemitter_embedded_sanity', function() {
       property1: 'property1',
       property2: 'property2',
       property3: 'property3'
-    }, null, function(e, insertResult) {
+    }, null, function (e, insertResult) {
       expect(e == null).to.be(true);
       publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '/1', {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
-      }, null, function(e, insertResult) {
+      }, null, function (e, insertResult) {
         expect(e == null).to.be(true);
 
-        publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', null, function(e, results) {
+        publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', null, function (e, results) {
 
           if (e) return callback();
 
@@ -864,7 +864,7 @@ describe('1_eventemitter_embedded_sanity', function() {
     });
   });
 
-  it('should get paths', function(callback) {
+  it('should get paths', function (callback) {
 
     var test_path_end = require('shortid').generate();
 
@@ -872,16 +872,16 @@ describe('1_eventemitter_embedded_sanity', function() {
       property1: 'property1',
       property2: 'property2',
       property3: 'property3'
-    }, null, function(e, insertResult) {
+    }, null, function (e, insertResult) {
       expect(e == null).to.be(true);
       publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '/1', {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
-      }, null, function(e, insertResult) {
+      }, null, function (e, insertResult) {
         expect(e == null).to.be(true);
 
-        publisherclient.getPaths('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', function(e, results) {
+        publisherclient.getPaths('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', function (e, results) {
 
           expect(results.length == 2).to.be(true);
           callback(e);
@@ -893,14 +893,14 @@ describe('1_eventemitter_embedded_sanity', function() {
   });
 
 
-  it('the listener should pick up a single delete event', function(callback) {
+  it('the listener should pick up a single delete event', function (callback) {
 
     //We put the data we want to delete into the database
     publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
       property1: 'property1',
       property2: 'property2',
       property3: 'property3'
-    }, null, function(e, result) {
+    }, null, function (e, result) {
 
       //////////////////console.log('did delete set');
       //path, event_type, count, handler, done
@@ -908,7 +908,7 @@ describe('1_eventemitter_embedded_sanity', function() {
       listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', {
         event_type: 'remove',
         count: 1
-      }, function(eventData) {
+      }, function (eventData) {
         //we are looking at the event internals on the listener to ensure our event management is working - because we are only listening for 1
         //instance of this event - the event listener should have been removed
         expect(listenerclient.events['/REMOVE@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me'].length).to.be(0);
@@ -918,14 +918,14 @@ describe('1_eventemitter_embedded_sanity', function() {
 
         callback();
 
-      }, function(e) {
+      }, function (e) {
 
         if (!e) return callback(e);
 
         expect(listenerclient.events['/REMOVE@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me'].length).to.be(1);
 
         //We perform the actual delete
-        publisherclient.remove('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', null, function(e, result) {
+        publisherclient.remove('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', null, function (e, result) {
 
         });
 
@@ -934,18 +934,18 @@ describe('1_eventemitter_embedded_sanity', function() {
     });
   });
 
-  it('should unsubscribe from an event', function(callback) {
+  it('should unsubscribe from an event', function (callback) {
 
     var currentListenerId;
 
     listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
       event_type: 'set',
       count: 0
-    }, function(message) {
+    }, function (message) {
 
       //we detach all listeners from the path here
       ////console.log('ABOUT OFF PATH');
-      listenerclient.offPath('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', function(e) {
+      listenerclient.offPath('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', function (e) {
 
         if (e)
           return callback(new Error(e));
@@ -954,12 +954,12 @@ describe('1_eventemitter_embedded_sanity', function() {
             event_type: 'set',
             count: 0
           },
-          function(message) {
+          function (message) {
 
             ////console.log('ON RAN');
             ////console.log(message);
 
-            listenerclient.off(currentListenerId, function(e) {
+            listenerclient.off(currentListenerId, function (e) {
 
               if (e)
                 return callback(new Error(e));
@@ -969,7 +969,7 @@ describe('1_eventemitter_embedded_sanity', function() {
             });
 
           },
-          function(e, listenerId) {
+          function (e, listenerId) {
             if (e) return callback(new Error(e));
 
             currentListenerId = listenerId;
@@ -978,7 +978,7 @@ describe('1_eventemitter_embedded_sanity', function() {
               property1: 'property1',
               property2: 'property2',
               property3: 'property3'
-            }, {}, function(e, setresult) {
+            }, {}, function (e, setresult) {
               if (e) return callback(new Error(e));
 
               ////console.log('DID ON SET');
@@ -989,7 +989,7 @@ describe('1_eventemitter_embedded_sanity', function() {
 
       });
 
-    }, function(e, listenerId) {
+    }, function (e, listenerId) {
       if (e) return callback(new Error(e));
 
       currentListenerId = listenerId;
@@ -998,20 +998,20 @@ describe('1_eventemitter_embedded_sanity', function() {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
-      }, {}, function(e, setresult) {
+      }, {}, function (e, setresult) {
         if (e) return callback(new Error(e));
       });
     });
   });
 
-  it('should subscribe to the catch all notification', function(callback) {
+  it('should subscribe to the catch all notification', function (callback) {
 
     var caught = {};
 
     this.timeout(10000);
     var caughtCount = 0;
 
-    listenerclient.onAll(function(eventData, meta) {
+    listenerclient.onAll(function (eventData, meta) {
 
       if (meta.action == '/REMOVE@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' ||
         meta.action == '/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
@@ -1020,7 +1020,7 @@ describe('1_eventemitter_embedded_sanity', function() {
       if (caughtCount == 2)
         callback();
 
-    }, function(e) {
+    }, function (e) {
 
       if (e) return callback(e);
 
@@ -1028,9 +1028,9 @@ describe('1_eventemitter_embedded_sanity', function() {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
-      }, null, function(e, put_result) {
+      }, null, function (e, put_result) {
 
-        publisherclient.remove('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all', null, function(e, del_result) {
+        publisherclient.remove('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all', null, function (e, del_result) {
 
 
         });
@@ -1041,17 +1041,17 @@ describe('1_eventemitter_embedded_sanity', function() {
 
   });
 
-  it('should unsubscribe from all events', function(callback) {
+  it('should unsubscribe from all events', function (callback) {
     this.timeout(10000);
 
     var onHappened = false;
 
-    listenerclient.onAll(function(message) {
+    listenerclient.onAll(function (message) {
 
       onHappened = true;
       callback(new Error('this wasnt meant to happen'));
 
-    }, function(e) {
+    }, function (e) {
 
       if (e) return callback(e);
 
@@ -1059,24 +1059,24 @@ describe('1_eventemitter_embedded_sanity', function() {
           event_type: 'set',
           count: 0
         },
-        function(message) {
+        function (message) {
           onHappened = true;
           callback(new Error('this wasnt meant to happen'));
         },
-        function(e) {
+        function (e) {
           if (e) return callback(e);
 
-          listenerclient.offAll(function(e) {
+          listenerclient.offAll(function (e) {
             if (e) return callback(e);
 
             publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {
               property1: 'property1',
               property2: 'property2',
               property3: 'property3'
-            }, null, function(e, put_result) {
+            }, null, function (e, put_result) {
               if (e) return callback(e);
 
-              setTimeout(function() {
+              setTimeout(function () {
 
                 if (!onHappened)
                   callback();
@@ -1089,23 +1089,23 @@ describe('1_eventemitter_embedded_sanity', function() {
     });
   });
 
-  it('should not publish with noPublish set', function(done) {
+  it('should not publish with noPublish set', function (done) {
 
     var timeout;
     //first listen for the change
     listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testNoPublish', {
       event_type: 'set',
       count: 1
-    }, function(message) {
+    }, function (message) {
       clearTimeout(timeout);
-      setImmediate(function() {
+      setImmediate(function () {
         expect(message).to.not.be.ok();
       });
-    }, function(e) {
+    }, function (e) {
       expect(e).to.not.be.ok();
 
-      timeout = setTimeout(function() {
-        listenerclient.offPath('/1_eventemitter_embedded_sanity/' + test_id + '/testNoPublish', function() {
+      timeout = setTimeout(function () {
+        listenerclient.offPath('/1_eventemitter_embedded_sanity/' + test_id + '/testNoPublish', function () {
           done();
         })
       }, 1000);
@@ -1115,7 +1115,7 @@ describe('1_eventemitter_embedded_sanity', function() {
         property3: 'property3'
       }, {
         noPublish: true
-      }, function(e, result) {
+      }, function (e, result) {
         expect(e).to.not.be.ok();
       });
     });

@@ -9,34 +9,33 @@ var happnInstance;
  */
 gulp.task('default', function (done) {
 
-service.create({
-  secure:true,
-  encryptPayloads:true,
-  services:{
-    security:{
-      config:{
-        keyPair:{
-          privateKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=',
-          publicKey:'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
+  service.create({
+      secure: true,
+      encryptPayloads: true,
+      services: {
+        security: {
+          config: {
+            keyPair: {
+              privateKey: 'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=',
+              publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
+            }
+          }
         }
       }
-    }
-  }
-}, 
-function(e, happnInst){
+    },
+    function (e, happnInst) {
 
-  if (e)
-    return callback(e);
+      if (e)
+        return callback(e);
 
-  happnInstance = happnInst;
+      happnInstance = happnInst;
 
-   new Server({
-    configFile: __dirname + '/01.karma.conf.js',
-    singleRun: true
-  }, done).start();
+      new Server({
+        configFile: __dirname + '/01.karma.conf.js',
+        singleRun: true
+      }, done).start();
 
-});
-  
+    });
 
- 
+
 });

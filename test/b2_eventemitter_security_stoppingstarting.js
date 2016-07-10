@@ -1,9 +1,9 @@
-describe('b2_eventemitter_security_stoppingstarting', function() {
+describe('b2_eventemitter_security_stoppingstarting', function () {
 
   require('benchmarket').start();
   after(require('benchmarket').store());
 
-  context('stopping and starting secure meshes', function() {
+  context('stopping and starting secure meshes', function () {
 
     var expect = require('expect.js');
     var async = require('async');
@@ -19,39 +19,39 @@ describe('b2_eventemitter_security_stoppingstarting', function() {
     var persistKey = '/persistence_test/' + require('shortid').generate();
     var currentService = null;
 
-    var stopService = function(callback){
-       if (currentService){
-        currentService.stop(function(e){
+    var stopService = function (callback) {
+      if (currentService) {
+        currentService.stop(function (e) {
           if (e && e.toString() != 'Error: Not running') return callback(e);
           callback();
         });
-       } else callback();
+      } else callback();
     }
 
-    var initService = function(filename, name, callback){
+    var initService = function (filename, name, callback) {
 
-      var doInitService = function(){
+      var doInitService = function () {
 
-          var serviceConfig = {
-            secure:true,
-            mode: 'embedded',
-            services: {
-              data: {
-                path: './services/data_embedded/service.js',
-                config: {}
-              }
-            },
-            utils: {
-              log_level: 'info|error|warning',
-              log_component: 'prepare'
+        var serviceConfig = {
+          secure: true,
+          mode: 'embedded',
+          services: {
+            data: {
+              path: './services/data_embedded/service.js',
+              config: {}
             }
+          },
+          utils: {
+            log_level: 'info|error|warning',
+            log_component: 'prepare'
           }
+        }
 
-          serviceConfig.services.data.config.filename = filename;
-          serviceConfig.name = name;
+        serviceConfig.services.data.config.filename = filename;
+        serviceConfig.name = name;
 
-          happn.service.create(serviceConfig,
-          function(e, happnService){
+        happn.service.create(serviceConfig,
+          function (e, happnService) {
             if (e) return callback(e);
             currentService = happnService;
             callback();
@@ -59,52 +59,52 @@ describe('b2_eventemitter_security_stoppingstarting', function() {
         );
       }
 
-      stopService(function(e){
+      stopService(function (e) {
         if (e) return callback(e);
         doInitService();
       });
     }
 
-    var getClient = function(service, callback){
+    var getClient = function (service, callback) {
       happn.client.create({
-          config:{username:'_ADMIN', password:'happn'},
-          plugin: happn.client_plugins.intra_process,
-          context: service,
-          secure:true
-        }, function(e, instance) {
+        config: {username: '_ADMIN', password: 'happn'},
+        plugin: happn.client_plugins.intra_process,
+        context: service,
+        secure: true
+      }, function (e, instance) {
 
-          if (e) return callback(e);
+        if (e) return callback(e);
 
-         callback(null, instance);
+        callback(null, instance);
 
       });
     }
 
-    before('should initialize the service', function(callback) {
+    before('should initialize the service', function (callback) {
 
       this.timeout(20000);
       initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', callback);
 
     });
 
-    after('should delete the temp data file', function(callback) {
+    after('should delete the temp data file', function (callback) {
 
       this.timeout(20000);
 
-      stopService(function(e){
-        fs.unlink(tmpFile, function(e){
-            callback();
+      stopService(function (e) {
+        fs.unlink(tmpFile, function (e) {
+          callback();
         });
       });
 
     });
 
 
-    it('should push some data into a permanent datastore', function(callback) {
+    it('should push some data into a permanent datastore', function (callback) {
 
       this.timeout(default_timeout);
 
-      getClient(currentService, function(e, testclient){
+      getClient(currentService, function (e, testclient) {
 
         if (e) return callback(e);
 
@@ -118,123 +118,123 @@ describe('b2_eventemitter_security_stoppingstarting', function() {
 
     });
 
-   it('should disconnect then reconnect and reverify the data', function(callback) {
+    it('should disconnect then reconnect and reverify the data', function (callback) {
 
-    this.timeout(default_timeout);
-    initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', function(e){
-
-      if (e) return callback(e);
-
-      getClient(currentService, function(e, testclient){
+      this.timeout(default_timeout);
+      initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', function (e) {
 
         if (e) return callback(e);
 
-        testclient.get(persistKey, null, function(e, response){
+        getClient(currentService, function (e, testclient) {
 
           if (e) return callback(e);
 
-          expect(response.property1).to.be("prop1");
-          callback();
-        });
+          testclient.get(persistKey, null, function (e, response) {
 
+            if (e) return callback(e);
+
+            expect(response.property1).to.be("prop1");
+            callback();
+          });
+
+        });
       });
     });
-   });
 
-   it('should create a memory server - check for the data - shouldnt be any', function(callback) {
+    it('should create a memory server - check for the data - shouldnt be any', function (callback) {
 
-    this.timeout(default_timeout);
+      this.timeout(default_timeout);
 
-    initService(null, 'b2_eventemitter_security_stoppingstarting', function(e){
-
-      if (e) return callback(e);
-
-      getClient(currentService, function(e, testclient){
+      initService(null, 'b2_eventemitter_security_stoppingstarting', function (e) {
 
         if (e) return callback(e);
 
-        testclient.get(persistKey, null, function(e, response){
+        getClient(currentService, function (e, testclient) {
 
           if (e) return callback(e);
 
-          expect(response).to.eql(null);
-          callback();
-        });
+          testclient.get(persistKey, null, function (e, response) {
 
-      });
-    });
+            if (e) return callback(e);
 
-   });
-
-   it('should stop then start and verify the server name', function(callback) {
-
-    this.timeout(default_timeout);
-    initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', function(e){
-
-      if (e) return callback(e);
-
-      var currentPersistedServiceName = currentService.services.system.name;
-      expect(currentPersistedServiceName).to.be('b2_eventemitter_security_stoppingstarting');
-
-      initService(null, null, function(e){
-
-        var currentUnpersistedServiceName = currentService.services.system.name;
-        expect(currentUnpersistedServiceName).to.not.be('b2_eventemitter_security_stoppingstarting');
-        expect(currentUnpersistedServiceName).to.not.be(null);
-        expect(currentUnpersistedServiceName).to.not.be(undefined);
-
-        initService(tmpFile, null, function(e){
-          if (e) return callback(e);
-
-          var currentPersistedRestartedServiceName = currentService.services.system.name;
-          expect(currentPersistedRestartedServiceName).to.be('b2_eventemitter_security_stoppingstarting');
-          callback();
+            expect(response).to.eql(null);
+            callback();
+          });
 
         });
-
       });
 
     });
 
+    it('should stop then start and verify the server name', function (callback) {
 
-   });
+      this.timeout(default_timeout);
+      initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', function (e) {
 
-  it('should stop then start and verify the server keypair', function(callback) {
+        if (e) return callback(e);
 
-    this.timeout(default_timeout);
-    initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', function(e){
+        var currentPersistedServiceName = currentService.services.system.name;
+        expect(currentPersistedServiceName).to.be('b2_eventemitter_security_stoppingstarting');
 
-      if (e) return callback(e);
+        initService(null, null, function (e) {
 
-      var currentPersistedServicePublicKey = currentService.services.security._keyPair.publicKey.toString();
+          var currentUnpersistedServiceName = currentService.services.system.name;
+          expect(currentUnpersistedServiceName).to.not.be('b2_eventemitter_security_stoppingstarting');
+          expect(currentUnpersistedServiceName).to.not.be(null);
+          expect(currentUnpersistedServiceName).to.not.be(undefined);
 
-      expect(currentPersistedServicePublicKey).to.not.be(null);
-      expect(currentPersistedServicePublicKey).to.not.be(undefined);
-      expect(currentPersistedServicePublicKey).to.not.be('');
+          initService(tmpFile, null, function (e) {
+            if (e) return callback(e);
 
-      initService(null, null, function(e){
+            var currentPersistedRestartedServiceName = currentService.services.system.name;
+            expect(currentPersistedRestartedServiceName).to.be('b2_eventemitter_security_stoppingstarting');
+            callback();
 
-        var currentUnPersistedServicePublicKey = currentService.services.security._keyPair.publicKey.toString();
-        expect(currentUnPersistedServicePublicKey).to.not.be(currentPersistedServicePublicKey);
-        expect(currentUnPersistedServicePublicKey).to.not.be(null);
-        expect(currentUnPersistedServicePublicKey).to.not.be(undefined);
-        expect(currentUnPersistedServicePublicKey).to.not.be('');
-
-        initService(tmpFile, null, function(e){
-          if (e) return callback(e);
-
-          var currentPersistedRestartedServicePublicKey = currentService.services.security._keyPair.publicKey.toString();
-          expect(currentPersistedRestartedServicePublicKey).to.be(currentPersistedServicePublicKey);
-          callback();
+          });
 
         });
 
       });
 
+
     });
 
+    it('should stop then start and verify the server keypair', function (callback) {
 
-   });
+      this.timeout(default_timeout);
+      initService(tmpFile, 'b2_eventemitter_security_stoppingstarting', function (e) {
+
+        if (e) return callback(e);
+
+        var currentPersistedServicePublicKey = currentService.services.security._keyPair.publicKey.toString();
+
+        expect(currentPersistedServicePublicKey).to.not.be(null);
+        expect(currentPersistedServicePublicKey).to.not.be(undefined);
+        expect(currentPersistedServicePublicKey).to.not.be('');
+
+        initService(null, null, function (e) {
+
+          var currentUnPersistedServicePublicKey = currentService.services.security._keyPair.publicKey.toString();
+          expect(currentUnPersistedServicePublicKey).to.not.be(currentPersistedServicePublicKey);
+          expect(currentUnPersistedServicePublicKey).to.not.be(null);
+          expect(currentUnPersistedServicePublicKey).to.not.be(undefined);
+          expect(currentUnPersistedServicePublicKey).to.not.be('');
+
+          initService(tmpFile, null, function (e) {
+            if (e) return callback(e);
+
+            var currentPersistedRestartedServicePublicKey = currentService.services.security._keyPair.publicKey.toString();
+            expect(currentPersistedRestartedServicePublicKey).to.be(currentPersistedServicePublicKey);
+            callback();
+
+          });
+
+        });
+
+      });
+
+
+    });
 
   });
 

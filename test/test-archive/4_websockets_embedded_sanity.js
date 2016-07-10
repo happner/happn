@@ -5,104 +5,107 @@ var happn_client = happn.client;
 var async = require('async');
 
 
-describe('4_websockets_embedded_sanity', function() {
+describe('4_websockets_embedded_sanity', function () {
 
-	var test_secret = 'test_secret';
-	var mode = "embedded";
-	var default_timeout = 4000;
-  	var happnInstance = null;
-  	var test_id;
-	/*
-	This test demonstrates starting up the happn service - 
-	the authentication service will use authTokenSecret to encrypt web tokens identifying
-	the logon session. The utils setting will set the system to log non priority information
-	*/
+  var test_secret = 'test_secret';
+  var mode = "embedded";
+  var default_timeout = 4000;
+  var happnInstance = null;
+  var test_id;
+  /*
+   This test demonstrates starting up the happn service - 
+   the authentication service will use authTokenSecret to encrypt web tokens identifying
+   the logon session. The utils setting will set the system to log non priority information
+   */
 
-	before('should initialize the service', function(callback) {
-		
-		this.timeout(20000);
+  before('should initialize the service', function (callback) {
 
-		test_id = Date.now() + '_' + require('shortid').generate();
+    this.timeout(20000);
 
-		try{
-			service.create({
-					mode:'embedded', 
-					services:{
-						auth:{
-							path:'./services/auth/service.js',
-							config:{
-								authTokenSecret:'a256a2fd43bf441483c5177fc85fd9d3',
-								systemSecret:test_secret
-							}
-						},
-						data:{
-							path:'./services/data_embedded/service.js',
-							config:{}
-						},
-						pubsub:{
-							path:'./services/pubsub/service.js'
-						}
-					},
-					utils:{
-						log_level:'info|error|warning',
-						log_component:'prepare'
-					}
-				},function (e, happn) {
-		          if (e)
-		            return callback(e);
+    test_id = Date.now() + '_' + require('shortid').generate();
 
-		          happnInstance = happn;
-		          callback();
-		        });
-		}catch(e){
-			callback(e);
-		}
-	});
+    try {
+      service.create({
+        mode: 'embedded',
+        services: {
+          auth: {
+            path: './services/auth/service.js',
+            config: {
+              authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
+              systemSecret: test_secret
+            }
+          },
+          data: {
+            path: './services/data_embedded/service.js',
+            config: {}
+          },
+          pubsub: {
+            path: './services/pubsub/service.js'
+          }
+        },
+        utils: {
+          log_level: 'info|error|warning',
+          log_component: 'prepare'
+        }
+      }, function (e, happn) {
+        if (e)
+          return callback(e);
 
-	after(function(done) {
-	  happnInstance.stop(done);
-	});
+        happnInstance = happn;
+        callback();
+      });
+    } catch (e) {
+      callback(e);
+    }
+  });
 
-	var publisherclient;
-	var listenerclient;
+  after(function (done) {
+    happnInstance.stop(done);
+  });
 
-	/*
-  	We are initializing 2 clients to test saving data against the database, one client will push data into the 
-  	database whilst another listens for changes.
-	*/
-	before('should initialize the clients', function(callback) {
-	    this.timeout(default_timeout);
+  var publisherclient;
+  var listenerclient;
 
-	    try {
-	      happn_client.create(function(e, instance) {
+  /*
+   We are initializing 2 clients to test saving data against the database, one client will push data into the 
+   database whilst another listens for changes.
+   */
+  before('should initialize the clients', function (callback) {
+    this.timeout(default_timeout);
 
-	        if (e) return callback(e);
+    try {
+      happn_client.create(function (e, instance) {
 
-	        publisherclient = instance;
-	        happn_client.create(function(e, instance) {
+        if (e) return callback(e);
 
-	          if (e) return callback(e);
-	          listenerclient = instance;
-	          callback();
+        publisherclient = instance;
+        happn_client.create(function (e, instance) {
 
-	        });
+          if (e) return callback(e);
+          listenerclient = instance;
+          callback();
 
-	      });
+        });
 
-	    } catch (e) {
-	      callback(e);
-	    }
+      });
 
-	 });
+    } catch (e) {
+      callback(e);
+    }
 
-	it('the listener should pick up a single wildcard event', function (callback) {
+  });
+
+  it('the listener should pick up a single wildcard event', function (callback) {
 
     this.timeout(default_timeout);
 
     try {
 
       //first listen for the change
-      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(0);
         callback();
@@ -155,11 +158,11 @@ describe('4_websockets_embedded_sanity', function() {
         if (e) return callback(e);
 
         publisherclient.get('4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
-          
+
           expect(results.property1 == 'property1').to.be(true);
           callback(e);
         });
-       
+
       });
 
     } catch (e) {
@@ -171,24 +174,24 @@ describe('4_websockets_embedded_sanity', function() {
 
     this.timeout(default_timeout);
     var timesCount = 10;
-    
+
     try {
 
-      async.times(timesCount, 
-      function(n, timesCallback){
+      async.times(timesCount,
+        function (n, timesCallback) {
 
-        var test_random_path2 = require('shortid').generate();
+          var test_random_path2 = require('shortid').generate();
 
-        publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/set_multiple/' + test_random_path2, {
-          property1: 'property1',
-          property2: 'property2',
-          property3: 'property3'
-        }, {noPublish: true}, timesCallback);
+          publisherclient.set('/4_websockets_embedded_sanity/' + test_id + '/set_multiple/' + test_random_path2, {
+            property1: 'property1',
+            property2: 'property2',
+            property3: 'property3'
+          }, {noPublish: true}, timesCallback);
 
-      }, 
-      function(e){
+        },
+        function (e) {
 
-        if (e) return callback(e);
+          if (e) return callback(e);
 
           listenerclient.get('/4_websockets_embedded_sanity/' + test_id + '/set_multiple/*', null, function (e, results) {
 
@@ -199,14 +202,13 @@ describe('4_websockets_embedded_sanity', function() {
 
           });
 
-      });
+        });
 
-     
+
     } catch (e) {
       callback(e);
     }
   });
-
 
 
   it('should set data, and then merge a new document into the data without overwriting old fields', function (callback) {
@@ -261,7 +263,7 @@ describe('4_websockets_embedded_sanity', function() {
     }
   });
 
-   it('should contain the same payload between 2 non-merging consecutive stores', function (done) {
+  it('should contain the same payload between 2 non-merging consecutive stores', function (done) {
     var object = {param1: 10, param2: 20};
     var firstTime;
 
@@ -486,7 +488,7 @@ describe('4_websockets_embedded_sanity', function() {
         publisherclient.get('/_TAGS/4_websockets_embedded_sanity/' + test_id + '/test/tag/*', null, function (e, results) {
 
           expect(e).to.be(null);
-          
+
           expect(results.length > 0).to.be(true);
 
           var found = false;
@@ -529,7 +531,10 @@ describe('4_websockets_embedded_sanity', function() {
     try {
 
       //first listen for the change
-      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
@@ -683,7 +688,10 @@ describe('4_websockets_embedded_sanity', function() {
     try {
 
       //first listen for the change
-      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
@@ -738,7 +746,7 @@ describe('4_websockets_embedded_sanity', function() {
 
           expect(results.length == 2).to.be(true);
           callback(e);
-          
+
         });
       });
     });
@@ -840,14 +848,16 @@ describe('4_websockets_embedded_sanity', function() {
     });
 
 
-
   });
 
   it('should unsubscribe from an event', function (callback) {
 
     var currentListenerId;
 
-    listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0}, function (message) {
+    listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+      event_type: 'set',
+      count: 0
+    }, function (message) {
 
       //we detach all listeners from the path here
       ////console.log('ABOUT OFF PATH');
@@ -856,7 +866,10 @@ describe('4_websockets_embedded_sanity', function() {
         if (e)
           return callback(new Error(e));
 
-        listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0},
+        listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+            event_type: 'set',
+            count: 0
+          },
           function (message) {
 
             ////console.log('ON RAN');
@@ -916,8 +929,8 @@ describe('4_websockets_embedded_sanity', function() {
 
     listenerclient.onAll(function (eventData, meta) {
 
-      if (meta.action == '/REMOVE@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' || 
-          meta.action == '/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
+      if (meta.action == '/REMOVE@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' ||
+        meta.action == '/SET@/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
         caughtCount++;
 
       if (caughtCount == 2)
@@ -958,7 +971,10 @@ describe('4_websockets_embedded_sanity', function() {
 
       if (e) return callback(e);
 
-      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {event_type: 'set', count: 0},
+      listenerclient.on('/4_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {
+          event_type: 'set',
+          count: 0
+        },
         function (message) {
           onHappened = true;
           callback(new Error('this wasnt meant to happen'));

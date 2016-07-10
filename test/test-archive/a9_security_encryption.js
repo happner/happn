@@ -11,13 +11,9 @@ describe('a9_security_encryption.js', function () {
 
   var testConfigs = {};
 
-  testConfigs.data = {
+  testConfigs.data = {}
 
-  }
-
-  testConfigs.security = {
-    
-  }
+  testConfigs.security = {}
 
   var testServices = {};
 
@@ -26,18 +22,18 @@ describe('a9_security_encryption.js', function () {
 
   before('should initialize the service', function (callback) {
 
-    var happnMock = {services:{}};
+    var happnMock = {services: {}};
 
-    async.eachSeries(['data', 'security'], function(serviceName, eachServiceCB){
+    async.eachSeries(['data', 'security'], function (serviceName, eachServiceCB) {
 
       testServices[serviceName] = new testServices[serviceName]();
       testServices[serviceName].happn = happnMock;
 
-      testServices[serviceName].initialize(testConfigs[serviceName], function(e, instance){
-        if (e)  return  eachServiceCB(e);
+      testServices[serviceName].initialize(testConfigs[serviceName], function (e, instance) {
+        if (e)  return eachServiceCB(e);
 
         happnMock.services[serviceName] = testServices[serviceName];
-      
+
         eachServiceCB();
 
       });
@@ -47,7 +43,7 @@ describe('a9_security_encryption.js', function () {
 
   var generatedPrivateKeyBob = new bitcore.PrivateKey();
   var generatedPublicKeyBob = generatedPrivateKeyBob.publicKey;
- 
+
   var generatedPrivateKeyAlice;
   var generatedPublicKeyAlice;
 
@@ -90,21 +86,21 @@ describe('a9_security_encryption.js', function () {
   it('should encrypt and decrypt data using the ECIES module directly', function (callback) {
 
     var bobSession = ECIES()
-    .privateKey(generatedPrivateKeyBob)
-    .publicKey(generatedPublicKeyAlice);
+      .privateKey(generatedPrivateKeyBob)
+      .publicKey(generatedPublicKeyAlice);
 
     var aliceSession = ECIES()
-    .privateKey(generatedPrivateKeyAlice)
-    .publicKey(generatedPublicKeyBob);
+      .privateKey(generatedPrivateKeyAlice)
+      .publicKey(generatedPublicKeyBob);
 
     var message = 'this is a secret';
 
     var encrypted = aliceSession
-    .encrypt(message);
+      .encrypt(message);
 
     var decrypted = bobSession
-    .decrypt(encrypted);
- 
+      .decrypt(encrypted);
+
     if (message == encrypted)
       throw new Error('ecrypted data matches secret message');
 
@@ -134,12 +130,12 @@ describe('a9_security_encryption.js', function () {
   it('should encrypt and decrypt data using symmetric hashing in the security layer', function (callback) {
 
     var message = 'this is a secret';
-    var hashed = testServices.security.generateHash(message, function(e, hash){
-      if (e)  return  callback(e);
+    var hashed = testServices.security.generateHash(message, function (e, hash) {
+      if (e)  return callback(e);
 
-      var verified = testServices.security.verifyHash(message, hash, function(e, verified){
+      var verified = testServices.security.verifyHash(message, hash, function (e, verified) {
 
-        if (e)  return  callback(e);
+        if (e)  return callback(e);
         expect(verified).to.be(true);
         callback();
 

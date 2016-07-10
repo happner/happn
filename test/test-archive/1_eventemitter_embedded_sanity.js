@@ -61,7 +61,7 @@ describe('1_eventemitter_embedded_sanity', function () {
     }
   });
 
-  after(function(done) {
+  after(function (done) {
     happnInstance.stop(done);
   });
 
@@ -69,7 +69,7 @@ describe('1_eventemitter_embedded_sanity', function () {
   var publisherclient;
   var listenerclient;
 
-   /*
+  /*
    We are initializing 2 clients to test saving data against the database, one client will push data into the 
    database whilst another listens for changes.
    */
@@ -77,7 +77,7 @@ describe('1_eventemitter_embedded_sanity', function () {
     this.timeout(default_timeout);
 
     try {
-     
+
       happn_client.create({
         plugin: happn.client_plugins.intra_process,
         context: happnInstance
@@ -106,7 +106,6 @@ describe('1_eventemitter_embedded_sanity', function () {
   });
 
 
-
   it('the listener should pick up a single wildcard event', function (callback) {
 
     this.timeout(default_timeout);
@@ -114,7 +113,10 @@ describe('1_eventemitter_embedded_sanity', function () {
     try {
 
       //first listen for the change
-      listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/*', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/*', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(0);
         callback();
@@ -124,14 +126,14 @@ describe('1_eventemitter_embedded_sanity', function () {
         if (!e) {
 
           expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(1);
-       
+
           //then make the change
           publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/blah', {
             property1: 'property1',
             property2: 'property2',
             property3: 'property3'
           }, null, function (e, result) {
-            
+
           });
         }
         else
@@ -150,14 +152,14 @@ describe('1_eventemitter_embedded_sanity', function () {
     var test_path_end = require('shortid').generate();
     publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/unfound/exact/' + test_path_end, null, function (e, results) {
       ////////////console.log('new data results');
-    
+
       expect(e).to.be(null);
       expect(results).to.be(null);
 
       callback(e);
 
     });
-        
+
   });
 
   it('the publisher should set new data', function (callback) {
@@ -176,7 +178,7 @@ describe('1_eventemitter_embedded_sanity', function () {
         if (!e) {
           publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
             ////////////console.log('new data results');
-          
+
             // expect(results.payload.length == 1).to.be(true);
             expect(results.property1 == 'property1').to.be(true);
 
@@ -199,26 +201,26 @@ describe('1_eventemitter_embedded_sanity', function () {
 
     this.timeout(default_timeout);
     var timesCount = 10;
-    
+
     var testBasePath = '/1_eventemitter_embedded_sanity/' + test_id + '/set_multiple'
 
     try {
 
-      async.times(timesCount, 
-      function(n, timesCallback){
+      async.times(timesCount,
+        function (n, timesCallback) {
 
-        var test_random_path2 = require('shortid').generate();
+          var test_random_path2 = require('shortid').generate();
 
-        publisherclient.set(testBasePath + '/' + test_random_path2, {
-          property1: 'property1',
-          property2: 'property2',
-          property3: 'property3'
-        }, {noPublish: true}, timesCallback);
+          publisherclient.set(testBasePath + '/' + test_random_path2, {
+            property1: 'property1',
+            property2: 'property2',
+            property3: 'property3'
+          }, {noPublish: true}, timesCallback);
 
-      }, 
-      function(e){
+        },
+        function (e) {
 
-        if (e) return callback(e);
+          if (e) return callback(e);
 
           listenerclient.get(testBasePath + '/' + '*', null, function (e, results) {
 
@@ -226,18 +228,18 @@ describe('1_eventemitter_embedded_sanity', function () {
 
             expect(results.length).to.be(timesCount);
 
-            results.every(function(result){
+            results.every(function (result) {
 
               /*
-              RESULT SHOULD LOOK LIKE THIS
-              { property1: 'property1',
-                property2: 'property2',
-                property3: 'property3',
-                _meta: 
-                 { modified: 1443606046766,
-                   created: 1443606046766,
-                   path: '/1_eventemitter_embedded_sanity/1443606046555_VkyH6cE1l/set_multiple/E17kSpqE1l' } }
-              */
+               RESULT SHOULD LOOK LIKE THIS
+               { property1: 'property1',
+               property2: 'property2',
+               property3: 'property3',
+               _meta: 
+               { modified: 1443606046766,
+               created: 1443606046766,
+               path: '/1_eventemitter_embedded_sanity/1443606046555_VkyH6cE1l/set_multiple/E17kSpqE1l' } }
+               */
 
               expect(result._meta.path.indexOf(testBasePath) == 0).to.be(true);
 
@@ -249,14 +251,13 @@ describe('1_eventemitter_embedded_sanity', function () {
 
           });
 
-      });
+        });
 
-     
+
     } catch (e) {
       callback(e);
     }
   });
-
 
 
   it('should set data, and then merge a new document into the data without overwriting old fields', function (callback) {
@@ -311,7 +312,7 @@ describe('1_eventemitter_embedded_sanity', function () {
     }
   });
 
-   it('should contain the same payload between 2 non-merging consecutive stores', function (done) {
+  it('should contain the same payload between 2 non-merging consecutive stores', function (done) {
     var object = {param1: 10, param2: 20};
     var firstTime;
 
@@ -536,7 +537,7 @@ describe('1_eventemitter_embedded_sanity', function () {
         publisherclient.get('/_TAGS/1_eventemitter_embedded_sanity/' + test_id + '/test/tag/*', null, function (e, results) {
 
           expect(e).to.be(null);
-          
+
           expect(results.length > 0).to.be(true);
 
           var found = false;
@@ -579,7 +580,10 @@ describe('1_eventemitter_embedded_sanity', function () {
     try {
 
       //first listen for the change
-      listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
@@ -733,7 +737,10 @@ describe('1_eventemitter_embedded_sanity', function () {
     try {
 
       //first listen for the change
-      listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
+      listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event', {
+        event_type: 'set',
+        count: 1
+      }, function (message) {
 
         expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
         callback();
@@ -788,7 +795,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
           expect(results.length == 2).to.be(true);
           callback(e);
-          
+
         });
       });
     });
@@ -891,14 +898,16 @@ describe('1_eventemitter_embedded_sanity', function () {
     });
 
 
-
   });
 
   it('should unsubscribe from an event', function (callback) {
 
     var currentListenerId;
 
-    listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0}, function (message) {
+    listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+      event_type: 'set',
+      count: 0
+    }, function (message) {
 
       //we detach all listeners from the path here
       ////console.log('ABOUT OFF PATH');
@@ -907,7 +916,10 @@ describe('1_eventemitter_embedded_sanity', function () {
         if (e)
           return callback(new Error(e));
 
-        listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {event_type: 'set', count: 0},
+        listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+            event_type: 'set',
+            count: 0
+          },
           function (message) {
 
             ////console.log('ON RAN');
@@ -967,8 +979,8 @@ describe('1_eventemitter_embedded_sanity', function () {
 
     listenerclient.onAll(function (eventData, meta) {
 
-      if (meta.action == '/REMOVE@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' || 
-          meta.action == '/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
+      if (meta.action == '/REMOVE@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' ||
+        meta.action == '/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
         caughtCount++;
 
       if (caughtCount == 2)
@@ -1009,7 +1021,10 @@ describe('1_eventemitter_embedded_sanity', function () {
 
       if (e) return callback(e);
 
-      listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {event_type: 'set', count: 0},
+      listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/off_all_test', {
+          event_type: 'set',
+          count: 0
+        },
         function (message) {
           onHappened = true;
           callback(new Error('this wasnt meant to happen'));

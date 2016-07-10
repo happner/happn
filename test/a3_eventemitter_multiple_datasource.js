@@ -1,4 +1,4 @@
-describe('a3_eventemitter_multiple_datasource', function() {
+describe('a3_eventemitter_multiple_datasource', function () {
 
   require('benchmarket').start();
   after(require('benchmarket').store());
@@ -26,32 +26,32 @@ describe('a3_eventemitter_multiple_datasource', function() {
 
   //console.log('persisted data file', tempFile1);
 
-  var getService = function(config, callback){
-   happn.service.create(config,
+  var getService = function (config, callback) {
+    happn.service.create(config,
       callback
     );
   }
 
-  var getClient = function(service, callback){
+  var getClient = function (service, callback) {
     happn.client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: service
-      }, function(e, instance) {
+      plugin: happn.client_plugins.intra_process,
+      context: service
+    }, function (e, instance) {
 
-        if (e) return callback(e);
+      if (e) return callback(e);
 
-       callback(null, instance);
+      callback(null, instance);
 
     });
   }
 
-  before('should initialize the services', function(callback) {
+  before('should initialize the services', function (callback) {
 
     this.timeout(60000);//travis sometiems takes ages...
 
     var serviceConfigs = [
       {
-        port:55001,
+        port: 55001,
         services: {
           auth: {
             path: './services/auth/service.js',
@@ -62,8 +62,8 @@ describe('a3_eventemitter_multiple_datasource', function() {
           },
           data: {
             path: './services/data_embedded/service.js',
-            config:{
-               filename:tempFile
+            config: {
+              filename: tempFile
             }
           },
           pubsub: {
@@ -88,21 +88,21 @@ describe('a3_eventemitter_multiple_datasource', function() {
           data: {
             path: './services/data_embedded/service.js',
             config: {
-              datastores:[
+              datastores: [
                 {
-                  name:'memory',
-                  isDefault:true,
-                  patterns:[
+                  name: 'memory',
+                  isDefault: true,
+                  patterns: [
                     '/a3_eventemitter_multiple_datasource/' + test_id + '/memorytest/*',
                     '/a3_eventemitter_multiple_datasource/' + test_id + '/memorynonwildcard'
                   ]
                 },
                 {
-                  name:'persisted',
-                  settings:{
-                    filename:tempFile1
+                  name: 'persisted',
+                  settings: {
+                    filename: tempFile1
                   },
-                  patterns:[
+                  patterns: [
                     '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedtest/*',
                     '/a3_eventemitter_multiple_datasource/' + test_id + '/persistednonwildcard'
                   ]
@@ -122,56 +122,56 @@ describe('a3_eventemitter_multiple_datasource', function() {
       }
     ];
 
-  async.eachSeries(serviceConfigs,
-    function(serviceConfig, serviceConfigCallback){
-       getService(serviceConfig, function(e, happnService){
+    async.eachSeries(serviceConfigs,
+      function (serviceConfig, serviceConfigCallback) {
+        getService(serviceConfig, function (e, happnService) {
 
-        if (e) return serviceConfigCallback(e);
+          if (e) return serviceConfigCallback(e);
 
-        services.push(happnService);
-        serviceConfigCallback();
+          services.push(happnService);
+          serviceConfigCallback();
 
-      });
-    },
-    function(e){
-
-      if (e) return callback(e);
-
-      getClient(services[0], function(e, client){
+        });
+      },
+      function (e) {
 
         if (e) return callback(e);
 
-        singleClient = client;
-
-        getClient(services[1], function(e, client){
+        getClient(services[0], function (e, client) {
 
           if (e) return callback(e);
 
-          multipleClient = client;
+          singleClient = client;
 
-          callback();
+          getClient(services[1], function (e, client) {
+
+            if (e) return callback(e);
+
+            multipleClient = client;
+
+            callback();
+
+          });
 
         });
 
+
       });
-
-
-    });
 
   });
 
-  after('should delete the temp data files', function(callback) {
+  after('should delete the temp data files', function (callback) {
 
-    fs.unlink(tempFile, function(e){
+    fs.unlink(tempFile, function (e) {
       if (e) return callback(e);
-      fs.unlink(tempFile1, function(e){
+      fs.unlink(tempFile1, function (e) {
         if (e) return callback(e);
 
         async.each(services,
-          function(currentService, eachServiceCB){
+          function (currentService, eachServiceCB) {
             currentService.stop(eachServiceCB);
-        },
-        callback);
+          },
+          callback);
 
       });
 
@@ -180,9 +180,9 @@ describe('a3_eventemitter_multiple_datasource', function() {
   });
 
 
-  it('should push some data into the single datastore service', function(callback) {
+  it('should push some data into the single datastore service', function (callback) {
 
-   this.timeout(4000);
+    this.timeout(4000);
 
     try {
       var test_path_end = require('shortid').generate();
@@ -210,9 +210,9 @@ describe('a3_eventemitter_multiple_datasource', function() {
 
   });
 
-  it('should push some data into the multiple datastore', function(callback) {
+  it('should push some data into the multiple datastore', function (callback) {
 
-     this.timeout(4000);
+    this.timeout(4000);
 
     try {
       var test_path_end = require('shortid').generate();
@@ -240,48 +240,48 @@ describe('a3_eventemitter_multiple_datasource', function() {
 
   });
 
-  var findRecordInDataFile = function(path, filepath, callback){
+  var findRecordInDataFile = function (path, filepath, callback) {
 
-    try{
+    try {
 
-        setTimeout(function(){
+      setTimeout(function () {
 
-           var fs = require('fs'), byline = require('byline');
-           var stream = byline(fs.createReadStream(filepath, { encoding: 'utf8' }));
-           var found = false;
+        var fs = require('fs'), byline = require('byline');
+        var stream = byline(fs.createReadStream(filepath, {encoding: 'utf8'}));
+        var found = false;
 
-           stream.on('data', function(line) {
+        stream.on('data', function (line) {
 
-            if (found)
-              return;
+          if (found)
+            return;
 
-             var record = JSON.parse(line);
+          var record = JSON.parse(line);
 
-             if (record._id == path){
-              found = true;
-              stream.end();
-              return callback(null, record);
-             }
+          if (record._id == path) {
+            found = true;
+            stream.end();
+            return callback(null, record);
+          }
 
-            });
+        });
 
-           stream.on('end', function(){
+        stream.on('end', function () {
 
-              if (!found)
-                callback(null, null);
+          if (!found)
+            callback(null, null);
 
-           });
+        });
 
-        }, 1000)
+      }, 1000)
 
-    }catch(e){
+    } catch (e) {
       callback(e);
     }
   }
 
-  it('should push some data into the multiple datastore, memory datastore, wildcard pattern', function(callback) {
+  it('should push some data into the multiple datastore, memory datastore, wildcard pattern', function (callback) {
 
-     this.timeout(4000);
+    this.timeout(4000);
 
     try {
       var test_path_end = require('shortid').generate();
@@ -298,7 +298,7 @@ describe('a3_eventemitter_multiple_datasource', function() {
 
             expect(results.property1 == 'property1').to.be(true);
 
-            findRecordInDataFile(test_path, tempFile1, function(e, record){
+            findRecordInDataFile(test_path, tempFile1, function (e, record) {
 
               if (e) return callback(e);
 
@@ -321,9 +321,9 @@ describe('a3_eventemitter_multiple_datasource', function() {
 
   });
 
-  it('should push some data into the multiple datastore, persisted datastore, wildcard pattern', function(callback) {
+  it('should push some data into the multiple datastore, persisted datastore, wildcard pattern', function (callback) {
 
-     this.timeout(4000);
+    this.timeout(4000);
 
     try {
       var test_path_end = require('shortid').generate();
@@ -340,7 +340,7 @@ describe('a3_eventemitter_multiple_datasource', function() {
 
             expect(results.property1 == 'property1').to.be(true);
 
-            findRecordInDataFile(test_path, tempFile1, function(e, record){
+            findRecordInDataFile(test_path, tempFile1, function (e, record) {
 
               if (e) return callback(e);
 
@@ -365,9 +365,9 @@ describe('a3_eventemitter_multiple_datasource', function() {
 
   });
 
-it('should push some data into the multiple datastore, memory datastore, exact pattern', function(callback) {
+  it('should push some data into the multiple datastore, memory datastore, exact pattern', function (callback) {
 
-     this.timeout(4000);
+    this.timeout(4000);
 
     try {
       var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/memorynonwildcard';
@@ -383,7 +383,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
             expect(results.property1 == 'property1').to.be(true);
 
-            findRecordInDataFile(test_path, tempFile1, function(e, record){
+            findRecordInDataFile(test_path, tempFile1, function (e, record) {
 
               if (e) return callback(e);
 
@@ -406,9 +406,9 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
   });
 
-  it('should push some data into the multiple datastore, persisted datastore, exact pattern', function(callback) {
+  it('should push some data into the multiple datastore, persisted datastore, exact pattern', function (callback) {
 
-     this.timeout(4000);
+    this.timeout(4000);
 
     try {
       var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistednonwildcard';
@@ -424,7 +424,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
             expect(results.property1 == 'property1').to.be(true);
 
-            findRecordInDataFile(test_path, tempFile1, function(e, record){
+            findRecordInDataFile(test_path, tempFile1, function (e, record) {
 
               if (e) return callback(e);
 
@@ -449,9 +449,9 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
   });
 
-  it('should push some data into the multiple datastore, default pattern', function(callback) {
+  it('should push some data into the multiple datastore, default pattern', function (callback) {
 
-     this.timeout(4000);
+    this.timeout(4000);
 
     try {
       var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/default';
@@ -467,7 +467,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
             expect(results.property1 == 'property1').to.be(true);
 
-            findRecordInDataFile(test_path, tempFile1, function(e, record){
+            findRecordInDataFile(test_path, tempFile1, function (e, record) {
 
               if (e) return callback(e);
 
@@ -533,7 +533,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
           expect(tagged.data.property2).to.be('property2');
           expect(tagged.data.property3).to.be('property3');
 
-          findRecordInDataFile(tagged_path, tempFile1, function(e, record){
+          findRecordInDataFile(tagged_path, tempFile1, function (e, record) {
 
             if (e) return callback(e);
 
@@ -552,7 +552,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
   });
 
-   it('check the same event should be raised, regardless of what data source we are pushing to', function (callback) {
+  it('check the same event should be raised, regardless of what data source we are pushing to', function (callback) {
 
     var caught = {};
 
@@ -564,18 +564,18 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
     multipleClient.onAll(function (eventData, meta) {
 
-      if (meta.action == '/SET@' + memoryTestPath || meta.action == '/SET@' + persistedTestPath){
+      if (meta.action == '/SET@' + memoryTestPath || meta.action == '/SET@' + persistedTestPath) {
         caughtCount++;
-        if (caughtCount == 2){
+        if (caughtCount == 2) {
 
-          findRecordInDataFile(persistedTestPath, tempFile1, function(e, record){
+          findRecordInDataFile(persistedTestPath, tempFile1, function (e, record) {
 
-              if (e) return callback(e);
+            if (e) return callback(e);
 
-              if (record)
-                callback();
-              else
-                callback(new Error('record not found in persisted file'));
+            if (record)
+              callback();
+            else
+              callback(new Error('record not found in persisted file'));
 
           });
         }
@@ -603,7 +603,6 @@ it('should push some data into the multiple datastore, memory datastore, exact p
           if (e) return callback(e);
 
 
-
         });
 
       });
@@ -612,9 +611,9 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
   });
 
-   it('should not find the pattern to be added in the persisted datastore', function(callback) {
+  it('should not find the pattern to be added in the persisted datastore', function (callback) {
 
-     this.timeout(4000);
+    this.timeout(4000);
 
     try {
       var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
@@ -630,7 +629,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
             expect(results.property1 == 'property1').to.be(true);
 
-            findRecordInDataFile(test_path, tempFile1, function(e, record){
+            findRecordInDataFile(test_path, tempFile1, function (e, record) {
 
               if (e) return callback(e);
 
@@ -653,9 +652,9 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
   });
 
-  it('should add a pattern to the persisted datastore, and check it works', function(callback) {
+  it('should add a pattern to the persisted datastore, and check it works', function (callback) {
 
-     this.timeout(4000);
+    this.timeout(4000);
 
     try {
       var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
@@ -673,7 +672,7 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
             expect(results.property1 == 'property1').to.be(true);
 
-            findRecordInDataFile(test_path, tempFile1, function(e, record){
+            findRecordInDataFile(test_path, tempFile1, function (e, record) {
 
               if (e) return callback(e);
 
@@ -698,17 +697,17 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
   });
 
-  it('should remove a pattern from the persisted datastore', function(callback) {
+  it('should remove a pattern from the persisted datastore', function (callback) {
 
-     this.timeout(4000);
+    this.timeout(4000);
 
     try {
 
       var test_path = '/a3_eventemitter_multiple_datasource/' + test_id + '/persistedaddedpattern';
       var patternExists = false;
 
-      for (var pattern in services[1].services.data.dataroutes){
-        if (pattern == test_path){
+      for (var pattern in services[1].services.data.dataroutes) {
+        if (pattern == test_path) {
           patternExists = true;
           break;
         }
@@ -720,8 +719,8 @@ it('should push some data into the multiple datastore, memory datastore, exact p
 
       services[1].services.data.removeDataStoreFilter(test_path);
 
-       for (var pattern in services[1].services.data.dataroutes){
-        if (pattern == test_path){
+      for (var pattern in services[1].services.data.dataroutes) {
+        if (pattern == test_path) {
           patternExists = true;
           break;
         }
