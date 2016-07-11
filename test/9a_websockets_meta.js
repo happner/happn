@@ -26,6 +26,7 @@ describe('9a_websockets_meta.js', function () {
   var disconnected = false;
 
   after(function (done) {
+    
   publisherclient.disconnect()
     .then(listenerclient.disconnect()
         .then(function () {
@@ -495,7 +496,7 @@ describe('9a_websockets_meta.js', function () {
 
   });
 
-  it('tests the meta data is not enumerable for responses', function (callback) {
+  xit('tests the meta data is not enumerable for responses', function (callback) {
 
     this.timeout(default_timeout);
 
@@ -527,7 +528,7 @@ describe('9a_websockets_meta.js', function () {
     }
   });
 
-  it('tests the meta data is not enumerable for gets', function (callback) {
+  xit('tests the meta data is not enumerable for gets', function (callback) {
 
     this.timeout(default_timeout);
 
