@@ -1,4 +1,4 @@
-describe('c9_unsubscribe_changes_eventemitter', function () {
+describe('c9_unsubscribe_changes_websockets', function () {
 
   require('benchmarket').start();
   after(require('benchmarket').store());

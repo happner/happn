@@ -1,13 +1,10 @@
 var happn = require('../lib/index');
 var serviceInstance;
 var expect = require('expect.js');
-var test_id = Date.now() + '_' + require('shortid').generate();
 
 describe('b1_websockets_security_check_for_holes', function () {
 
   require('benchmarket').start();
-  after(require('benchmarket').store());
-
   this.timeout(60000);
 
   var getService = function (config, callback) {
@@ -17,7 +14,6 @@ describe('b1_websockets_security_check_for_holes', function () {
   }
 
   var websocketsClient;
-  var eventEmitterClient;
 
   before('it starts completely defaulted service, created a websockets client and an eventemiiter client', function (done) {
 
@@ -53,7 +49,10 @@ describe('b1_websockets_security_check_for_holes', function () {
 
     websocketsClient.disconnect()
       .then(serviceInstance.stop()
-        .then(callback))
+        .then(function(){
+          require('benchmarket').store();
+          callback();
+        }))
       .catch(callback);
 
   });
@@ -78,7 +77,6 @@ describe('b1_websockets_security_check_for_holes', function () {
       console.log(apples);
       return done(new Error('found forbidden method signatures...'));
     }
-
 
     done();
 

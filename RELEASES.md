@@ -249,3 +249,8 @@
 
 - fixed issue where non-iterable _meta doesnt make it through to the client on websocket connections
 - made _meta non-enumerable for websockets and eventemitter
+
+2.9.3 2016-07-11
+----------------
+
+- adjusted back to making _meta enumerable, as this causes issues in happner, also _meta is useful in a lot of instances
