@@ -254,3 +254,10 @@
 ----------------------
 
 - adjusted back to making _meta enumerable, as this causes issues in happner, also _meta is useful in a lot of instances
+
+2.9.5 2016-07-14
+----------------
+
+- fixed offAll path issue
+- added utils object in client, with async function
+- updated travis to test node v6
