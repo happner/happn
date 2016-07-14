@@ -179,7 +179,7 @@ describe('c9_unsubscribe_changes_websockets', function () {
           property3: 'property3'
         }, {}, function (e) {
           if (e) return callback(new Error(e));
-          setTimeout(callback, 2000);
+          setTimeout(callback, 1000);
         });
 
       });
@@ -195,6 +195,41 @@ describe('c9_unsubscribe_changes_websockets', function () {
         if (e) return callback(new Error(e));
       });
 
+    });
+  });
+
+  it('should unsubscribe from an event path using a wildcard', function (callback) {
+
+    var currentListenerId;
+    var onRan = false;
+    var pathOnRan = false;
+
+    listenerclient.on('/e2e_test1/testsubscribe/data/wildcard_path_off_test/*', {event_type: 'set', count: 0}, function (message) {
+      return callback(new Error('not meant to happen'));
+    }, function (e) {
+      if (e) return callback(new Error(e));
+
+      listenerclient.on('/e2e_test1/testsubscribe/data/wildcard_path_off_test/data/*', function(data){
+        return callback(new Error('not meant to happen'));
+      }, function(e){
+
+        if (e) return callback(new Error(e));
+
+        listenerclient.offPath('/e2e_test1/testsubscribe/data/wildcard*', function (e) {
+
+          if (e) return callback(new Error(e));
+
+          publisherclient.set('/e2e_test1/testsubscribe/data/wildcard_path_off_test', {
+            property1: 'property1',
+            property2: 'property2',
+            property3: 'property3'
+          }, {}, function (e) {
+            if (e) return callback(new Error(e));
+            setTimeout(callback, 1000);
+          });
+
+        });
+      });
     });
   });
 

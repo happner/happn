@@ -260,3 +260,4 @@
 
 - fixed offAll path issue
 - added utils object in client, with async function
+- updated travis to test node v6
