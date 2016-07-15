@@ -261,3 +261,9 @@
 - fixed offAll path issue
 - added utils object in client, with async function
 - updated travis to test node v6
+
+2.9.6 2016-07-15
+----------------
+
+- fixed issue where handleDataResponseLocal was failing when passed an undefined handler
+- related to this happner issue 146
