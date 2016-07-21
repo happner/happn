@@ -267,3 +267,8 @@
 
 - fixed issue where handleDataResponseLocal was failing when passed an undefined handler
 - related to this happner issue 146
+
+2.9.7 2016-07-21
+----------------
+
+- fix #103 - allow require of happn client when module is defined
