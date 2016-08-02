@@ -278,3 +278,9 @@
 
 - updated the default reconnection options for primus websocket connections to retry indefinitely, eventually every 3 minutes
 - added some configuration options that simplify configuring websocket options
+
+2.10.1 2016-08-02
+-----------------
+
+- fixed d2 test
+- shorter config defaults to standard defaults
