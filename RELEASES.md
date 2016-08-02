@@ -272,3 +272,9 @@
 ----------------
 
 - fix #103 - allow require of happn client when module is defined
+
+2.10.0 2016-08-02
+----------------
+
+- updated the default reconnection options for primus websocket connections to retry indefinitely, eventually every 3 minutes
+- added some configuration options that simplify configuring websocket options
