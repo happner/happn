@@ -12,15 +12,12 @@ describe('8_websockets_embedded_ports', function () {
   var happn_client = happn.client;
   var async = require('async');
 
-
   var service1Port = 8000;
   var service2Port = 8001;
 
   var service1Client;
   var service2Client;
   var defaultClient;
-
-  var mode = "embedded";
 
   var default_timeout = 4000;
 
@@ -75,10 +72,6 @@ describe('8_websockets_embedded_ports', function () {
       callback(e);
     }
   });
-
-  var device1client;// a client that is connecting to the device 1
-  var device2client;// a client that is connecting to the device 2
-  var gatewayclient;// a client that connects to the gateway for services on the gateway (non proxied requests)
 
   it('should initialize the clients', function (callback) {
     this.timeout(default_timeout);
