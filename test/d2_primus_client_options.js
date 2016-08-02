@@ -57,10 +57,10 @@ describe('d2_primus_client_options.js', function () {
         primusClient = instance;
 
         expect(primusClient.pubsub.options.reconnect.retries).to.be(Infinity);
-        expect(primusClient.pubsub.options.reconnect.max).to.be(1800000);
+        expect(primusClient.pubsub.options.reconnect.max).to.be(180000);
 
         expect(primusClient.pubsub.recovery.retries).to.be(Infinity);
-        expect(primusClient.pubsub.recovery.max).to.be(1800000);
+        expect(primusClient.pubsub.recovery.max).to.be(180000);
 
         primusClient.disconnect(callback);
 
