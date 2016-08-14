@@ -284,3 +284,9 @@
 
 - fixed d2 test
 - shorter config defaults to standard defaults
+
+2.11.0 2016-08-14
+-----------------
+
+- have stateless session checking and login
+- made the default sessionTokenKey larger
