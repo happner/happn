@@ -54,7 +54,7 @@ describe('d3-security-tokens', function () {
               name:"web-session",
               map:{
                 user:['WEB_SESSION'],
-                is_token:1
+                session_type:1
               },
               policy:{
                 session_inactivity_threshold:2000
@@ -62,14 +62,13 @@ describe('d3-security-tokens', function () {
             }, {
               name:"connected-device",
               map:{
-                group:['CONNECTED_DEVICES']
+                group:['CONNECTED_DEVICES'],
+                public_key:['AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2']
               },
               policy: {
-                timeout: {
-                  token_ttl: 2000,
-                  token_renewable:true,
-                  is_token:1
-                }
+                token_ttl: 2000,
+                token_renewable:true,
+                session_type:1
               }
             }, {
               name:"stateful-ws",
@@ -77,11 +76,9 @@ describe('d3-security-tokens', function () {
                 group:['STATEFUL_SESSIONS']
               },
               policy: {
-                timeout: {
-                  token_ttl: 2000,
-                  token_renewable:true,
-                  is_token:1
-                }
+                token_ttl: 2000,
+                token_renewable:true,
+                session_type:1
               }
             }, {
               name:"default",
