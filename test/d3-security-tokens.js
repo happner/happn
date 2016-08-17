@@ -66,9 +66,10 @@ describe('d3-security-tokens', function () {
                 public_key:['AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2']
               },
               policy: {
-                token_ttl: 2000,
-                token_renewable:true,
-                session_type:1
+                token_ttl: 2000,//stale after 2 seconds
+                token_renewable:true,//renew requests allowed
+                token_renew_limit:2000,//not renewable after 2 seconds of being stale
+                session_type:1//token stateless
               }
             }, {
               name:"stateful-ws",
@@ -76,10 +77,8 @@ describe('d3-security-tokens', function () {
                 group:['STATEFUL_SESSIONS']
               },
               policy: {
-                token_ttl: 2000,//stale after 2 seconds
-                token_renewable:true,//renew requests allowed
-                token_renew_limit:2000,//not renewable after 2 seconds of being stale
-                session_type:1
+                token_ttl: Infinity,
+                session_type:0//stateful
               }
             }, {
               name:"default",
