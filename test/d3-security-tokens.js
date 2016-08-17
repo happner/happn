@@ -76,8 +76,9 @@ describe('d3-security-tokens', function () {
                 group:['STATEFUL_SESSIONS']
               },
               policy: {
-                token_ttl: 2000,
-                token_renewable:true,
+                token_ttl: 2000,//stale after 2 seconds
+                token_renewable:true,//renew requests allowed
+                token_renew_limit:2000,//not renewable after 2 seconds of being stale
                 session_type:1
               }
             }, {
