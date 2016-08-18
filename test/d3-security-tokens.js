@@ -49,42 +49,56 @@ describe('d3-security-tokens', function () {
             privateKey: 'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=',
             publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
           },
-          profiles:[
+          profiles:[ //profiles are in an array, in descending order of priority, so if you fit more than one profile, the top profile is chosen
             {
               name:"web-session",
               map:{
                 user:['WEB_SESSION'],
-                session_type:1
+                session_type:1//token stateless
               },
               policy:{
+                token_ttl: Infinity,
                 session_inactivity_threshold:2000
               }
             }, {
               name:"connected-device",
               map:{
                 group:['CONNECTED_DEVICES'],
-                public_key:['AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2']
+                public_key:['AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'],
+                session_type:1//token stateless
               },
               policy: {
                 token_ttl: 2000,//stale after 2 seconds
                 token_renewable:true,//renew requests allowed
                 token_renew_limit:2000,//not renewable after 2 seconds of being stale
-                session_type:1//token stateless
               }
             }, {
               name:"stateful-ws",
               map:{
-                group:['STATEFUL_SESSIONS']
+                group:['STATEFUL_SESSIONS'],
+                session_type:0//stateful
               },
               policy: {
                 token_ttl: Infinity,
-                session_type:0//stateful
+
               }
             }, {
-              name:"default",
-              map:{default:true},
+              name:"default-ws",// this is the default underlying profile for ws sessions
+              map:{
+                session_type:0//stateful
+              },
               policy: {
                 token_ttl: Infinity,
+                token_renewable:false,
+                session_inactivity_threshold:Infinity
+              }
+            }, {
+              name:"default-http",// this is the default underlying profile for ws sessions
+              map:{
+                session_type:1//token stateless
+              },
+              policy: {
+                token_ttl: 60000,//token goes stale after a minute
                 token_renewable:false,
                 session_inactivity_threshold:Infinity
               }
