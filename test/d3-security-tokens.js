@@ -45,6 +45,7 @@ describe('d3-security-tokens', function () {
     services:{
       security: {
         config: {
+          sessionTokenSecret:"absolutely necessary if you want tokens to carry on working after a restart",
           keyPair: {
             privateKey: 'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=',
             publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
@@ -57,8 +58,8 @@ describe('d3-security-tokens', function () {
                 session_type:1//token stateless
               },
               policy:{
-                token_ttl: Infinity,
-                session_inactivity_threshold:2000
+                session_ttl: Infinity,
+                session_inactivity_threshold:2000//this is costly, as we need to store state on the server side
               }
             }, {
               name:"connected-device",
@@ -68,11 +69,24 @@ describe('d3-security-tokens', function () {
                 session_type:1//token stateless
               },
               policy: {
-                token_ttl: 2000,//stale after 2 seconds
+                session_ttl: 2000,//stale after 2 seconds
                 token_renewable:true,//renew requests allowed
                 token_renew_limit:2000,//not renewable after 2 seconds of being stale
               }
-            }, {
+            },
+            {
+              name:"trusted-connected-device",
+              map:{
+                group:['TRUSTED_CONNECTED_DEVICES'],
+                public_key:['AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'],
+                session_type:1//token stateless
+              },
+              policy: {
+                session_ttl: 2000,//token never goes stale
+                token_renewable:true,//renew requests allowed
+                token_renew_limit:Infinity,//as long as this device possesses the above public key, it can renew its old token at any time
+              }
+            },{
               name:"stateful-ws",
               map:{
                 group:['STATEFUL_SESSIONS'],
@@ -88,7 +102,7 @@ describe('d3-security-tokens', function () {
                 session_type:0//stateful
               },
               policy: {
-                token_ttl: Infinity,
+                session_ttl: Infinity,
                 token_renewable:false,
                 session_inactivity_threshold:Infinity
               }
@@ -98,7 +112,7 @@ describe('d3-security-tokens', function () {
                 session_type:1//token stateless
               },
               policy: {
-                token_ttl: 60000,//token goes stale after a minute
+                session_ttl: 60000,//session goes stale after a minute
                 token_renewable:false,
                 session_inactivity_threshold:Infinity
               }
