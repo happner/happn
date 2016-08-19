@@ -290,3 +290,8 @@
 
 - have stateless session checking and login
 - made the default sessionTokenKey larger
+
+2.11.1 2016-08-19
+-----------------
+
+- fix bug preventing specifed host to listen
