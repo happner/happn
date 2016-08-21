@@ -15,9 +15,9 @@ describe('a4_security_encryption.js', function () {
 
   var testConfigs = {};
 
-  testConfigs.data = {}
+  testConfigs.data = {};
 
-  testConfigs.crypto = {}
+  testConfigs.crypto = {};
 
   var testServices = {};
 
