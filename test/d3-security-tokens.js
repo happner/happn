@@ -247,7 +247,7 @@ describe('d3-security-tokens', function () {
 
   });
 
-  it('should test the __prepareLogin method', function(done){
+  it('should test the default config settings', function(done){
 
     var happn = require('../lib/index')
     var happn_client = happn.client;
@@ -260,18 +260,149 @@ describe('d3-security-tokens', function () {
       }
     });
 
-    clientInstance.performRequest = function(path, action, data, options, callback){
+    expect(clientInstance.options.config.publicKey).to.be('AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2');
+    expect(clientInstance.options.config.privateKey).to.be('Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=');
 
+    var clientInstance = happn_client.__instance({
+      username:'_ADMIN',
+      publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
+      privateKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M='
+    });
+
+    expect(clientInstance.options.config.publicKey).to.be('AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2');
+    expect(clientInstance.options.config.privateKey).to.be('Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=');
+
+    var clientInstance = happn_client.__instance({
+      username:'_ADMIN',
+      password: 'happntest'
+    });
+
+    expect(clientInstance.options.config.username).to.be('_ADMIN');
+    expect(clientInstance.options.config.password).to.be('happntest');
+
+    var clientInstance = happn_client.__instance({
+      config:{
+        username:'_ADMIN',
+        password: 'happntest'
+      }
+    });
+
+    expect(clientInstance.options.config.username).to.be('_ADMIN');
+    expect(clientInstance.options.config.password).to.be('happntest');
+
+    done();
+
+  });
+
+  it('should test the __prepareLogin method, password', function(done){
+
+    var happn = require('../lib/index')
+    var happn_client = happn.client;
+
+    var Crypto = require('happn-util-crypto');
+    var crypto = new Crypto();
+
+    var nonce;
+
+    var clientInstance = happn_client.__instance({
+      username:'_ADMIN',
+      password:'happnTestPWD'
+    });
+
+    clientInstance.serverInfo = {};
+
+    var loginParameters = {
+      username:clientInstance.options.config.username,
+      password:'happnTestPWD'
+    };
+
+    clientInstance.performRequest = function(path, action, data, options, cb){
+      cb(new Error('this wasnt meant to happn'));
     };
 
     //loginParameters, callback
-    clientInstance.__prepareLogin();
+    clientInstance.__prepareLogin(loginParameters, function(e, prepared){
 
+      if (e) return callback(e);
+
+      expect(prepared.username).to.be(clientInstance.options.config.username);
+      expect(prepared.password).to.be('happnTestPWD');
+
+      done();
+
+    });
+
+  });
+
+  it('should test the __prepareLogin method, digest', function(done){
+
+    var happn = require('../lib/index')
+    var happn_client = happn.client;
+
+    var Crypto = require('happn-util-crypto');
+    var crypto = new Crypto();
+
+    var nonce;
+
+    var clientInstance = happn_client.__instance({
+      username:'_ADMIN',
+      keyPair:{
+        publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
+        privateKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M='
+      }
+    });
+
+    clientInstance.serverInfo = {};
+
+    var loginParameters = {
+      username:clientInstance.options.config.username,
+      publicKey:clientInstance.options.config.publicKey,
+      loginType:'digest'
+    };
+
+    clientInstance.performRequest = function(path, action, data, options, cb){
+
+      var nonce_requests = {};
+
+      if (!options) options = {};
+
+      if (action == 'request-nonce'){
+
+        nonce = crypto.generateNonce();
+
+        var request = {
+          nonce:nonce,
+          publicKey:data.publicKey
+        };
+
+        nonce_requests[nonce] = request;
+
+        cb(null, nonce);
+      }
+    };
+
+    clientInstance.__ensureCryptoLibrary(function(e){
+
+      if (e) return callback(e);
+
+      //loginParameters, callback
+      clientInstance.__prepareLogin(loginParameters, function(e, prepared){
+
+        if (e) return callback(e);
+
+        var verificationResult = crypto.verify(nonce, prepared.digest, clientInstance.options.config.publicKey);
+
+        expect(verificationResult).to.be(true);
+
+        done();
+
+      });
+    });
   });
 
   xit('should test the login function of the happn client, passing in a digest', function(){
 
-    var happn = require('../lib/index')
+    var happn = require('../lib/index');
     var happn_client = happn.client;
 
     var clientInstance = happn_client.__instance({
@@ -284,54 +415,54 @@ describe('d3-security-tokens', function () {
 
     clientInstance.performRequest = function(path, action, data, options, callback){
 
-      var nonce_requests = {};
+        var nonce_requests = {};
 
-      if (!options) options = {};
+        if (!options) options = {};
 
-      mockServices(function(e, happnMock){
+        mockServices(function(e, happnMock){
 
-      if (action == 'request-nonce'){
+        if (action == 'request-nonce'){
 
-        var Crypto = require('happn-util-crypto');
-        var crypto = new Crypto();
+          var Crypto = require('happn-util-crypto');
+          var crypto = new Crypto();
 
-        var nonce = crypto.generateNonce();
+          var nonce = crypto.generateNonce();
 
-        var request = {
-          nonce:nonce,
-          publicKey:data.publicKey
-        };
+          var request = {
+            nonce:nonce,
+            publicKey:data.publicKey
+          };
 
-        nonce_requests[nonce] = request;
+          nonce_requests[nonce] = request;
 
-        request.__timedOut = setTimeout(function(){
+          request.__timedOut = setTimeout(function(){
 
-          delete nonce_requests[this.nonce];
+            delete nonce_requests[this.nonce];
 
-        }.bind(request), 3000);
+          }.bind(request), 3000);
 
-        callback(null, nonce);
-      }
-
-      if (action == 'login'){
-
-        if (data.digest){
-
-          if (nonce_requests[data.nonce] !== null){
-
-            clearTimeout(nonce_requests[data.nonce].__timedOut);
-
-            happnMock.services.crypto.verify(data.nonce, data.digest, data.publicKey);
-
-          } else callback(new Error('could not find nonce request for nonce: ' + data.nonce));
+          callback(null, nonce);
         }
-      }
 
-      clientInstance.login();
+        if (action == 'login'){
 
-    });
+          if (data.digest){
 
-  };
+            if (nonce_requests[data.nonce] !== null){
+
+              clearTimeout(nonce_requests[data.nonce].__timedOut);
+
+              happnMock.services.crypto.verify(data.nonce, data.digest, data.publicKey);
+
+            } else callback(new Error('could not find nonce request for nonce: ' + data.nonce));
+          }
+        }
+
+        clientInstance.login();
+
+      });
+    }
+  });
 
   xit('should create a user with a public key, then login using a signature', function (callback) {
 
@@ -437,7 +568,6 @@ describe('d3-security-tokens', function () {
   xit('log in using the default profile - session should only lapse on disconnection', function (callback) {
     this.timeout(20000);
   });
-
 
   require('benchmarket').stop();
 
