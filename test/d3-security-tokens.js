@@ -33,9 +33,9 @@ describe('d3-security-tokens', function () {
           profiles:[ //profiles are in an array, in descending order of priority, so if you fit more than one profile, the top profile is chosen
             {
               name:"web-session",
-              map:{
+              session:{
                 user:['WEB_SESSION'],
-                session_type:0//token stateless
+                type:0//token stateless
               },
               policy:{
                 ttl: 4000,
@@ -43,18 +43,18 @@ describe('d3-security-tokens', function () {
               }
             }, {
               name:"rest-device",
-              map:{
+              session:{
                 group:['REST_DEVICES'],
-                session_type:0//token stateless
+                type:0//token stateless
               },
               policy: {
                 ttl: 2000//stale after 2 seconds
               }
             },{
               name:"trusted-device",
-              map:{
+              session:{
                 group:['TRUSTED_DEVICES'],
-                session_type:1//stateful connected device
+                type:1//stateful connected device
               },
               policy: {
                 ttl: 2000,//stale after 2 seconds
@@ -64,9 +64,9 @@ describe('d3-security-tokens', function () {
               }
             },{
               name:"specific-device",
-              map:{
+              session:{
                 ip_address:['127.0.0.1'],//match by IP address
-                session_type:-1//any type of session
+                type:-1//any type of session
               },
               policy: {
                 ttl: Infinity,//this device has this access no matter what
@@ -77,8 +77,8 @@ describe('d3-security-tokens', function () {
               }
             }, {
               name:"default-stateful",// this is the default underlying profile for stateful sessions - would exist regardless of whether you defined it or not
-              map:{
-                session_type:1//stateful
+              session:{
+                type:1//stateful
               },
               policy: {
                 ttl: Infinity,
@@ -86,12 +86,12 @@ describe('d3-security-tokens', function () {
               }
             }, {
               name:"default-stateless",// this is the default underlying profile for ws sessions - would exist regardless of whether you defined it or not
-              map:{
-                session_type:0//token stateless
+              session:{
+                type:0//token stateless
               },
               policy: {
-                session_ttl: 60000,//session goes stale after a minute
-                session_inactivity_threshold:Infinity
+                ttl: 60000,//session goes stale after a minute
+                inactivity_threshold:Infinity
               }
             }
           ]
