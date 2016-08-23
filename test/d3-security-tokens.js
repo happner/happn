@@ -55,7 +55,9 @@ describe('d3-security-tokens', function () {
             },{
               name:"trusted-device",
               session:{ //filter by the security properties of the session, so user, groups and permissions
-                group:{$in:['TRUSTED_DEVICES']},
+                user:{groups:{
+                  "TRUSTED_DEVICES" : { $exists: true }
+                }},
                 type:{$eq:1} //stateful connected device
               },
               policy: {
@@ -153,7 +155,7 @@ describe('d3-security-tokens', function () {
     });
   };
 
-  it.only ('should test the session filtering capability', function(done){
+  it ('should test the session filtering capability', function(done){
 
     var sift = require('sift');
 
@@ -197,6 +199,24 @@ describe('d3-security-tokens', function () {
     var foundItemProfile1 = sift(serviceConfig.services.security.config.profiles[1].session, [testSession1]);
 
     expect(foundItemProfile1.length).to.be(1);
+
+    var testSession2 = {
+      user:{
+        groups:{
+          'TRUSTED_DEVICES':{
+            permissions:{}
+          }
+        }
+      },
+      type:1
+    };
+
+    var foundItemProfile2 = sift(serviceConfig.services.security.config.profiles[2].session, [testSession2, testSession1]);
+
+    expect(foundItemProfile2.length).to.be(1);
+
+    expect(foundItemProfile2[0].user.groups.TRUSTED_DEVICES).to.not.be(null);
+    expect(foundItemProfile2[0].user.groups.TRUSTED_DEVICES).to.not.be(undefined);
 
     done();
 
