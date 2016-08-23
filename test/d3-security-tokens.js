@@ -34,8 +34,8 @@ describe('d3-security-tokens', function () {
             {
               name:"web-session",
               session:{
-                user:['WEB_SESSION'],
-                type:0//token stateless
+                user:{username:{$eq:'WEB_SESSION'}},
+                type:{$eq:0}
               },
               policy:{
                 ttl: 4000,
@@ -43,18 +43,20 @@ describe('d3-security-tokens', function () {
               }
             }, {
               name:"rest-device",
-              session:{
-                group:['REST_DEVICES'],
-                type:0//token stateless
+              session:{ //filter by the security properties of the session - check if this session user belongs to a specific group
+                user:{groups:{
+                  "REST_DEVICES" : { $exists: true }
+                }},
+                type:{$eq:0} //token stateless
               },
               policy: {
                 ttl: 2000//stale after 2 seconds
               }
             },{
               name:"trusted-device",
-              session:{
-                group:['TRUSTED_DEVICES'],
-                type:1//stateful connected device
+              session:{ //filter by the security properties of the session, so user, groups and permissions
+                group:{$in:['TRUSTED_DEVICES']},
+                type:{$eq:1} //stateful connected device
               },
               policy: {
                 ttl: 2000,//stale after 2 seconds
@@ -64,9 +66,9 @@ describe('d3-security-tokens', function () {
               }
             },{
               name:"specific-device",
-              session:{
-                ip_address:['127.0.0.1'],//match by IP address
-                type:-1//any type of session
+              session:{ //instance based mapping, so what kind of session is this?
+                type:{$in:[0,1]}, //any type of session
+                ip_address:{$eq:'127.0.0.1'}
               },
               policy: {
                 ttl: Infinity,//this device has this access no matter what
@@ -78,7 +80,7 @@ describe('d3-security-tokens', function () {
             }, {
               name:"default-stateful",// this is the default underlying profile for stateful sessions - would exist regardless of whether you defined it or not
               session:{
-                type:1//stateful
+                type:{$eq:1}
               },
               policy: {
                 ttl: Infinity,
@@ -87,10 +89,10 @@ describe('d3-security-tokens', function () {
             }, {
               name:"default-stateless",// this is the default underlying profile for ws sessions - would exist regardless of whether you defined it or not
               session:{
-                type:0//token stateless
+                type:{$eq:0}
               },
               policy: {
-                ttl: 60000,//session goes stale after a minute
+                ttl: 60000 * 10,//session goes stale after 10 minutes
                 inactivity_threshold:Infinity
               }
             }
@@ -150,6 +152,55 @@ describe('d3-security-tokens', function () {
 
     });
   };
+
+  it.only ('should test the session filtering capability', function(done){
+
+    var sift = require('sift');
+
+    var testSession = {
+      user:{
+        username:'WEB_SESSION'
+      },
+      type:0
+    };
+
+    var testSessionNotFound = {
+      user:{
+        username:'WEB_SESSION'
+      },
+      type:1
+    };
+
+    var foundItem = sift(serviceConfig.services.security.config.profiles[0].session, [testSession]);
+
+    expect(foundItem.length).to.be(1);
+
+    var notFoundItem = sift(serviceConfig.services.security.config.profiles[0].session, [testSessionNotFound]);
+
+    expect(notFoundItem.length).to.be(0);
+
+    var foundInGroupItem = sift(serviceConfig.services.security.config.profiles[0].session, [testSessionNotFound, testSession]);
+
+    expect(foundInGroupItem.length).to.be(1);
+
+   var testSession1 = {
+     user:{
+       groups:{
+         'REST_DEVICES':{
+            permissions:{}
+         }
+       }
+     },
+     type:0
+   };
+
+    var foundItemProfile1 = sift(serviceConfig.services.security.config.profiles[1].session, [testSession1]);
+
+    expect(foundItemProfile1.length).to.be(1);
+
+    done();
+
+  });
 
   it('should test the sign and fail to verify function of the crypto service, bad digest', function(done){
 
