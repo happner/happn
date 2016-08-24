@@ -86,6 +86,8 @@ describe('d3_data_functional', function() {
 
   it('merges data', function(callback) {
 
+    this.timeout(10000);
+
     var initialCreated;
 
     serviceInstance.upsert('/merge/' + testId, {"test":"data"}, {}, function(e, response){
@@ -94,27 +96,30 @@ describe('d3_data_functional', function() {
 
       initialCreated = response._meta.created;
 
-      serviceInstance.upsert('/merge/' + testId, {"test1":"data1"}, {merge:true}, function(e, response){
+      setTimeout(function(){
 
-        if (e) return callback(e);
-
-        expect(response._meta.created).to.equal(initialCreated);
-
-        serviceInstance.get('/merge/' + testId, {}, function(e, response){
+        serviceInstance.upsert('/merge/' + testId, {"test1":"data1"}, {merge:true}, function(e, response){
 
           if (e) return callback(e);
 
-          expect(response.data.test).to.equal("data");
-          expect(response.data.test1).to.equal("data1");
           expect(response._meta.created).to.equal(initialCreated);
-          expect(response._meta.modified > initialCreated).to.equal(true);
 
-          callback();
+          serviceInstance.get('/merge/' + testId, {}, function(e, response){
+
+            if (e) return callback(e);
+
+            expect(response.data.test).to.equal("data");
+            expect(response.data.test1).to.equal("data1");
+            expect(response._meta.created).to.equal(initialCreated);
+            expect(response._meta.modified > initialCreated).to.equal(true);
+
+            callback();
+
+          });
 
         });
 
-      });
-
+      }, 1000);
 
     });
 
