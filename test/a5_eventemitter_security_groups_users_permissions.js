@@ -8,19 +8,22 @@ describe('a5_eventemitter_security_groups', function () {
     var expect = require('expect.js');
     var happn = require('../lib/index');
     var service = happn.service;
-    var happn_client = happn.client;
+
     var async = require('async');
     var Logger = require('happn-logger');
 
     var test_id = Date.now() + '_' + require('shortid').generate();
-    var Promise = require('bluebird');
-    var HAPPNER_STOP_DELAY = 5000;
 
     var testConfigs = {};
 
-    testConfigs.data = {}
+    var tempFile = __dirname + '/tmp/testdata_secur_' + require('shortid').generate() + '.db';
 
-    testConfigs.security = {}
+    testConfigs.data = {
+      persist:true,
+      filename:tempFile
+    };
+
+    testConfigs.security = {};
 
     var testServices = {};
 
@@ -123,7 +126,7 @@ describe('a5_eventemitter_security_groups', function () {
         customString: 'custom1',
         customNumber: 0
       }
-    }
+    };
 
     var subGroup = {
       name: 'TEST SUB GROUP' + test_id,
@@ -131,7 +134,7 @@ describe('a5_eventemitter_security_groups', function () {
         customString: 'customSub1',
         customNumber: 1
       }
-    }
+    };
 
     var testUser = {
       username: 'TEST USER@blah.com' + test_id,
@@ -139,7 +142,7 @@ describe('a5_eventemitter_security_groups', function () {
       custom_data: {
         something: 'usefull'
       }
-    }
+    };
 
     var testPermissions = [];
     var addedGroup;

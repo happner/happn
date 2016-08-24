@@ -290,3 +290,13 @@
 
 - have stateless session checking and login
 - made the default sessionTokenKey larger
+
+2.11.1 2016-08-19
+-----------------
+
+- fix bug preventing specifed host to listen
+
+2.12.0 2016-08-24
+-----------------
+
+- small changes to make mongo plugin backwards compatible

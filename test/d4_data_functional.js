@@ -1,4 +1,4 @@
-describe('happn-service-mongo functional tests', function() {
+describe('d3_data_functional', function() {
 
   this.timeout(20000);
 
@@ -86,6 +86,8 @@ describe('happn-service-mongo functional tests', function() {
 
   it('merges data', function(callback) {
 
+    this.timeout(10000);
+
     var initialCreated;
 
     serviceInstance.upsert('/merge/' + testId, {"test":"data"}, {}, function(e, response){
@@ -94,27 +96,30 @@ describe('happn-service-mongo functional tests', function() {
 
       initialCreated = response._meta.created;
 
-      serviceInstance.upsert('/merge/' + testId, {"test1":"data1"}, {merge:true}, function(e, response){
+      setTimeout(function(){
 
-        if (e) return callback(e);
-
-        expect(response._meta.created).to.equal(initialCreated);
-
-        serviceInstance.get('/merge/' + testId, {}, function(e, response){
+        serviceInstance.upsert('/merge/' + testId, {"test1":"data1"}, {merge:true}, function(e, response){
 
           if (e) return callback(e);
 
-          expect(response.data.test).to.equal("data");
-          expect(response.data.test1).to.equal("data1");
           expect(response._meta.created).to.equal(initialCreated);
-          expect(response._meta.modified > initialCreated).to.equal(true);
 
-          callback();
+          serviceInstance.get('/merge/' + testId, {}, function(e, response){
+
+            if (e) return callback(e);
+
+            expect(response.data.test).to.equal("data");
+            expect(response.data.test1).to.equal("data1");
+            expect(response._meta.created).to.equal(initialCreated);
+            expect(response._meta.modified > initialCreated).to.equal(true);
+
+            callback();
+
+          });
 
         });
 
-      });
-
+      }, 1000);
 
     });
 
@@ -282,6 +287,39 @@ describe('happn-service-mongo functional tests', function() {
 
     });
 
+  });
+
+  it('gets data with $not', function(done) {
+
+    var test_obj = {
+      data:'ok'
+    };
+
+    var test_obj1 = {
+      data:'notok'
+    };
+
+    serviceInstance.upsert('/not_get/' + testId + '/ok/1', test_obj, null, function (e) {
+      expect(e == null).to.be(true);
+
+      serviceInstance.upsert('/not_get/' + testId + '/_notok_/1' , test_obj1, null, function (e) {
+        expect(e == null).to.be(true);
+
+        var listCriteria = {criteria: {$not:{}}};
+
+        listCriteria.criteria.$not['_id'] = {$regex: new RegExp(".*_notok_.*")};
+
+        serviceInstance.get('/not_get/' + testId + '/*', listCriteria, function (e, search_result) {
+
+          expect(e == null).to.be(true);
+
+          expect(search_result.length == 1).to.be(true);
+
+          done();
+
+        });
+      });
+    });
   });
 
   it('sets value data', function (callback) {
