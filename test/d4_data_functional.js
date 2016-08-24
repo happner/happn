@@ -68,6 +68,22 @@ describe('happn-service-mongo functional tests', function() {
 
   });
 
+  it('gets no data', function(callback) {
+
+    var random = require('shortid').generate();
+
+    serviceInstance.get('/wontfind/' + random, {}, function(e, response){
+
+      if (e) return callback(e);
+
+      expect(response).to.equal(null);
+      callback();
+
+    });
+
+  });
+
+
   it('merges data', function(callback) {
 
     var initialCreated;
