@@ -289,6 +289,39 @@ describe('d3_data_functional', function() {
 
   });
 
+  it('gets data with $not', function(done) {
+
+    var test_obj = {
+      data:'ok'
+    };
+
+    var test_obj1 = {
+      data:'notok'
+    };
+
+    serviceInstance.upsert('/not_get/' + testId + '/ok/1', test_obj, null, function (e) {
+      expect(e == null).to.be(true);
+
+      serviceInstance.upsert('/not_get/' + testId + '/_notok_/1' , test_obj1, null, function (e) {
+        expect(e == null).to.be(true);
+
+        var listCriteria = {criteria: {$not:{}}};
+
+        listCriteria.criteria.$not['_id'] = {$regex: new RegExp(".*_notok_.*")};
+
+        serviceInstance.get('/not_get/' + testId + '/*', listCriteria, function (e, search_result) {
+
+          expect(e == null).to.be(true);
+
+          expect(search_result.length == 1).to.be(true);
+
+          done();
+
+        });
+      });
+    });
+  });
+
   it('sets value data', function (callback) {
 
     try {
