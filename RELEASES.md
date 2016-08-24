@@ -295,3 +295,8 @@
 -----------------
 
 - fix bug preventing specifed host to listen
+
+2.12.0 2016-08-24
+-----------------
+
+- small changes to make mongo plugin backwards compatible
