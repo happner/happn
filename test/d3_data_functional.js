@@ -107,7 +107,7 @@ describe('d3_data_functional', function() {
           expect(response.data.test).to.equal("data");
           expect(response.data.test1).to.equal("data1");
           expect(response._meta.created).to.equal(initialCreated);
-          expect(response._meta.modified > initialCreated).to.equal(true);
+          expect(response._meta.modified >= initialCreated).to.equal(true);
 
           callback();
 
