@@ -10,7 +10,7 @@ describe('d3-security-tokens', function () {
   var async = require('async');
   var uuid = require('node-uuid');
   var Logger = require('happn-logger');
-
+  var CheckPoint = require('../lib/services/security/checkpoint');
   /*
    This test demonstrates starting up the happn service -
    the authentication service will use authTokenSecret to encrypt web tokens identifying
@@ -23,6 +23,9 @@ describe('d3-security-tokens', function () {
 
   var serviceConfig = {
     services:{
+      data:{
+
+      },
       security: {
         config: {
           sessionTokenSecret:"absolutely necessary if you want tokens to carry on working after a restart",
@@ -79,6 +82,18 @@ describe('d3-security-tokens', function () {
                   '/SPECIFIC_DEVICE/*':{actions: ['get','on']}
                 }
               }
+            },
+            {
+              name:"non-reusable",
+              session:{ //instance based mapping, so what kind of session is this?
+                user:{groups:{
+                  "LIMITED_REUSE" : { $exists: true }
+                }},
+                type:{$in:[0,1]} //stateless or stateful
+              },
+              policy: {
+                usage_limit:2//you can only use this session call twice
+              }
             }, {
               name:"default-stateful",// this is the default underlying profile for stateful sessions - would exist regardless of whether you defined it or not
               session:{
@@ -117,33 +132,38 @@ describe('d3-security-tokens', function () {
       instance.stop({reconnect:false},callback);
   };
 
-  var mockServices = function(callback){
+  var mockServices = function(callback, servicesConfig){
 
-    var testConfigs = {};
-
-    testConfigs.data = {};
-
-    testConfigs.crypto = {};
+    var testConfig = {
+      secure:true,
+      services:{
+        data:{},
+        crypto:{},
+        security:{}
+      }
+    };
 
     var testServices = {};
 
     testServices.data = require('../lib/services/data_embedded/service');
     testServices.crypto = require('../lib/services/crypto/service');
+    testServices.security = require('../lib/services/security/service');
 
     var happnMock = {services: {}};
 
+    if (servicesConfig) testConfig = servicesConfig;
+
     happnMock.utils = require('../lib/utils');
 
-    async.eachSeries(['data', 'crypto'], function (serviceName, eachServiceCB) {
+    async.eachSeries(['data', 'crypto', 'security'], function (serviceName, eachServiceCB) {
 
       testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;
 
-      testServices[serviceName].initialize(testConfigs[serviceName], function (e, instance) {
+      testServices[serviceName].initialize(serviceConfig.services[serviceName], function (e, instance) {
         if (e)  return eachServiceCB(e);
 
         happnMock.services[serviceName] = testServices[serviceName];
-
         eachServiceCB();
 
       });
@@ -471,7 +491,7 @@ describe('d3-security-tokens', function () {
     });
   });
 
-  xit('should test the login function of the happn client, passing in a digest', function(){
+  it('should test the login function of the happn client, passing in a digest', function(){
 
     var happn = require('../lib/index');
     var happn_client = happn.client;
@@ -535,26 +555,266 @@ describe('d3-security-tokens', function () {
     }
   });
 
-  xit('should create a user with a public key, then login using a signature', function (callback) {
+  it("tests the security checkpoints __createPermissionSet function", function(done){
+
+    var checkpoint = new CheckPoint({
+      logger:require('happn-logger')
+    });
+
+    checkpoint.securityService = {
+      getGroup:function(groupName, opts, callback){
+
+        if (groups[groupName]) callback(null, groups[groupName]);
+
+      },
+      happn:{
+        utils:require('../lib/utils')
+      }
+    };
+
+    var permissions = {
+      '/test/group/explicit':{action:['set']},
+      '/test/group/*':{action:['*']},
+      '/test/group/*':{action:['*']}
+    };
+
+    var permissionSet = checkpoint.__createPermissionSet(permissions);
+
+    expect(permissionSet.explicit['/test/group/explicit'].action[0]).to.be('set');
+    expect(permissionSet.wildcard['/test/group/*'].action[0]).to.be('*');
+    expect(Object.keys(permissionSet.wildcard).length).to.be(1);
+
+    done();
+
+  });
+
+  it("tests the security checkpoints __loadPermissionSet function", function(done){
+
+    var groups = {
+      'TEST_GROUP':{
+        permissions:{
+          '/test/group/explicit':{action:['set']},
+          '/test/group/*':{action:['*']}
+        }
+      },
+      'TEST_GROUP_1':{
+        permissions:{
+          '/test/group/*':{action:['*']}
+        }
+      }
+    };
+
+    var identity = {
+      user:{
+        groups:groups
+      }
+    };
+
+    var checkpoint = new CheckPoint({
+      logger:require('happn-logger')
+    });
+
+    checkpoint.securityService = {
+      getGroup:function(groupName, opts, callback){
+
+        if (groups[groupName]) callback(null, groups[groupName]);
+
+      },
+      happn:{
+        utils:require('../lib/utils')
+      }
+    };
+
+    checkpoint.__loadPermissionSet(identity, function(e, permissionSet){
+
+      if (e) return done(e);
+
+      expect(permissionSet.explicit['/test/group/explicit'].action[0]).to.be('set');
+      expect(permissionSet.wildcard['/test/group/*'].action[0]).to.be('*');
+      expect(Object.keys(permissionSet.wildcard).length).to.be(1);
+
+      done();
+
+
+    });
+
+  });
+
+  it("tests the security checkpoints __authorized function", function(done){
+
+    var groups = {
+      'TEST_GROUP':{
+        permissions:{
+          '/test/explicit':{action:['set']},
+          '/test/wild/*':{action:['*']}
+        }
+      },
+      'TEST_GROUP_1':{
+        permissions:{
+          '/test/wild/*':{action:['*']}
+        }
+      }
+    };
+
+    var identity = {
+      user:{
+        groups:groups
+      }
+    };
+
+    var checkpoint = new CheckPoint({
+      logger:require('happn-logger')
+    });
+
+    checkpoint.securityService = {
+      getGroup:function(groupName, opts, callback){
+
+        if (groups[groupName]) callback(null, groups[groupName]);
+
+      },
+      happn:{
+        utils:require('../lib/utils')
+      }
+    };
+
+    checkpoint.__loadPermissionSet(identity, function(e, permissionSet){
+
+      if (e) return done(e);
+
+      expect(permissionSet.explicit['/test/explicit'].action[0]).to.be('set');
+      expect(permissionSet.wildcard['/test/wild/*'].action[0]).to.be('*');
+      expect(Object.keys(permissionSet.wildcard).length).to.be(1);
+
+
+      expect(checkpoint.__authorized(permissionSet, '/test/explicit', 'set')).to.be(true);
+      expect(checkpoint.__authorized(permissionSet, '/test/wild/blah', 'on')).to.be(true);
+      expect(checkpoint.__authorized(permissionSet, '/test/explicit/1', 'set')).to.be(false);
+      expect(checkpoint.__authorized(permissionSet, '/test', 'get')).to.be(false);
+
+      done();
+
+
+    });
+
+  });
+
+  var mockRequest = function(token, url, payload, method){
+
+    if (!token) throw new Error('you must specify a token');
+    if (!url) throw new Error('you must specify an url');
+    if (method.toLowerCase() == 'post' && !payload) throw new Error('you must specify an url');
+
+    if (!method) method = 'GET';
+
+    var MockRequest = require('./helpsrs/mock_request');
+
+    var request = new MockRequest({
+      method: method.toUppserCase(),
+      url: url,
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    request.write(payload);
+
+    request.end();
+
+    return request;
+
+  };
+
+  var mockLoginRequest = function(credentials, callback){
+
+    var MockRequest = require('./helpsrs/mock_request');
+
+    var request = new MockRequest({
+      method: 'POST',
+      url: '/auth/login',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    request.write(credentials);
+    request.end();
+
+    return request;
+
+  };
+
+  xit('tests the security services generateToken and decodeToken methods', function(e){
+
+    mockServices(function(e, happnMock){
+
+      if (e) return done(e);
+
+      var token = happnMock.services.security.generateToken({
+
+        id: 1,
+        isToken:true,
+        username: 'TEST',
+        timestamp: Date.now(),
+        ttl: 3000,
+        permissions:undefined
+
+      });
+
+
+      var decoded = happnMock.services.security.decodeToken(token)
+
+
+    }, serviceConfig);
+
+  });
+
+  xit('tests the security services __httpRequest method', function(e){
+
+    mockServices(function(e, happnMock){
+
+      if (e) return done(e);
+
+
+
+    }, serviceConfig);
+
+  });
+
+  xit('tests the security services __profileSession method', function(e){
+
+    mockServices(function(e, happnMock){
+
+      if (e) return done(e);
+
+
+
+
+
+    }, serviceConfig);
+
+  });
+
+  xit('should create a user with a public key, then login to a using a signature', function (done) {
 
     this.timeout(20000);
 
     var config =  {
-    sessionTokenSecret:"absolutely necessary if you want tokens to carry on working after a restart",
-    profiles:[ //profiles are in an array, in descending order of priority, so if you fit more than one profile, the top profile is chosen
-        {
-          name:"web-session",
-          map:{
-            user:['WEB_SESSION'],
-            session_type:1//token stateless
-          },
-          policy:{
-            session_ttl: Infinity,
-            session_inactivity_threshold:2000//this is costly, as we need to store state on the server side
+      secure:true,
+      sessionTokenSecret:"absolutely necessary if you want tokens to carry on working after a restart",
+      profiles:[
+          {
+            name:"web-session",
+            session:{
+              user:{username:{$eq:'WEB_SESSION'}},
+              type:{$eq:0}
+            },
+            policy:{
+              ttl: 4000,
+              inactivity_threshold:2000//this is costly, as we need to store state on the server side
+            }
           }
-        }
-      ]
-    };
+        ]
+      };
 
     getService(config, function (e, instance) {
 
@@ -568,14 +828,15 @@ describe('d3-security-tokens', function () {
       };
 
       var testUser = {
-        username: 'TEST_USER',
-        public_key: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
+        username: 'WEB_SESSION',
+        publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
       };
 
       var addedTestGroup;
       var addedTestuser;
 
       var testClient;
+      var serviceInstance = instance;
 
       serviceInstance.services.security.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
 
@@ -592,19 +853,15 @@ describe('d3-security-tokens', function () {
             if (e) return done(e);
 
             happn.client.create({
-
               username: testUser.username,
               publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
-              privateKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M='
+              privateKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=',
+              loginType:'digest'
 
               })
 
               .then(function (clientInstance) {
                 testClient = clientInstance;
-
-
-
-
                 done();
               })
 
