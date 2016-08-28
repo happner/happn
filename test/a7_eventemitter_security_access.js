@@ -34,7 +34,7 @@ describe('a7_eventemitter_security_access', function () {
 
   context('login', function () {
 
-    it('authenticates with the _ADMIN user, using the default password', function (done) {
+    it.only('authenticates with the _ADMIN user, using the default password', function (done) {
 
       happn.client.create({
           config: {username: '_ADMIN', password: 'happn'},
