@@ -508,8 +508,6 @@ describe('d3-security-tokens', function () {
 
         var nonce_requests = {};
 
-        if (!options) options = {};
-
         mockServices(function(e, happnMock){
 
         if (action == 'request-nonce'){
@@ -693,6 +691,53 @@ describe('d3-security-tokens', function () {
 
       done();
 
+    });
+  });
+
+  it.only('tests the security services __profileSession method', function(e){
+
+    mockServices(function(e, happnMock){
+
+      if (e) return done(e);
+
+
+
+
+
+    }, serviceConfig);
+
+  });
+
+  it("tests the security checkpoints _authorizeSession function", function(done){
+
+    var checkpoint = new CheckPoint({
+      logger:require('happn-logger')
+    });
+
+    checkpoint.securityService = {
+      happn:{
+        utils:require('../lib/utils')
+      }
+    };
+
+    var testSession = {
+      type:1,
+      timestamp:Date.now(),
+      policy:{
+        1:{
+          ttl:2000
+        },
+        0:{
+          ttl:2000
+        }
+      }
+    };
+
+    checkpoint._authorizeSession(session, function(e, authorized){
+
+      if (e) return done(e);
+
+      done();
 
     });
 
