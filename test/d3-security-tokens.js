@@ -866,8 +866,6 @@ describe('d3-security-tokens', function () {
 
       if (e) return done(e);
 
-      console.log('checkpoint.__inactivityCounters:::',checkpoint.__inactivityCounters);
-
       expect(checkpoint.__inactivityCounters[99]).to.not.be(null);
       expect(checkpoint.__inactivityCounters[99]).to.not.be(undefined);
 
@@ -878,6 +876,8 @@ describe('d3-security-tokens', function () {
           if (!e) return done('this was not meant to happn');
 
           expect(e.toString()).to.be('Error: session inactivity threshold reached');
+
+          //ensure we have removed the inactivity counter after the ttl
           expect(checkpoint.__inactivityCounters[99]).to.be(undefined);
 
           done();
@@ -887,6 +887,72 @@ describe('d3-security-tokens', function () {
       }, 1500);
 
     });
+
+  });
+
+  it("tests the security checkpoints _authorizeSession inactivity_threshold keep-alive", function(done){
+
+    this.timeout(20000);
+
+    var checkpoint = new CheckPoint({
+      logger:require('happn-logger')
+    });
+
+    checkpoint.securityService = {
+      happn:{
+        utils:require('../lib/utils')
+      }
+    };
+
+    var testSession = {
+      id:99,
+      type:0,
+      timestamp:Date.now(),
+      policy:{
+        1:{
+          ttl:6000,
+          inactivity_threshold:1000
+        },
+        0:{
+          ttl:15000,
+          inactivity_threshold:2000
+        }
+      }
+    };
+
+    var counter = 0;
+
+    var checkSessionIsAlive = function(){
+
+      checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+        if (e) return done(e);
+
+        if (counter <= 3){
+
+          counter++;
+
+          setTimeout(function(){
+
+            checkSessionIsAlive();
+
+          }, 1200);
+
+        }else{
+
+          setTimeout(function(){
+
+            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+              expect(e.toString()).to.be('Error: session inactivity threshold reached');
+              done();
+            });
+
+          }, 2200);
+        }
+      });
+    };
+
+    checkSessionIsAlive();
 
   });
 
