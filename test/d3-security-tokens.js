@@ -37,8 +37,10 @@ describe('d3-security-tokens', function () {
             {
               name:"web-session",
               session:{
-                user:{username:{$eq:'WEB_SESSION'}},
-                type:{$eq:0}
+                $and:[{
+                  user:{username:{$eq:'WEB_SESSION'}},
+                  type:{$eq:0}
+                }]
               },
               policy:{
                 ttl: 4000,
@@ -46,23 +48,25 @@ describe('d3-security-tokens', function () {
               }
             }, {
               name:"rest-device",
-              session:{ //filter by the security properties of the session - check if this session user belongs to a specific group
+              session:{
+                $and:[{ //filter by the security properties of the session - check if this session user belongs to a specific group
                 user:{groups:{
                   "REST_DEVICES" : { $exists: true }
                 }},
                 type:{$eq:0} //token stateless
-              },
+              }]},
               policy: {
                 ttl: 2000//stale after 2 seconds
               }
             },{
               name:"trusted-device",
-              session:{ //filter by the security properties of the session, so user, groups and permissions
+              session:{
+                $and:[{ //filter by the security properties of the session, so user, groups and permissions
                 user:{groups:{
                   "TRUSTED_DEVICES" : { $exists: true }
                 }},
                 type:{$eq:1} //stateful connected device
-              },
+              }]},
               policy: {
                 ttl: 2000,//stale after 2 seconds
                 permissions:{//permissions that the holder of this token is limited, regardless of the underlying user
@@ -71,10 +75,10 @@ describe('d3-security-tokens', function () {
               }
             },{
               name:"specific-device",
-              session:{ //instance based mapping, so what kind of session is this?
+              session:{$and:[{ //instance based mapping, so what kind of session is this?
                 type:{$in:[0,1]}, //any type of session
                 ip_address:{$eq:'127.0.0.1'}
-              },
+              }]},
               policy: {
                 ttl: Infinity,//this device has this access no matter what
                 inactivity_threshold:Infinity,
@@ -85,29 +89,29 @@ describe('d3-security-tokens', function () {
             },
             {
               name:"non-reusable",
-              session:{ //instance based mapping, so what kind of session is this?
+              session:{$and:[{ //instance based mapping, so what kind of session is this?
                 user:{groups:{
                   "LIMITED_REUSE" : { $exists: true }
                 }},
                 type:{$in:[0,1]} //stateless or stateful
-              },
+              }]},
               policy: {
                 usage_limit:2//you can only use this session call twice
               }
             }, {
               name:"default-stateful",// this is the default underlying profile for stateful sessions - would exist regardless of whether you defined it or not
-              session:{
+              session:{$and:[{
                 type:{$eq:1}
-              },
+              }]},
               policy: {
                 ttl: Infinity,
                 inactivity_threshold:Infinity
               }
             }, {
               name:"default-stateless",// this is the default underlying profile for ws sessions - would exist regardless of whether you defined it or not
-              session:{
+              session:{$and:[{
                 type:{$eq:0}
-              },
+              }]},
               policy: {
                 ttl: 60000 * 10,//session goes stale after 10 minutes
                 inactivity_threshold:Infinity
@@ -145,7 +149,7 @@ describe('d3-security-tokens', function () {
 
     var testServices = {};
 
-    testServices.data = require('../lib/services/data_embedded/service');
+    testServices.data = require('../lib/services/data/service');
     testServices.crypto = require('../lib/services/crypto/service');
     testServices.security = require('../lib/services/security/service');
 
@@ -694,21 +698,35 @@ describe('d3-security-tokens', function () {
     });
   });
 
-  it.only('tests the security services __profileSession method', function(e){
+  it('tests the security services __profileSession method, default profiles', function(done){
+
+    var session = {
+      user:{
+        username:'WEB_SESSION'
+      }
+    };
 
     mockServices(function(e, happnMock){
 
       if (e) return done(e);
 
+      happnMock.services.security.__profileSession(session);
 
+      expect(session.policy[0].ttl).to.be(600000);
+      expect(session.policy[1].ttl).to.be(Infinity);
 
+      expect(session.policy[0].inactivity_threshold).to.be(Infinity);
+      expect(session.policy[1].inactivity_threshold).to.be(Infinity);
 
+      done();
 
     }, serviceConfig);
 
   });
 
-  it("tests the security checkpoints _authorizeSession function", function(done){
+  it("tests the security checkpoints _authorizeSession ttl", function(done){
+
+    this.timeout(20000);
 
     var checkpoint = new CheckPoint({
       logger:require('happn-logger')
@@ -721,6 +739,7 @@ describe('d3-security-tokens', function () {
     };
 
     var testSession = {
+      id:99,
       type:1,
       timestamp:Date.now(),
       policy:{
@@ -728,16 +747,144 @@ describe('d3-security-tokens', function () {
           ttl:2000
         },
         0:{
-          ttl:2000
+          ttl:5000
         }
       }
     };
 
-    checkpoint._authorizeSession(session, function(e, authorized){
+    //session, path, action, callback
+
+    checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
 
       if (e) return done(e);
 
-      done();
+      setTimeout(function(){
+
+        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+          if (!e) return done('this was not meant to happn');
+
+          expect(e.toString()).to.be('Error: expired session token');
+
+          testSession.type = 0;
+
+          //we have a more permissive ttl for stateless sessions
+          checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+            expect(e).to.be(undefined);
+
+            done();
+          });
+        });
+      }, 2500);
+    });
+  });
+
+  it("tests the security checkpoints _authorizeSession inactivity_threshold timed out", function(done){
+
+    this.timeout(20000);
+
+    var checkpoint = new CheckPoint({
+      logger:require('happn-logger')
+    });
+
+    checkpoint.securityService = {
+      happn:{
+        utils:require('../lib/utils')
+      }
+    };
+
+    var testSession = {
+      id:99,
+      type:1,
+      timestamp:Date.now(),
+      policy:{
+        1:{
+          ttl:6000,
+          inactivity_threshold:1000
+        },
+        0:{
+          ttl:5000,
+          inactivity_threshold:10000
+        }
+      }
+    };
+
+    setTimeout(function(){
+
+      checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+        if (!e) return done('this was not meant to happn');
+
+        expect(e.toString()).to.be('Error: session inactivity threshold reached');
+
+        testSession.type = 0;//should be fine - plenty of time
+
+        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+          if (e) return done(e);
+
+          done();
+
+        });
+      });
+    }, 1500);
+
+  });
+
+  it("tests the security checkpoints _authorizeSession inactivity_threshold active then timed out", function(done){
+
+    this.timeout(20000);
+
+    var checkpoint = new CheckPoint({
+      logger:require('happn-logger')
+    });
+
+    checkpoint.securityService = {
+      happn:{
+        utils:require('../lib/utils')
+      }
+    };
+
+    var testSession = {
+      id:99,
+      type:1,
+      timestamp:Date.now(),
+      policy:{
+        1:{
+          ttl:6000,
+          inactivity_threshold:1000
+        },
+        0:{
+          ttl:5000,
+          inactivity_threshold:10000
+        }
+      }
+    };
+
+    checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+      if (e) return done(e);
+
+      console.log('checkpoint.__inactivityCounters:::',checkpoint.__inactivityCounters);
+
+      expect(checkpoint.__inactivityCounters[99]).to.not.be(null);
+      expect(checkpoint.__inactivityCounters[99]).to.not.be(undefined);
+
+      setTimeout(function(){
+
+        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+          if (!e) return done('this was not meant to happn');
+
+          expect(e.toString()).to.be('Error: session inactivity threshold reached');
+          expect(checkpoint.__inactivityCounters[99]).to.be(undefined);
+
+          done();
+
+        });
+
+      }, 1500);
 
     });
 

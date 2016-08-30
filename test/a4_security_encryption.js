@@ -21,7 +21,7 @@ describe('a4_security_encryption.js', function () {
 
   var testServices = {};
 
-  testServices.data = require('../lib/services/data_embedded/service');
+  testServices.data = require('./service');
   testServices.crypto = require('../lib/services/crypto/service');
 
   before('should initialize the service', function (callback) {

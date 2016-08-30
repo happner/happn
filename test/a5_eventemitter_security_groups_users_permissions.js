@@ -39,7 +39,7 @@ describe('a5_eventemitter_security_groups', function () {
       //delete require.cache['/Users/simonbishop/Documents/Projects/happn/lib/services/data_embedded/service.js'];
 
       testServices.crypto = require('../lib/services/crypto/service');
-      testServices.data = require('../lib/services/data_embedded/service');
+      testServices.data = require('./service');
       testServices.security = require('../lib/services/security/service');
 
       var checkpoint = require('../lib/services/security/checkpoint');
