@@ -647,13 +647,13 @@ describe('d3-security-tokens', function () {
     var groups = {
       'TEST_GROUP':{
         permissions:{
-          '/test/explicit':{action:['set']},
-          '/test/wild/*':{action:['*']}
+          '/test/explicit':{actions:['set']},
+          '/test/wild/*':{actions:['*']}
         }
       },
       'TEST_GROUP_1':{
         permissions:{
-          '/test/wild/*':{action:['*']}
+          '/test/wild/*':{actions:['*']}
         }
       }
     };
@@ -683,8 +683,8 @@ describe('d3-security-tokens', function () {
 
       if (e) return done(e);
 
-      expect(permissionSet.explicit['/test/explicit'].action[0]).to.be('set');
-      expect(permissionSet.wildcard['/test/wild/*'].action[0]).to.be('*');
+      expect(permissionSet.explicit['/test/explicit'].actions[0]).to.be('set');
+      expect(permissionSet.wildcard['/test/wild/*'].actions[0]).to.be('*');
       expect(Object.keys(permissionSet.wildcard).length).to.be(1);
 
 
@@ -771,7 +771,7 @@ describe('d3-security-tokens', function () {
           //we have a more permissive ttl for stateless sessions
           checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
 
-            expect(e).to.be(undefined);
+            expect(e).to.be(null);
 
             done();
           });
@@ -953,6 +953,59 @@ describe('d3-security-tokens', function () {
     };
 
     checkSessionIsAlive();
+
+  });
+
+  it("tests the security checkpoints _authorizeSession permissions passthrough", function(done) {
+
+    this.timeout(20000);
+
+    var checkpoint = new CheckPoint({
+      logger: require('happn-logger')
+    });
+
+    checkpoint.securityService = {
+      happn: {
+        utils: require('../lib/utils')
+      }
+    };
+
+    var testSession = {
+      id: 99,
+      type: 0,
+      timestamp: Date.now(),
+      policy: {
+        1: {
+          ttl: 6000,
+          inactivity_threshold: 1000
+        },
+        0: {
+          ttl: 15000,
+          inactivity_threshold: 2000,
+          permissions:{
+            '/test/permission/*':{actions:['*']}
+          }
+        }
+      }
+    };
+
+    checkpoint._authorizeSession(testSession, '/test/permission/24', 'on', function(e, passthrough){
+
+      if (e) return done(e);
+
+      expect(passthrough).to.be(true);
+
+      checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function(e, passthrough) {
+
+        if (e) return done(e);
+
+        expect(passthrough).to.be(false);
+
+        done();
+
+      });
+
+    });
 
   });
 
