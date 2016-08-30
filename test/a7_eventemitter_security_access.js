@@ -13,7 +13,7 @@ describe('a7_eventemitter_security_access', function () {
     happn.service.create(config,
       callback
     );
-  }
+  };
 
   before('it starts completely defaulted service', function (done) {
 
@@ -34,7 +34,7 @@ describe('a7_eventemitter_security_access', function () {
 
   context('login', function () {
 
-    it.only('authenticates with the _ADMIN user, using the default password', function (done) {
+    it('authenticates with the _ADMIN user, using the default password', function (done) {
 
       happn.client.create({
           config: {username: '_ADMIN', password: 'happn'},

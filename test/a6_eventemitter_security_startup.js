@@ -26,7 +26,7 @@ describe('a6_eventemitter_security_groups', function () {
     testServices = {};
 
     testServices.crypto = require('../lib/services/crypto/service');
-    testServices.data = require('./service');
+    testServices.data = require('../lib/services/data/service');
     testServices.security = require('../lib/services/security/service');
 
     async.eachSeries(['crypto', 'data', 'security'], function (serviceName, eachServiceCB) {

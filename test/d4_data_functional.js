@@ -4,7 +4,7 @@ describe('d3_data_functional', function() {
 
   var expect = require('expect.js');
 
-  var service = require('./service');
+  var service = require('../lib/services/data/service');
   var serviceInstance = new service();
 
   var testId = require('shortid').generate();
