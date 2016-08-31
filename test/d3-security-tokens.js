@@ -141,6 +141,7 @@ describe('d3-security-tokens', function () {
     var testConfig = {
       secure:true,
       services:{
+        cache:{},
         data:{},
         crypto:{},
         security:{}
@@ -149,6 +150,7 @@ describe('d3-security-tokens', function () {
 
     var testServices = {};
 
+    testServices.cache = require('../lib/services/cache/service');
     testServices.data = require('../lib/services/data/service');
     testServices.crypto = require('../lib/services/crypto/service');
     testServices.security = require('../lib/services/security/service');
@@ -159,7 +161,7 @@ describe('d3-security-tokens', function () {
 
     happnMock.utils = require('../lib/utils');
 
-    async.eachSeries(['data', 'crypto', 'security'], function (serviceName, eachServiceCB) {
+    async.eachSeries(['cache', 'data', 'crypto', 'security'], function (serviceName, eachServiceCB) {
 
       testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;
@@ -472,7 +474,7 @@ describe('d3-security-tokens', function () {
 
         nonce_requests[nonce] = request;
 
-        cb(null, nonce);
+        cb(null, {nonce:nonce});
       }
     };
 
@@ -1086,47 +1088,104 @@ describe('d3-security-tokens', function () {
 
   });
 
-  it('tests the security services createAuthenticationNonce method', function (done) {
+  it('tests the security services createAuthenticationNonce and verifyAuthenticationDigest methods', function (done) {
 
-    mockServices(function(e, happnMock){
+    this.timeout(5000);
 
-      if (e) return done(e);
+    var happn = require('../lib/index');
+    var happn_client = happn.client;
 
-      var request = {
-        publicKey:''
-      };
-
-      var token = happnMock.services.security.generateToken(session);
-      var decoded = happnMock.services.security.decodeToken(token);
-
-      for (var propertyName in session){
-        expect(JSON.stringify(session[propertyName])).to.be(JSON.stringify(decoded[propertyName]));
+    var clientInstance = happn_client.__instance({
+      username:'_ADMIN',
+      keyPair:{
+        publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
+        privateKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M='
       }
+    });
 
-      done();
+    clientInstance.__ensureCryptoLibrary(function(e) {
 
-    }, serviceConfig);
+      if (e) return callback(e);
 
-    var Crypto = require('happn-util-crypto');
-    var crypto = new Crypto();
+      mockServices(function (e, happnMock) {
 
-    var nonce = crypto.generateNonce();
+        var mockSession = {
+          publicKey: "AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2"
+        };
 
-    var request = {
-      nonce:nonce,
-      publicKey:data.publicKey
-    };
+        expect(happnMock.services.security.config.defaultNonceTTL).to.be(60000);
 
-    nonce_requests[nonce] = request;
+        happnMock.services.security.createAuthenticationNonce(mockSession, function (e, nonce) {
 
-    request.__timedOut = setTimeout(function(){
+          if (e) return done(e);
 
-      delete nonce_requests[this.nonce];
+          mockSession.digest = clientInstance.__signNonce(nonce);
 
-    }.bind(request), 3000);
+          happnMock.services.security.verifyAuthenticationDigest(mockSession, function (e, verified) {
 
-    callback(null, nonce);
+            if (e) return done(e);
+            expect(verified).to.be(true);
 
+            done();
+
+          });
+
+        });
+
+      }, serviceConfig);
+
+    });
+
+  });
+
+  it('tests the security services createAuthenticationNonce method, timing out', function (done) {
+
+    this.timeout(5000);
+
+    var happn = require('../lib/index');
+    var happn_client = happn.client;
+
+    var clientInstance = happn_client.__instance({
+      username:'_ADMIN',
+      keyPair:{
+        publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
+        privateKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M='
+      }
+    });
+
+    clientInstance.__ensureCryptoLibrary(function(e) {
+
+      if (e) return callback(e);
+
+      mockServices(function (e, happnMock) {
+
+        var mockSession = {
+          publicKey: "AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2"
+        };
+
+        expect(happnMock.services.security.config.defaultNonceTTL).to.be(60000);
+
+        happnMock.services.security.config.defaultNonceTTL = 500;//set it to something small
+
+        happnMock.services.security.createAuthenticationNonce(mockSession, function (e, nonce) {
+
+          if (e) return done(e);
+
+          mockSession.digest = clientInstance.__signNonce(nonce);
+
+          setTimeout(function(){
+
+            happnMock.services.security.verifyAuthenticationDigest(mockSession, function (e) {
+
+              expect(e.toString()).to.be('Error: nonce expired or public key invalid');
+
+              done();
+
+            });
+          }, 1000);
+        });
+      }, serviceConfig);
+    });
   });
 
   it('should create a user with a public key, then login to a using a signature', function (done) {
@@ -1188,6 +1247,7 @@ describe('d3-security-tokens', function () {
             if (e) return done(e);
 
             happn.client.create({
+
               username: testUser.username,
               publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
               privateKey:'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=',
@@ -1196,8 +1256,12 @@ describe('d3-security-tokens', function () {
               })
 
               .then(function (clientInstance) {
-                testClient = clientInstance;
-                done();
+
+                clientInstance.disconnect(function(e){
+                  if (e) console.warn('couldnt disconnect client:::', e);
+                  serviceInstance.stop(done);
+                })
+
               })
 
               .catch(function (e) {
@@ -1207,9 +1271,102 @@ describe('d3-security-tokens', function () {
           });
         });
       });
-
     });
+  });
 
+  it('should create a user with a public key, then fail login to a using a signature - bad public key', function (done) {
+
+    this.timeout(20000);
+
+    var config =  {
+      secure:true,
+      sessionTokenSecret:"absolutely necessary if you want tokens to carry on working after a restart",
+      profiles:[
+        {
+          name:"web-session",
+          session:{
+            user:{username:{$eq:'WEB_SESSION'}},
+            type:{$eq:0}
+          },
+          policy:{
+            ttl: 4000,
+            inactivity_threshold:2000//this is costly, as we need to store state on the server side
+          }
+        }
+      ]
+    };
+
+    var CryptoService = require('../lib/services/crypto/service');
+    var crypto = new CryptoService({logger: Logger});
+
+    crypto.initialize({}, function(e){
+
+      if (e) return done(e);
+
+      getService(config, function (e, instance) {
+
+        if (e) return done(e);
+
+        var testGroup = {
+          name: 'CONNECTED_DEVICES',
+          permissions:{
+            '/CONNECTED_DEVICES/*':{actions: ['*']}
+          }
+        };
+
+        var testUser = {
+          username: 'WEB_SESSION',
+          publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
+        };
+
+        var addedTestGroup;
+        var addedTestuser;
+
+        var serviceInstance = instance;
+
+        serviceInstance.services.security.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
+
+          if (e) return done(e);
+          addedTestGroup = result;
+
+          serviceInstance.services.security.upsertUser(testUser, {overwrite: false}, function (e, result) {
+
+            if (e) return done(e);
+            addedTestuser = result;
+
+            serviceInstance.services.security.linkGroup(addedTestGroup, addedTestuser, function (e) {
+
+              if (e) return done(e);
+
+              var newKeypair = crypto.createKeyPair();
+
+              var creds = {
+
+                username: testUser.username,
+                publicKey: newKeypair.publicKey,
+                privateKey:newKeypair.privateKey
+
+              };
+
+              happn.client.create(creds)
+
+                .then(function (clientInstance) {
+
+                  done(new Error('this was not meant to happn'))
+
+                })
+
+                .catch(function (e) {
+
+                  expect(e.toString()).to.be('Invalid credentials');
+                  serviceInstance.stop(done);
+                });
+
+            });
+          });
+        });
+      });
+    });
   });
 
   xit('should create a user without a public key on the server, should fail to log in because the key is not registered with the username on the server', function (callback) {
