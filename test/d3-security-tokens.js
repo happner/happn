@@ -866,8 +866,8 @@ describe('d3-security-tokens', function () {
 
       if (e) return done(e);
 
-      expect(checkpoint.__inactivityCounters[99]).to.not.be(null);
-      expect(checkpoint.__inactivityCounters[99]).to.not.be(undefined);
+      expect(checkpoint.__inactivityCountersCache[99]).to.not.be(null);
+      expect(checkpoint.__inactivityCountersCache[99]).to.not.be(undefined);
 
       setTimeout(function(){
 
@@ -878,7 +878,7 @@ describe('d3-security-tokens', function () {
           expect(e.toString()).to.be('Error: session inactivity threshold reached');
 
           //ensure we have removed the inactivity counter after the ttl
-          expect(checkpoint.__inactivityCounters[99]).to.be(undefined);
+          expect(checkpoint.__inactivityCountersCache[99]).to.be(undefined);
 
           done();
 
@@ -1004,9 +1004,11 @@ describe('d3-security-tokens', function () {
         done();
 
       });
-
     });
+  });
 
+  xit("tests the security checkpoints token usage limit", function(done) {
+    done(new Error('untested'));
   });
 
   var mockRequest = function(token, url, payload, method){
@@ -1054,58 +1056,80 @@ describe('d3-security-tokens', function () {
 
   };
 
-  xit('tests the security services generateToken and decodeToken methods', function(e){
+  it('tests the security services generateToken and decodeToken methods', function(done){
 
     mockServices(function(e, happnMock){
 
       if (e) return done(e);
 
-      var token = happnMock.services.security.generateToken({
+      var session = {
 
         id: 1,
         isToken:true,
         username: 'TEST',
         timestamp: Date.now(),
         ttl: 3000,
-        permissions:undefined
+        permissions:{}
 
-      });
+      };
 
+      var token = happnMock.services.security.generateToken(session);
+      var decoded = happnMock.services.security.decodeToken(token);
 
-      var decoded = happnMock.services.security.decodeToken(token)
+      for (var propertyName in session){
+        expect(JSON.stringify(session[propertyName])).to.be(JSON.stringify(decoded[propertyName]));
+      }
 
+      done();
 
     }, serviceConfig);
 
   });
 
-  xit('tests the security services __httpRequest method', function(e){
+  it('tests the security services createAuthenticationNonce method', function (done) {
 
     mockServices(function(e, happnMock){
 
       if (e) return done(e);
 
+      var request = {
+        publicKey:''
+      };
 
+      var token = happnMock.services.security.generateToken(session);
+      var decoded = happnMock.services.security.decodeToken(token);
 
-    }, serviceConfig);
+      for (var propertyName in session){
+        expect(JSON.stringify(session[propertyName])).to.be(JSON.stringify(decoded[propertyName]));
+      }
 
-  });
-
-  xit('tests the security services __profileSession method', function(e){
-
-    mockServices(function(e, happnMock){
-
-      if (e) return done(e);
-
-
-
-
+      done();
 
     }, serviceConfig);
 
+    var Crypto = require('happn-util-crypto');
+    var crypto = new Crypto();
+
+    var nonce = crypto.generateNonce();
+
+    var request = {
+      nonce:nonce,
+      publicKey:data.publicKey
+    };
+
+    nonce_requests[nonce] = request;
+
+    request.__timedOut = setTimeout(function(){
+
+      delete nonce_requests[this.nonce];
+
+    }.bind(request), 3000);
+
+    callback(null, nonce);
+
   });
 
-  xit('should create a user with a public key, then login to a using a signature', function (done) {
+  it('should create a user with a public key, then login to a using a signature', function (done) {
 
     this.timeout(20000);
 
@@ -1196,7 +1220,7 @@ describe('d3-security-tokens', function () {
     this.timeout(20000);
   });
 
-  xit('should login with a connected device profile - session should go stale, token is renewable using key based cryptography', function (callback) {
+  xit('should login with a connected device profile - session should go stale, creating a new session should be demonstrated', function (callback) {
     this.timeout(20000);
   });
 

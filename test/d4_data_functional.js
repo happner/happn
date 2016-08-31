@@ -352,4 +352,95 @@ describe('d3_data_functional', function() {
     }
   });
 
+  it('does a sort and limit', function(done){
+
+    var itemCount = 100;
+
+    var randomItems = [];
+
+    var test_string = require('shortid').generate();
+
+    var base_path = '/sort_and_limit/' + test_string + '/';
+
+    var async = require('async');
+
+    for (var i = 0; i < itemCount; i++){
+
+      var item = {
+        item_sort_id: i + (Math.floor( Math.random() * 1000000 ))
+      };
+
+      randomItems.push(item);
+    }
+
+    async.eachSeries(randomItems,
+
+      function(item, callback){
+
+        var testPath = base_path + item.item_sort_id;
+
+        serviceInstance.upsert(testPath, item, {noPublish: true}, function(e, upserted){
+
+          if (e) return callback(e);
+
+          callback();
+
+        });
+      },
+
+      function(e){
+
+        if (e) return done(e);
+
+        //ascending
+        randomItems.sort(function(a, b){
+
+          return a.item_sort_id - b.item_sort_id;
+
+        });
+
+        serviceInstance.get(base_path + '*', {options:{sort:{item_sort_id:1}}, limit:50}, function(e, items){
+
+          if (e) return done(e);
+
+          for (var itemIndex in items){
+
+            if (itemIndex >= 50) break;
+
+            var item_from_mongo = items[itemIndex];
+            var item_from_array = randomItems[itemIndex];
+
+            if (item_from_mongo.data.item_sort_id != item_from_array.item_sort_id) return done(new Error('ascending sort failed'));
+          }
+
+          //ascending
+          randomItems.sort(function(a, b){
+
+            return b.item_sort_id - a.item_sort_id;
+
+          });
+
+          serviceInstance.get(base_path + '/*', {sort:{"item_sort_id":-1}, limit:50}, function(e, items){
+
+            if (e) return done(e);
+
+            for (var itemIndex in items){
+
+              if (itemIndex >= 50) break;
+
+              var item_from_mongo = items[itemIndex];
+              var item_from_array = randomItems[itemIndex];
+
+              if (item_from_mongo.data.item_sort_id != item_from_array.item_sort_id) return done(new Error('descending sort failed'));
+            }
+
+            done();
+
+          });
+
+        });
+      }
+    );
+  });
+
 });
