@@ -356,7 +356,7 @@ describe('b9_security_web_token', function () {
 
       var encodedDigest = encodeURIComponent(digest);
 
-      doRequest('/auth/login?username=_ADMIN&digest=' + encodedDigest + '&publicKey=' + encodedPublicKey, null, true, function (response) {
+      doRequest('/auth/login?username=_ADMIN&digest=' + encodedDigest + '&publicKey=' + encodedPublicKey, null, true, function (response, body) {
 
         expect(response.statusCode).to.equal(200);
         callback();
