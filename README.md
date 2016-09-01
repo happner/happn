@@ -435,6 +435,122 @@ happn.client.create({config:{username:'_ADMIN', password:'testPWD'}, secure:true
 
 ```
 
+SECURITY PROFILES 
+-----------------
+
+*profiles can be configured to fit vdifferent session types*
+
+```javascript
+
+//there are 2 default profiles that exist in secure systems - here is an example configuration 
+//showing how profiles can be configured for a service:
+
+ var serviceConfig = {
+    services:{
+      data:{
+
+      },
+      security: {
+        config: {
+          sessionTokenSecret:"TESTTOKENSECRET",
+          keyPair: {
+            privateKey: 'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=',
+            publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
+          },
+          profiles:[ //profiles are in an array, in descending order of priority, so if you fit more than one profile, the top profile is chosen
+            {
+              name:"web-session",
+              session:{
+                $and:[{
+                  user:{username:{$eq:'WEB_SESSION'}},
+                  type:{$eq:0}
+                }]
+              },
+              policy:{
+                ttl: 4000,
+                inactivity_threshold:2000//this is costly, as we need to store state on the server side
+              }
+            }, {
+              name:"rest-device",
+              session:{
+                $and:[{ //filter by the security properties of the session - check if this session user belongs to a specific group
+                user:{groups:{
+                  "REST_DEVICES" : { $exists: true }
+                }},
+                type:{$eq:0} //token stateless
+              }]},
+              policy: {
+                ttl: 2000//stale after 2 seconds
+              }
+            },{
+              name:"trusted-device",
+              session:{
+                $and:[{ //filter by the security properties of the session, so user, groups and permissions
+                user:{groups:{
+                  "TRUSTED_DEVICES" : { $exists: true }
+                }},
+                type:{$eq:1} //stateful connected device
+              }]},
+              policy: {
+                ttl: 2000,//stale after 2 seconds
+                permissions:{//permissions that the holder of this token is limited, regardless of the underlying user
+                  '/TRUSTED_DEVICES/*':{actions: ['*']}
+                }
+              }
+            },{
+              name:"specific-device",
+              session:{$and:[{ //instance based mapping, so what kind of session is this?
+                type:{$in:[0,1]}, //any type of session
+                ip_address:{$eq:'127.0.0.1'}
+              }]},
+              policy: {
+                ttl: Infinity,//this device has this access no matter what
+                inactivity_threshold:Infinity,
+                permissions:{//this device has read-only access to a specific item
+                  '/SPECIFIC_DEVICE/*':{actions: ['get','on']}
+                }
+              }
+            },
+            {
+              name:"non-reusable",
+              session:{$and:[{ //instance based mapping, so what kind of session is this?
+                user:{groups:{
+                  "LIMITED_REUSE" : { $exists: true }
+                }},
+                type:{$in:[0,1]} //stateless or stateful
+              }]},
+              policy: {
+                usage_limit:2//you can only use this session call twice
+              }
+            }, {
+              name:"default-stateful",// this is the default underlying profile for stateful sessions
+              session:{
+                $and:[{type:{$eq:1}}]
+              },
+              policy: {
+                ttl: Infinity,
+                inactivity_threshold:Infinity
+              }
+            }, {
+              name:"default-stateless",// this is the default underlying profile for ws sessions
+              session:{
+                $and:[{type:{$eq:0}}]
+              },
+              policy: {
+                ttl: 60000 * 10,//session goes stale after 10 minutes
+                inactivity_threshold:Infinity
+              }
+            }
+          ]
+        }
+      }
+    }
+  };
+
+```
+
+*the test that clearly demonstrates profiles can be found [here](https://github.com/happner/happn/blob/master/test/d3-security-tokens)*
+
 WEB PATH LEVEL SECURITY
 -----------------------
 
@@ -488,11 +604,7 @@ function (e, instance) {
 		});
 
 
-
-
 	});
-
-
 
 });
 
