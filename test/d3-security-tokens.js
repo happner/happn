@@ -28,7 +28,7 @@ describe('d3-security-tokens', function () {
       },
       security: {
         config: {
-          sessionTokenSecret:"absolutely necessary if you want tokens to carry on working after a restart",
+          sessionTokenSecret:"TESTTOKENSECRET",
           keyPair: {
             privateKey: 'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=',
             publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
@@ -99,19 +99,19 @@ describe('d3-security-tokens', function () {
                 usage_limit:2//you can only use this session call twice
               }
             }, {
-              name:"default-stateful",// this is the default underlying profile for stateful sessions - would exist regardless of whether you defined it or not
-              session:{$and:[{
-                type:{$eq:1}
-              }]},
+              name:"default-stateful",// this is the default underlying profile for stateful sessions
+              session:{
+                $and:[{type:{$eq:1}}]
+              },
               policy: {
                 ttl: Infinity,
                 inactivity_threshold:Infinity
               }
             }, {
-              name:"default-stateless",// this is the default underlying profile for ws sessions - would exist regardless of whether you defined it or not
-              session:{$and:[{
-                type:{$eq:0}
-              }]},
+              name:"default-stateless",// this is the default underlying profile for ws sessions
+              session:{
+                $and:[{type:{$eq:0}}]
+              },
               policy: {
                 ttl: 60000 * 10,//session goes stale after 10 minutes
                 inactivity_threshold:Infinity
@@ -731,54 +731,70 @@ describe('d3-security-tokens', function () {
     this.timeout(20000);
 
     var checkpoint = new CheckPoint({
-      logger:require('happn-logger')
+      logger: require('happn-logger')
     });
 
-    checkpoint.securityService = {
-      happn:{
-        utils:require('../lib/utils')
-      }
-    };
+    var CacheService = require('../lib/services/cache/service');
+    var cacheInstance = new CacheService();
 
-    var testSession = {
-      id:99,
-      type:1,
-      timestamp:Date.now(),
-      policy:{
-        1:{
-          ttl:2000
-        },
-        0:{
-          ttl:5000
-        }
-      }
-    };
-
-    //session, path, action, callback
-
-    checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+    cacheInstance.initialize({}, function(e) {
 
       if (e) return done(e);
 
-      setTimeout(function(){
+      var securityService = {
+        happn: {
+          utils: require('../lib/utils')
+        },
+        cacheService: cacheInstance,
+        onDataChanged: function () {
+        }
+      };
+
+      var testSession = {
+        id: 99,
+        type: 1,
+        timestamp: Date.now(),
+        policy: {
+          1: {
+            ttl: 2000
+          },
+          0: {
+            ttl: 4000
+          }
+        }
+      };
+
+      checkpoint.initialize({}, securityService, function (e) {
+
+        if (e) return done(e);
 
         checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
 
-          if (!e) return done('this was not meant to happn');
+          if (e) return done(e);
 
-          expect(e.toString()).to.be('Error: expired session token');
+          setTimeout(function(){
 
-          testSession.type = 0;
+            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
 
-          //we have a more permissive ttl for stateless sessions
-          checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+              if (!e) return done('this was not meant to happn');
 
-            expect(e).to.be(null);
+              expect(e.toString()).to.be('Error: expired session token');
 
-            done();
-          });
+              testSession.type = 0;
+
+              //we have a more permissive ttl for stateless sessions
+              checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+                expect(e).to.be(null);
+
+                done();
+              });
+            });
+          }, 2500);
         });
-      }, 2500);
+
+      })
+
     });
   });
 
@@ -787,50 +803,66 @@ describe('d3-security-tokens', function () {
     this.timeout(20000);
 
     var checkpoint = new CheckPoint({
-      logger:require('happn-logger')
+      logger: require('happn-logger')
     });
 
-    checkpoint.securityService = {
-      happn:{
-        utils:require('../lib/utils')
-      }
-    };
+    var CacheService = require('../lib/services/cache/service');
+    var cacheInstance = new CacheService();
 
-    var testSession = {
-      id:99,
-      type:1,
-      timestamp:Date.now(),
-      policy:{
-        1:{
-          ttl:6000,
-          inactivity_threshold:1000
+    cacheInstance.initialize({}, function(e) {
+
+      if (e) return done(e);
+
+      var securityService = {
+        happn: {
+          utils: require('../lib/utils')
         },
-        0:{
-          ttl:5000,
-          inactivity_threshold:10000
+        cacheService: cacheInstance,
+        onDataChanged: function () {
         }
-      }
-    };
+      };
 
-    setTimeout(function(){
+      var testSession = {
+        id:99,
+        type:1,
+        timestamp:Date.now(),
+        policy:{
+          1:{
+            ttl:6000,
+            inactivity_threshold:1000
+          },
+          0:{
+            ttl:5000,
+            inactivity_threshold:10000
+          }
+        }
+      };
 
-      checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+      checkpoint.initialize({}, securityService, function (e) {
 
-        if (!e) return done('this was not meant to happn');
+        setTimeout(function () {
 
-        expect(e.toString()).to.be('Error: session inactivity threshold reached');
+          checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e) {
 
-        testSession.type = 0;//should be fine - plenty of time
+            if (!e) return done('this was not meant to happn');
 
-        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+            expect(e.toString()).to.be('Error: session inactivity threshold reached');
 
-          if (e) return done(e);
+            testSession.type = 0;//should be fine - plenty of time
 
-          done();
+            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e) {
 
-        });
+              if (e) return done(e);
+
+              done();
+
+            });
+          });
+        }, 1500);
+
       });
-    }, 1500);
+
+    });
 
   });
 
@@ -839,57 +871,65 @@ describe('d3-security-tokens', function () {
     this.timeout(20000);
 
     var checkpoint = new CheckPoint({
-      logger:require('happn-logger')
+      logger: require('happn-logger')
     });
 
-    checkpoint.securityService = {
-      happn:{
-        utils:require('../lib/utils')
-      }
-    };
+    var CacheService = require('../lib/services/cache/service');
+    var cacheInstance = new CacheService();
 
-    var testSession = {
-      id:99,
-      type:1,
-      timestamp:Date.now(),
-      policy:{
-        1:{
-          ttl:6000,
-          inactivity_threshold:1000
-        },
-        0:{
-          ttl:5000,
-          inactivity_threshold:10000
-        }
-      }
-    };
-
-    checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+    cacheInstance.initialize({}, function(e) {
 
       if (e) return done(e);
 
-      expect(checkpoint.__inactivityCountersCache[99]).to.not.be(null);
-      expect(checkpoint.__inactivityCountersCache[99]).to.not.be(undefined);
+      var securityService = {
+        happn: {
+          utils: require('../lib/utils')
+        },
+        cacheService: cacheInstance,
+        onDataChanged: function () {
+        }
+      };
 
-      setTimeout(function(){
+      var testSession = {
+        id:99,
+        type:1,
+        timestamp:Date.now(),
+        policy:{
+          1:{
+            ttl:6000,
+            inactivity_threshold:1000
+          },
+          0:{
+            ttl:5000,
+            inactivity_threshold:10000
+          }
+        }
+      };
 
-        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+      checkpoint.initialize({}, securityService, function (e) {
 
-          if (!e) return done('this was not meant to happn');
+        if (e) return done(e);
 
-          expect(e.toString()).to.be('Error: session inactivity threshold reached');
+        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e) {
 
-          //ensure we have removed the inactivity counter after the ttl
-          expect(checkpoint.__inactivityCountersCache[99]).to.be(undefined);
+          if (e) return done(e);
 
-          done();
+          setTimeout(function () {
 
+            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e) {
+
+              if (!e) return done('this was not meant to happn');
+
+              expect(e.toString()).to.be('Error: session inactivity threshold reached');
+
+              done();
+
+            });
+
+          }, 1500);
         });
-
-      }, 1500);
-
+      });
     });
-
   });
 
   it("tests the security checkpoints _authorizeSession inactivity_threshold keep-alive", function(done){
@@ -897,65 +937,144 @@ describe('d3-security-tokens', function () {
     this.timeout(20000);
 
     var checkpoint = new CheckPoint({
-      logger:require('happn-logger')
+      logger: require('happn-logger')
     });
 
-    checkpoint.securityService = {
-      happn:{
-        utils:require('../lib/utils')
-      }
-    };
+    var CacheService = require('../lib/services/cache/service');
+    var cacheInstance = new CacheService();
 
-    var testSession = {
-      id:99,
-      type:0,
-      timestamp:Date.now(),
-      policy:{
-        1:{
-          ttl:6000,
-          inactivity_threshold:1000
+    cacheInstance.initialize({}, function(e) {
+
+      if (e) return done(e);
+
+      var securityService = {
+        happn: {
+          utils: require('../lib/utils')
         },
-        0:{
-          ttl:15000,
-          inactivity_threshold:2000
+        cacheService: cacheInstance,
+        onDataChanged: function () {
         }
-      }
-    };
+      };
 
-    var counter = 0;
+      var testSession = {
+        id: 99,
+        type: 1,
+        timestamp: Date.now(),
+        policy: {
+          1: {
+            inactivity_threshold:2000
+          },
+          0: {
+            inactivity_threshold:2000
+          }
+        }
+      };
 
-    var checkSessionIsAlive = function(){
-
-      checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+      checkpoint.initialize({}, securityService, function(e) {
 
         if (e) return done(e);
 
-        if (counter <= 3){
+        var counter = 0;
 
-          counter++;
+        var checkSessionIsAlive = function(){
+
+          checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+            if (e) return done(e);
+
+            if (counter < 3){
+
+              counter++;
+
+              setTimeout(function(){
+
+                checkSessionIsAlive();
+
+              }, 1200);
+
+            }else{
+
+              testSession.type = 0;
+
+              setTimeout(function(){
+
+                return checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+                  expect(e.toString()).to.be('Error: session inactivity threshold reached');
+                  done();
+                });
+
+              }, 2100);
+            }
+          });
+        };
+
+        checkSessionIsAlive();
+
+      });
+    });
+  });
+
+
+  it("tests the security checkpoints _authorizeSession inactivity_threshold", function(done){
+
+    this.timeout(20000);
+
+    var checkpoint = new CheckPoint({
+      logger: require('happn-logger')
+    });
+
+    var CacheService = require('../lib/services/cache/service');
+    var cacheInstance = new CacheService();
+
+    cacheInstance.initialize({}, function(e) {
+
+      if (e) return done(e);
+
+      var securityService = {
+        happn: {
+          utils: require('../lib/utils')
+        },
+        cacheService: cacheInstance,
+        onDataChanged: function () {
+        }
+      };
+
+      var testSession = {
+        id: 99,
+        type: 1,
+        timestamp: Date.now(),
+        policy: {
+          1: {
+            inactivity_threshold:2000
+          },
+          0: {
+            inactivity_threshold:2000
+          }
+        }
+      };
+
+      checkpoint.initialize({}, securityService, function(e) {
+
+        if (e) return done(e);
+
+        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+
+          if (e) return done(e);
 
           setTimeout(function(){
 
-            checkSessionIsAlive();
+            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e) {
 
-          }, 1200);
-
-        }else{
-
-          setTimeout(function(){
-
-            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
               expect(e.toString()).to.be('Error: session inactivity threshold reached');
               done();
+
             });
 
-          }, 2200);
-        }
+          }, 2100);
+        });
       });
-    };
-
-    checkSessionIsAlive();
-
+    });
   });
 
   it("tests the security checkpoints _authorizeSession permissions passthrough", function(done) {
@@ -966,51 +1085,218 @@ describe('d3-security-tokens', function () {
       logger: require('happn-logger')
     });
 
-    checkpoint.securityService = {
-      happn: {
-        utils: require('../lib/utils')
-      }
-    };
+    var CacheService = require('../lib/services/cache/service');
+    var cacheInstance = new CacheService();
 
-    var testSession = {
-      id: 99,
-      type: 0,
-      timestamp: Date.now(),
-      policy: {
-        1: {
-          ttl: 6000,
-          inactivity_threshold: 1000
-        },
-        0: {
-          ttl: 15000,
-          inactivity_threshold: 2000,
-          permissions:{
-            '/test/permission/*':{actions:['*']}
-          }
-        }
-      }
-    };
-
-    checkpoint._authorizeSession(testSession, '/test/permission/24', 'on', function(e, passthrough){
+    cacheInstance.initialize({}, function(e) {
 
       if (e) return done(e);
 
-      expect(passthrough).to.be(true);
+      var securityService = {
+        happn: {
+          utils: require('../lib/utils')
+        },
+        cacheService: cacheInstance,
+        onDataChanged: function () {
+        }
+      };
 
-      checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function(e, passthrough) {
+      var testSession = {
+        id: 99,
+        type: 0,
+        timestamp: Date.now(),
+        policy: {
+          1: {
+            ttl: 6000,
+            inactivity_threshold: 1000
+          },
+          0: {
+            ttl: 15000,
+            inactivity_threshold: 2000,
+            permissions:{
+              '/test/permission/*':{actions:['*']}
+            }
+          }
+        }
+      };
+
+      checkpoint.initialize({}, securityService, function (e) {
 
         if (e) return done(e);
 
-        expect(passthrough).to.be(false);
+        checkpoint._authorizeSession(testSession, '/test/permission/24', 'on', function (e, passthrough) {
 
-        done();
+          if (e) return done(e);
+
+          expect(passthrough).to.be(true);
+
+          checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function (e, passthrough) {
+
+            if (e) return done(e);
+
+            expect(passthrough).to.be(false);
+
+            done();
+
+          });
+        });
+      });
+    });
+  });
+
+  it("tests the security checkpoints token usage limit", function(done) {
+
+    this.timeout(20000);
+
+    var checkpoint = new CheckPoint({
+      logger: require('happn-logger')
+    });
+
+    var CacheService = require('../lib/services/cache/service');
+    var cacheInstance = new CacheService();
+
+    cacheInstance.initialize({}, function(e){
+
+      if (e) return done(e);
+
+      var securityService = {
+        happn: {
+          utils: require('../lib/utils')
+        },
+        cacheService:cacheInstance,
+        onDataChanged:function(){}
+      };
+
+      var testSession = {
+        id: 99,
+        type: 0,
+        timestamp: Date.now(),
+        policy: {
+          1: {
+            usage_limit:2,
+            ttl:2000
+          },
+          0: {
+            usage_limit:1,
+            ttl:2000
+          }
+        }
+      };
+
+      checkpoint.initialize({}, securityService, function(e){
+
+          if (e) return done(e);
+
+         checkpoint.__checkUsageLimit(testSession, testSession.policy[1], function(e, ok){
+
+           if (e) return done(e);
+
+           expect(ok).to.be(true);
+
+           checkpoint.__checkUsageLimit(testSession, testSession.policy[1], function(e, ok){
+
+             if (e) return done(e);
+
+             checkpoint.__checkUsageLimit(testSession, testSession.policy[1], function(e, ok){
+
+               if (e) return done(e);
+
+               expect(ok).to.be(false);
+
+               done();
+
+             });
+
+           });
+
+         });
 
       });
     });
   });
 
-  xit("tests the security checkpoints token usage limit", function(done) {
-    done(new Error('untested'));
+  xit("tests the security checkpoints token usage limit1", function(done) {
+
+    this.timeout(20000);
+
+    var checkpoint = new CheckPoint({
+      logger: require('happn-logger')
+    });
+
+    var CacheService = require('../lib/services/cache/service');
+    var cacheInstance = new CacheService();
+
+    cacheInstance.initialize({}, function(e){
+
+      if (e) return done(e);
+
+      var securityService = {
+        happn: {
+          utils: require('../lib/utils')
+        },
+        cacheService:cacheInstance,
+        onDataChanged:function(){}
+      };
+
+      var testSession = {
+        id: 99,
+        type: 0,
+        timestamp: Date.now(),
+        policy: {
+          1: {
+            usage_limit:5,
+            ttl:2000
+          },
+          0: {
+            usage_limit:6,
+            ttl:2000
+          }
+        }
+      };
+
+      checkpoint.initialize({}, securityService, function(e){
+
+        if (e) return done(e);
+
+        async.timesSeries(6, function(index, cb){
+
+          checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function(e, passthrough) {
+
+            console.log('authorized:::', e, passthrough, index);
+
+            if (e){
+              if (index == 5 && e.toString() == "Error: session usage limit reached"){
+                console.log('OOOKKKKK!');
+                return cb();
+              }else cb(e);
+            } else cb();
+          });
+        }, function(e){
+
+          if (e) return done(e);
+
+          console.log('authorizing again:::', testSession);
+
+          testSession.type = 1;
+
+          async.times(5, function(index, cb){
+
+            console.log(index);
+
+            checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function(e, passthrough) {
+
+              if (e){
+                if (index == 4 && e.toString() == "Error: session usage limit reached"){
+                  console.log('OOOKKKKK');
+                  return cb();
+                }else cb(e);
+              } else cb();
+            });
+
+          }, done);
+        });
+      });
+    });
   });
 
   var mockRequest = function(token, url, payload, method){
@@ -1367,6 +1653,204 @@ describe('d3-security-tokens', function () {
         });
       });
     });
+  });
+
+  function addUserAndGroup(serviceInstance, user, group){
+
+    var addedTestGroup;
+    var addedTestuser;
+
+    serviceInstance.services.security.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
+
+      if (e) return done(e);
+      addedTestGroup = result;
+
+      serviceInstance.services.security.upsertUser(testUser, {overwrite: false}, function (e, result) {
+
+        if (e) return done(e);
+        addedTestuser = result;
+
+        serviceInstance.services.security.linkGroup(addedTestGroup, addedTestuser, done);
+
+      });
+    });
+  }
+
+  var testUsers = {
+
+    webSessionUser:{
+        username: 'WEB_SESSION',
+        publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
+        password:'WEB_SESSION_PWD'
+      },
+
+    webSessionGroup:{
+      name: 'WEB_SESSIONS',
+      permissions:{
+        '/WEB_SESSIONS/*':{actions: ['*']}
+      }
+    },
+
+    connectedDevicesUser:{
+      username: 'CONNECTED_DEVICES',
+      publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
+      password:'CONNECTED_DEVICES_PWD'
+    },
+
+    connectedDevicesGroup:{
+      name: 'CONNECTED_DEVICES',
+      permissions:{
+        '/CONNECTED_DEVICES/*':{actions: ['*']}
+      }
+    },
+
+    trustedDevicesUser:{
+      username: 'TRUSTED_DEVICES',
+      publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
+      password:'TRUSTED_DEVICES_PWD'
+    },
+
+    trustedDevicesGroup:{
+      name: 'TRUSTED_DEVICES',
+      permissions:{
+        '/TRUSTED_DEVICES/*':{actions: ['*']}
+      }
+    },
+
+    limitedReuseUser:{
+      username: 'LIMITED_REUSE',
+      publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2',
+      password:'LIMITED_REUSE_PWD'
+    },
+
+    limitedReuseGroup:{
+      name: 'LIMITED_REUSE',
+      permissions:{
+        '/LIMITED_REUSE/*':{actions: ['*']}
+      }
+    }
+  };
+
+  function testEnvironment1(callback){
+
+    //LIMITED_REUSE
+
+    getService(serviceConfig, function (e, instance) {
+
+      if (e) return callback(e);
+
+      addUserAndGroup(instance, testUsers.webSessionUser, webSessionGroup, function(e){
+
+        if (e) return callback(e);
+
+        addUserAndGroup(instance, testUsers.connectedDevicesUser, connectedDevicesGroup, function(e){
+
+          if (e) return callback(e);
+
+          addUserAndGroup(instance, testUsers.trustedDevicesUser, trustedDevicesGroup, function(e){
+
+            if (e) return callback(e);
+
+            addUserAndGroup(instance, testUsers.limitedReuseUser, limitedReuseGroup, function(e){
+
+              if (e) return callback(e);
+              else callback(null, instance);
+
+            });
+          });
+        });
+      });
+    });
+  }
+
+  function testStatelessWebSession(serviceInstance, callback){
+    callback(new Error('not implemented'));
+  }
+
+  function testStatefulWebSession(serviceInstance, callback){
+    callback(new Error('not implemented'));
+  }
+
+  function testStatelessTrustedDevice(serviceInstance, callback){
+    callback(new Error('not implemented'));
+  }
+
+  function testStatefulTrustedDevice(serviceInstance, callback){
+    callback(new Error('not implemented'));
+  }
+
+  function testStatelessConnectedDevice(serviceInstance, callback){
+    callback(new Error('not implemented'));
+  }
+
+  function testStatefulConnectedDevice(serviceInstance, callback){
+    callback(new Error('not implemented'));
+  }
+
+  function testStatelessLimitedReuse(serviceInstance, callback){
+    callback(new Error('not implemented'));
+  }
+
+  function testStatefulLimitedReuse(serviceInstance, callback){
+    callback(new Error('not implemented'));
+  }
+
+  xit('ensures the correct profiles have been picked for various sessions', function (callback) {
+
+    testEnvironment1(function(e, serviceInstance){
+
+      if (e) return done(e);
+
+      testStatelessWebSession(function(e){
+
+        if (e) return done(e);
+
+        testStatefulWebSession(function(e){
+
+          if (e) return done(e);
+
+          testStatelessTrustedDevice(function(e){
+
+            if (e) return done(e);
+
+            testStatefulTrustedDevice(function(e){
+
+              if (e) return done(e);
+
+              testStatelessConnectedDevice(function(e){
+
+                if (e) return done(e);
+
+                testStatefulConnectedDevice(function(e){
+
+                  if (e) return done(e);
+
+                  testStatelessLimitedReuse(function(e){
+
+                    if (e) return done(e);
+
+                    testStatefulLimitedReuse(function(e){
+
+                      if (e) return done(e);
+
+                    });
+
+                  });
+
+                });
+
+              });
+
+            });
+
+          });
+
+        });
+
+      });
+
+    });
+
   });
 
   xit('should create a user without a public key on the server, should fail to log in because the key is not registered with the username on the server', function (callback) {

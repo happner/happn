@@ -102,7 +102,7 @@ describe('d3_data_functional', function() {
 
           if (e) return callback(e);
 
-          expect(response._meta.created).to.equal(initialCreated);
+          expect(response._meta.modified >= initialCreated).to.equal(true);
 
           serviceInstance.get('/merge/' + testId, {}, function(e, response){
 
