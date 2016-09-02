@@ -13,7 +13,7 @@ describe('a7_eventemitter_security_access', function () {
     happn.service.create(config,
       callback
     );
-  }
+  };
 
   before('it starts completely defaulted service', function (done) {
 

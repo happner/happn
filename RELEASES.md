@@ -300,3 +300,10 @@
 -----------------
 
 - small changes to make mongo plugin backwards compatible
+
+2.13.0 2016-09-01
+-----------------
+
+- caching service
+- security profiles
+
