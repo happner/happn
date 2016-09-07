@@ -487,7 +487,7 @@ describe('2_websockets_embedded_sanity', function () {
 
         ////////////////////console.log('merge tag results');
         ////////////////////console.log(e);
-        ////////////////////console.log(result);
+        //console.log(result);
 
         expect(result.data.property1).to.be('property1');
         expect(result.data.property2).to.be('property2');
@@ -837,20 +837,10 @@ describe('2_websockets_embedded_sanity', function () {
         //We perform the actual delete
         publisherclient.remove('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me', null, function (e, result) {
 
-
-          //////////////////console.log('REMOVE HAPPENED!!!');
-          //////////////////console.log(e);
-          //////////////////console.log(result);
-
-
-          ////////////////////////////console.log('put happened - listening for result');
+          
         });
-
-
       });
     });
-
-
   });
 
   it('should unsubscribe from an event', function (callback) {
