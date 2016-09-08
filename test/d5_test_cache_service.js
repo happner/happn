@@ -11,6 +11,8 @@ describe('d5_test_cache_service', function() {
 
   var config = {};
 
+  var async = require('async');
+
   before('should initialize the service', function(callback) {
 
     serviceInstance.initialize(config, callback);
@@ -565,6 +567,48 @@ describe('d5_test_cache_service', function() {
         if (e) return done(e);
 
         expect(data).to.be(35);
+        done();
+
+      });
+    });
+  });
+
+  xit('tests the all function, default cache', function(done){
+
+
+  });
+
+  it('tests the all function, specific cache', function(done){
+
+    serviceInstance.clear('specific');
+    var specific = serviceInstance.new('specific');
+
+    async.times(5, function(time, timeCB){
+
+      var key = "sync_key_" + time;
+      var opts = {};
+
+      if (time == 4) opts.ttl = 2000;
+
+      specific.set(key, {"val":key}, opts, timeCB);
+
+    }, function(e){
+
+      if (e) return done(e);
+
+      expect(Object.keys(specific.__cache).length).to.be(5);
+
+      specific.all(function(e, items){
+
+        if (e) return done(e);
+        expect(items.length).to.be(5);
+
+        expect(items[0].data.val).to.be("sync_key_" + 0);
+        expect(items[1].data.val).to.be("sync_key_" + 1);
+        expect(items[2].data.val).to.be("sync_key_" + 2);
+        expect(items[3].data.val).to.be("sync_key_" + 3);
+        expect(items[4].data.val).to.be("sync_key_" + 4);
+
         done();
 
       });

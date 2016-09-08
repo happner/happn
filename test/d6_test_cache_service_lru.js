@@ -9,6 +9,8 @@ describe('d6_test_cache_service', function() {
 
   var testId = require('shortid').generate();
 
+  var async = require('async');
+
   var config = {
     defaultCacheOpts:{
       type:'LRU',
@@ -569,4 +571,43 @@ describe('d6_test_cache_service', function() {
       });
     });
   });
+
+
+  it('tests the all function, specific cache', function(done){
+
+    serviceInstance.clear('specific');
+    var specific = serviceInstance.new('specific');
+
+    async.times(5, function(time, timeCB){
+
+      var key = "sync_key_" + time;
+      var opts = {};
+
+      if (time == 4) opts.ttl = 2000;
+
+      specific.set(key, {"val":key}, opts, timeCB);
+
+    }, function(e){
+
+      if (e) return done(e);
+
+      specific.all(function(e, items){
+
+        if (e) return done(e);
+        
+        expect(items.length).to.be(5);
+
+        //backwards because LRU
+        expect(items[0].data.val).to.be("sync_key_" + 4);
+        expect(items[1].data.val).to.be("sync_key_" + 3);
+        expect(items[2].data.val).to.be("sync_key_" + 2);
+        expect(items[3].data.val).to.be("sync_key_" + 1);
+        expect(items[4].data.val).to.be("sync_key_" + 0);
+
+        done();
+
+      });
+    });
+  });
+
 });
