@@ -744,11 +744,11 @@ describe('d7_test_cache_service_persisted', function() {
           if (e) return done(e);
           expect(items.length).to.be(5);
 
-          expect(items[0].data.val).to.be("sync_key_" + 0);
-          expect(items[1].data.val).to.be("sync_key_" + 1);
-          expect(items[2].data.val).to.be("sync_key_" + 2);
-          expect(items[3].data.val).to.be("sync_key_" + 3);
-          expect(items[4].data.val).to.be("sync_key_" + 4);
+          expect(items[0].val).to.be("sync_key_" + 0);
+          expect(items[1].val).to.be("sync_key_" + 1);
+          expect(items[2].val).to.be("sync_key_" + 2);
+          expect(items[3].val).to.be("sync_key_" + 3);
+          expect(items[4].val).to.be("sync_key_" + 4);
 
           done();
 
@@ -793,11 +793,11 @@ describe('d7_test_cache_service_persisted', function() {
 
           expect(items.length).to.be(5);
 
-          expect(items[0].data.val).to.be("sync_key_" + 0);
-          expect(items[1].data.val).to.be("sync_key_" + 1);
-          expect(items[2].data.val).to.be("sync_key_" + 2);
-          expect(items[3].data.val).to.be("sync_key_" + 3);
-          expect(items[4].data.val).to.be("sync_key_" + 4);
+          expect(items[0].val).to.be("sync_key_" + 0);
+          expect(items[1].val).to.be("sync_key_" + 1);
+          expect(items[2].val).to.be("sync_key_" + 2);
+          expect(items[3].val).to.be("sync_key_" + 3);
+          expect(items[4].val).to.be("sync_key_" + 4);
 
           done();
 
