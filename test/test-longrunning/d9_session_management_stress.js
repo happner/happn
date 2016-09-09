@@ -5,7 +5,7 @@ describe('d9_session_management_sanity', function () {
   after(require('benchmarket').store());
 
   var expect = require('expect.js');
-  var happn = require('../lib/index')
+  var happn = require('../../lib/index')
   var service = happn.service;
   var happn_client = happn.client;
   var async = require('async');
@@ -88,100 +88,9 @@ describe('d9_session_management_sanity', function () {
     });
   };
 
-  before('starts up happn instance with session management switched on', function(callback){
-    getService(callback);
-  });
+  it('tests session management, multiple clients in series', function (callback) {
 
-  it('tests active sessions and session activity logging on a secure instance', function (callback) {
-
-    this.timeout(6000);
-
-    var RandomActivityGenerator = require("happn-random-activity-generator");
-
-    var randomActivity1 = new RandomActivityGenerator(clientInstance);
-
-    randomActivity1.generateActivityStart("test", function () {
-
-      setTimeout(function () {
-        randomActivity1.generateActivityEnd("test", function (aggregatedLog) {
-
-          serviceInstance.services.security.listActiveSessions(function(e, list){
-
-            if (e) return callback(e);
-            expect(list.length).to.be(1);
-
-            serviceInstance.services.security.listSessionActivity(function(e, list){
-
-              if (e) return callback(e);
-              expect(list.length).to.be(1);
-
-              callback();
-
-            });
-          });
-        });
-      }, 3000);
-    });
-  });
-
-  it('tests session revocation on a secure instance', function (callback) {
-
-    this.timeout(10000);
-
-    var RandomActivityGenerator = require("happn-random-activity-generator");
-
-    var randomActivity1 = new RandomActivityGenerator(clientInstance);
-
-    randomActivity1.generateActivityStart("test", function () {
-
-      setTimeout(function () {
-
-        randomActivity1.generateActivityEnd("test", function (aggregatedLog) {
-
-          serviceInstance.services.security.listActiveSessions(function(e, list){
-
-            if (e) return callback(e);
-            expect(list.length).to.be(1);
-
-            var session = list[0];
-
-            serviceInstance.services.security.listSessionActivity(function(e, list){
-
-              if (e) return callback(e);
-              expect(list.length).to.be(1);
-
-              serviceInstance.services.security.revokeSession(session, 'APP', function(e){
-
-                if (e) return callback(e);
-
-                serviceInstance.services.security.listRevokedSessions(function(e, items){
-
-                  if (e) return callback(e);
-
-                  expect(items.length).to.be(1);
-
-                  clientInstance.set('/TEST/DATA', {}, function(e, result){
-
-                    expect(e.toString()).to.be('Error: session with id ' + session.id + ' has been revoked');
-
-                    serviceInstance.services.security.restoreSession(session, function(e){
-
-                      if (e) return callback(e);
-                      clientInstance.set('/TEST/DATA', {}, callback);
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-      }, 5000);
-    });
-  });
-
-  it('tests session management, multiple clients', function (callback) {
-
-    var times = 4;
+    var times = 20;
 
     this.timeout(times * 6000 + 10000);
 
@@ -190,6 +99,85 @@ describe('d9_session_management_sanity', function () {
     getService(function(e){
 
       async.timesSeries(times, function(timeIndex, timeCB){
+
+        happn_client.create({
+          config: {
+            port:55556,
+            username: '_ADMIN',
+            password: 'happn'
+          }
+        }, function (e, instance) {
+
+          if (e) return callback(e);
+
+          var sessionData = {};
+
+          sessionData.client = instance;
+
+          var RandomActivityGenerator = require("happn-random-activity-generator");
+          var randomActivity = new RandomActivityGenerator(instance);
+
+          sessionData.random = randomActivity;
+
+          randomActivity.generateActivityStart("test", function () {
+
+            setTimeout(function(){
+
+              randomActivity.generateActivityEnd("test", function (aggregatedLog) {
+
+                sessionData.results = aggregatedLog;
+                sessionData.client = instance;
+
+                console.log('collected data:::', aggregatedLog);
+
+                session_results.push(sessionData);
+
+                timeCB();
+
+              });
+            }, 1500);
+          });
+        });
+
+      }, function(e){
+
+        if (e) return callback(e);
+
+        setTimeout(function(){
+
+          serviceInstance.services.security.listActiveSessions(function(e, list){
+
+            if (e) return callback(e);
+
+            expect(list.length).to.be(times + 1);//+1 for connected client
+
+            serviceInstance.services.security.listSessionActivity(function(e, list){
+
+              if (e) return callback(e);
+
+              expect(list.length).to.be(times);
+
+              callback();
+
+            });
+          });
+
+        }, 10000);
+      });
+    });
+  });
+
+  it('tests session management, multiple clients in parallel', function (callback) {
+
+    var times = 100;
+
+    this.timeout(times * 6000 + 10000);
+
+    var session_results = [];
+
+    getService(function(e){
+
+      async.times(times, function(timeIndex, timeCB){
 
         happn_client.create({
           config: {
@@ -253,9 +241,10 @@ describe('d9_session_management_sanity', function () {
             });
           });
 
-        }, 4000);
+        }, 10000);
       });
     });
+
   });
 
   require('benchmarket').stop();
