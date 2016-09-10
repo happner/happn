@@ -27,7 +27,9 @@ describe('d9_session_management_sanity', function () {
       callback();
   };
 
-  var getService = function(activateSessionManagement, sessionActivityTTL, callback){
+  var getService = function(activateSessionManagement, sessionActivityTTL, callback, port){
+
+    if (!port) port = 55556;
 
     if (typeof activateSessionManagement == 'function'){
 
@@ -46,11 +48,12 @@ describe('d9_session_management_sanity', function () {
 
         var serviceConfig = {
           secure: true,
-          port:55556,
+          port:port,
           services:{
             security:{
               config:{
                 activateSessionManagement:activateSessionManagement,
+                logSessionActivity:true,
                 sessionActivityTTL:sessionActivityTTL
               }
             }
@@ -66,7 +69,7 @@ describe('d9_session_management_sanity', function () {
 
             happn_client.create({
               config: {
-                port:55556,
+                port:port,
                 username: '_ADMIN',
                 password: 'happn'
               },
@@ -96,7 +99,7 @@ describe('d9_session_management_sanity', function () {
 
     var session_results = [];
 
-    getService(function(e){
+    getService(true, 500000, function(e){
 
       async.timesSeries(times, function(timeIndex, timeCB){
 
@@ -175,13 +178,13 @@ describe('d9_session_management_sanity', function () {
 
     var session_results = [];
 
-    getService(function(e){
+    getService(true, 500000, function(e){
 
       async.times(times, function(timeIndex, timeCB){
 
         happn_client.create({
           config: {
-            port:55556,
+            port:55557,
             username: '_ADMIN',
             password: 'happn'
           }
@@ -237,13 +240,11 @@ describe('d9_session_management_sanity', function () {
               expect(list.length).to.be(times);
 
               callback();
-
             });
           });
-
         }, 10000);
       });
-    });
+    }, 55557);
 
   });
 

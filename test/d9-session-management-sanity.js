@@ -22,7 +22,7 @@ describe('d9_session_management_sanity', function () {
 
   var stopService = function(callback){
     if (serviceInstance)
-      serviceInstance.stop(callback)
+      serviceInstance.stop(callback);
     else
       callback();
   };
@@ -51,6 +51,7 @@ describe('d9_session_management_sanity', function () {
             security:{
               config:{
                 activateSessionManagement:activateSessionManagement,
+                logSessionActivity:true,
                 sessionActivityTTL:sessionActivityTTL
               }
             }
@@ -256,6 +257,14 @@ describe('d9_session_management_sanity', function () {
         }, 4000);
       });
     });
+  });
+
+  xit('tests session management, switching on session management with activity logging', function (callback) {
+
+  });
+
+  xit('tests session management, switching on session management without activity logging', function (callback) {
+
   });
 
   require('benchmarket').stop();

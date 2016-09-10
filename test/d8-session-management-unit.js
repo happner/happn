@@ -61,6 +61,7 @@ describe('d8_session_management', function () {
 
           securityService.initialize({
             activateSessionManagement:sessionManagementActive,
+            logSessionActivity:true,
             sessionActivityTTL:3000,
             secure:true
           }, function(e){
@@ -366,7 +367,7 @@ describe('d8_session_management', function () {
 
           expect(e.toString()).to.be('Error: session management not activated');
 
-          happn.services.security.activateSessionManagement(function(e){
+          happn.services.security.activateSessionManagement(true, function(e){
 
             if (e) return done(e);
 
