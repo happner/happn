@@ -35,6 +35,7 @@
     "happn-util-crypto": "0.2.0",
     "jsonpack": "^1.1.5",
     "jwt-simple": "0.2.0",
+    "long-timeout": "^0.1.1",
     "lru-cache": "4.0.0",
     "node-uuid": "1.4.7",
     "password-hash-and-salt": "0.1.3",

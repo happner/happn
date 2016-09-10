@@ -84,19 +84,27 @@ describe('d8_session_management', function () {
     });
   };
 
-  var mockSession = function(type, id, username, ttl){
+  var mockSession = function(type, id, username, ttl, securityService){
 
     if (!ttl) ttl = Infinity;
 
-    return {
+    var session = {
       timestamp:Date.now(),
       type:type,
       id:id,
       ttl:ttl,
       user:{
         username:username
+      },
+      policy:{
+        0:{ttl:ttl},
+        1:{ttl:ttl}
       }
     };
+
+    session.token = securityService.generateToken(session);
+
+    return session;
   };
 
   it('tests sessionActivity activation', function (done) {
@@ -123,8 +131,7 @@ describe('d8_session_management', function () {
 
       if (e) return done(e);
 
-
-      var session = mockSession(1, 'TEST567', 'TESTUSER');
+      var session = mockSession(1, 'TEST567', 'TESTUSER', null, happn.services.security);
 
       happn.services.security.addActiveSession(session, function(e){
 
@@ -164,7 +171,7 @@ describe('d8_session_management', function () {
 
       async.times(10, function(timeIndex, timeCB){
 
-        var session = mockSession(1, 'TEST_SESSION' + timeIndex, 'TEST_USER' + timeIndex);
+        var session = mockSession(1, 'TEST_SESSION' + timeIndex, 'TEST_USER' + timeIndex, null, happn.services.security);
         happn.services.security.__logSessionActivity(session, 'testpath'  + timeIndex, 'testaction' + timeIndex, timeCB);
       }, function(e){
 
@@ -204,7 +211,7 @@ describe('d8_session_management', function () {
 
       async.times(10, function(timeIndex, timeCB){
 
-        var session = mockSession(1, 'TEST_SESSION' + timeIndex, 'TEST_USER' + timeIndex);
+        var session = mockSession(1, 'TEST_SESSION' + timeIndex, 'TEST_USER' + timeIndex, null, happn.services.security);
         happn.services.security.__logSessionActivity(session, 'testpath'  + timeIndex, 'testaction' + timeIndex, timeCB);
       }, function(e){
 
@@ -228,7 +235,7 @@ describe('d8_session_management', function () {
 
       if (e) return done(e);
 
-      var session = mockSession(1, 'TEST_SESSION', 'TEST_USER');
+      var session = mockSession(1, 'TEST_SESSION', 'TEST_USER', null, happn.services.security);
 
       happn.services.security.__logSessionActivity(session, 'testpath1', 'testaction1', function(e){
 
@@ -258,7 +265,7 @@ describe('d8_session_management', function () {
 
       if (e) return done(e);
 
-      var session = mockSession(1, 'TEST_SESSION', 'TEST_USER', 60000);
+      var session = mockSession(1, 'TEST_SESSION', 'TEST_USER', 60000, happn.services.security);
 
       happn.services.security.revokeSession(session, function(e){
 
@@ -301,11 +308,11 @@ describe('d8_session_management', function () {
 
     };
 
-    var session = mockSession(1, 'TEST_SESSION', 'TEST_USER');
-
     mockServices(function(e, happn) {
 
       if (e) return done(e);
+
+      var session = mockSession(1, 'TEST_SESSION', 'TEST_USER', null, happn.services.security);
 
       happn.services.pubsub.attachSession(mockSocket, session);
 
@@ -345,11 +352,11 @@ describe('d8_session_management', function () {
 
     var mockSocket = {};
 
-    var session = mockSession(1, 'TEST_SESSION1', 'TEST_USER1');
-
     mockServices(false, function(e, happn) {
 
       if (e) return done(e);
+
+      var session = mockSession(1, 'TEST_SESSION1', 'TEST_USER1', null, happn.services.security);
 
       happn.services.pubsub.attachSession(mockSocket, session);
 
@@ -386,13 +393,13 @@ describe('d8_session_management', function () {
 
     this.timeout(7000);
 
-    var mockSocket = {};
-
-    var session = mockSession(1, 'TEST_SESSION1', 'TEST_USER1', 3000);
-
     mockServices(true, function(e, happn) {
 
       if (e) return done(e);
+
+      var mockSocket = {};
+
+      var session = mockSession(1, 'TEST_SESSION1', 'TEST_USER1', 1500, happn.services.security);
 
       happn.services.pubsub.attachSession(mockSocket, session);
 
@@ -428,13 +435,13 @@ describe('d8_session_management', function () {
 
     this.timeout(7000);
 
-    var mockSocket = {};
-
-    var session = mockSession(1, 'TEST_SESSION1', 'TEST_USER1', 2000);
-
     mockServices(true, function(e, happn) {
 
       if (e) return done(e);
+
+      var mockSocket = {};
+
+      var session = mockSession(1, 'TEST_SESSION1', 'TEST_USER1', 1000, happn.services.security);
 
       happn.services.pubsub.attachSession(mockSocket, session);
 
