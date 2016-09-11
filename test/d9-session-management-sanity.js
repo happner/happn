@@ -27,7 +27,21 @@ describe('d9_session_management_sanity', function () {
       callback();
   };
 
-  var getService = function(activateSessionManagement, sessionActivityTTL, callback){
+  after('disconnects the client and stops the server', function(callback){
+
+    this.timeout(3000);
+
+    disconnectClient(function(){
+      stopService(callback);
+    });
+
+  });
+
+  var getService = function(activateSessionManagement, sessionActivityTTL, callback, sessionActivityLogging, port){
+
+    if (!port) port = 55556;
+
+    if (sessionActivityLogging == undefined) sessionActivityLogging = true;
 
     if (typeof activateSessionManagement == 'function'){
 
@@ -46,12 +60,12 @@ describe('d9_session_management_sanity', function () {
 
         var serviceConfig = {
           secure: true,
-          port:55556,
+          port:port,
           services:{
             security:{
               config:{
                 activateSessionManagement:activateSessionManagement,
-                logSessionActivity:true,
+                logSessionActivity:sessionActivityLogging,
                 sessionActivityTTL:sessionActivityTTL
               }
             }
@@ -67,7 +81,7 @@ describe('d9_session_management_sanity', function () {
 
             happn_client.create({
               config: {
-                port:55556,
+                port:port,
                 username: '_ADMIN',
                 password: 'happn'
               },
@@ -259,11 +273,117 @@ describe('d9_session_management_sanity', function () {
     });
   });
 
-  xit('tests session management, switching on session management with activity logging', function (callback) {
+  it('tests session management, switching on session management with activity logging', function (callback) {
+    this.timeout(6000);
 
+    getService(false, 10000,  function(e){
+
+      var RandomActivityGenerator = require("happn-random-activity-generator");
+
+      var randomActivity1 = new RandomActivityGenerator(clientInstance);
+
+      randomActivity1.generateActivityStart("test", function () {
+
+        setTimeout(function () {
+          randomActivity1.generateActivityEnd("test", function (aggregatedLog) {
+
+            serviceInstance.services.security.listActiveSessions(function(e, list){
+
+              expect(e.toString()).to.be('Error: session management not activated');
+
+              serviceInstance.services.security.listSessionActivity(function(e, list){
+
+                expect(e.toString()).to.be('Error: session activity logging not activated');
+
+                serviceInstance.services.security.activateSessionManagement(true, function(e){
+
+                  if (e) return callback(e);
+
+                  var randomActivity2 = new RandomActivityGenerator(clientInstance);
+
+                  randomActivity2.generateActivityStart("test", function () {
+                    setTimeout(function () {
+                      randomActivity2.generateActivityEnd("test", function (aggregatedLog) {
+
+                        serviceInstance.services.security.listActiveSessions(function(e, list){
+
+                          if (e) return callback(e);
+
+                          expect(list.length).to.be(1);
+
+                          serviceInstance.services.security.listSessionActivity(function(e, list){
+
+                            if (e) return callback(e);
+
+                            expect(list.length).to.be(1);
+                            callback();
+                          });
+                        });
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        }, 3000);
+      });
+    }, false, 55559);
   });
 
-  xit('tests session management, switching on session management without activity logging', function (callback) {
+  it('tests session management, switching on session management without activity logging', function (callback) {
+
+    this.timeout(6000);
+
+    getService(false, 10000,  function(e){
+
+      var RandomActivityGenerator = require("happn-random-activity-generator");
+
+      var randomActivity1 = new RandomActivityGenerator(clientInstance);
+
+      randomActivity1.generateActivityStart("test", function () {
+
+        setTimeout(function () {
+          randomActivity1.generateActivityEnd("test", function (aggregatedLog) {
+
+            serviceInstance.services.security.listActiveSessions(function(e, list){
+
+              expect(e.toString()).to.be('Error: session management not activated');
+
+              serviceInstance.services.security.listSessionActivity(function(e, list){
+
+                expect(e.toString()).to.be('Error: session activity logging not activated');
+
+                serviceInstance.services.security.activateSessionManagement(false, function(e){
+
+                  if (e) return callback(e);
+
+                  var randomActivity2 = new RandomActivityGenerator(clientInstance);
+
+                  randomActivity2.generateActivityStart("test", function () {
+                    setTimeout(function () {
+                      randomActivity2.generateActivityEnd("test", function (aggregatedLog) {
+
+                        serviceInstance.services.security.listActiveSessions(function(e, list){
+
+                          if (e) return callback(e);
+                          expect(list.length).to.be(1);
+
+                          serviceInstance.services.security.listSessionActivity(function(e, list){
+                            expect(e.toString()).to.be('Error: session activity logging not activated');
+                            callback();
+                          });
+                        });
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        }, 3000);
+      });
+    }, false, 55560);
 
   });
 
