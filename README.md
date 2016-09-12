@@ -467,7 +467,7 @@ SECURITY PROFILES
                 }]
               },
               policy:{
-                ttl: 4000,
+                ttl: "4 seconds",//4 seconds = 4000ms, 4 days = 1000 * 60 * 60 * 24 * 4, allow for hours/minutes
                 inactivity_threshold:2000//this is costly, as we need to store state on the server side
               }
             }, {
