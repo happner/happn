@@ -387,6 +387,90 @@ describe('d9_session_management_sanity', function () {
 
   });
 
+  it('tests session management, switching on session management without activity logging, then starting up activity logging', function (callback) {
+
+    this.timeout(10000);
+
+    getService(false, 10000,  function(e){
+
+      var RandomActivityGenerator = require("happn-random-activity-generator");
+
+      var randomActivity1 = new RandomActivityGenerator(clientInstance);
+
+      randomActivity1.generateActivityStart("test", function () {
+
+        setTimeout(function () {
+          randomActivity1.generateActivityEnd("test", function (aggregatedLog) {
+
+            serviceInstance.services.security.listActiveSessions(function(e, list){
+
+              expect(e.toString()).to.be('Error: session management not activated');
+
+              serviceInstance.services.security.listSessionActivity(function(e, list){
+
+                expect(e.toString()).to.be('Error: session activity logging not activated');
+
+                serviceInstance.services.security.activateSessionManagement(false, function(e){
+
+                  if (e) return callback(e);
+
+                  var randomActivity2 = new RandomActivityGenerator(clientInstance);
+
+                  randomActivity2.generateActivityStart("test", function () {
+                    setTimeout(function () {
+                      randomActivity2.generateActivityEnd("test", function (aggregatedLog) {
+
+                        serviceInstance.services.security.listActiveSessions(function(e, list){
+
+                          if (e) return callback(e);
+                          expect(list.length).to.be(1);
+
+                          serviceInstance.services.security.listSessionActivity(function(e, list){
+                            expect(e.toString()).to.be('Error: session activity logging not activated');
+
+                            serviceInstance.services.security.activateSessionActivity(function(e){
+
+                              if (e) return callback(e);
+
+                              serviceInstance.services.security.listActiveSessions(function(e, list) {
+
+                                if (e) return callback(e);
+                                expect(list.length).to.be(1);
+
+                                clientInstance.set('/test/data', 50000, function(e){
+
+                                  if (e) return callback(e);
+
+                                  setTimeout(function () {
+
+                                    serviceInstance.services.security.listSessionActivity(function (e, list) {
+
+                                      if (e) return callback(e);
+                                      expect(list.length).to.be(1);
+
+                                      callback();
+
+                                    });
+                                  }, 2000);
+
+                                });
+                              });
+                            });
+                          });
+                        });
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        }, 3000);
+      });
+    }, false, 55560);
+
+  });
+
   require('benchmarket').stop();
 
 });

@@ -2,7 +2,7 @@ describe('d3-security-tokens', function () {
 
   // TODO:benchmarket stuff
   // require('benchmarket').start();
-  // after(require('benchmarket').store());
+  after(require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index');
@@ -43,8 +43,8 @@ describe('d3-security-tokens', function () {
                 }]
               },
               policy:{
-                ttl: 4000,
-                inactivity_threshold:2000//this is costly, as we need to store state on the server side
+                ttl: '4 seconds',
+                inactivity_threshold:'2 seconds'//this is costly, as we need to store state on the server side
               }
             }, {
               name:"rest-device",
@@ -56,7 +56,8 @@ describe('d3-security-tokens', function () {
                 type:{$eq:0} //token stateless
               }]},
               policy: {
-                ttl: 2000//stale after 2 seconds
+                ttl: 2000,//stale after 2 seconds
+                inactivity_threshold:'2 days' //stale after 2 days
               }
             },{
               name:"trusted-device",
@@ -68,7 +69,7 @@ describe('d3-security-tokens', function () {
                 type:{$eq:1} //stateful connected device
               }]},
               policy: {
-                ttl: 2000,//stale after 2 seconds
+                ttl: '2 seconds',//stale after 2 seconds
                 permissions:{//permissions that the holder of this token is limited, regardless of the underlying user
                   '/TRUSTED_DEVICES/*':{actions: ['*']}
                 }
@@ -1208,93 +1209,7 @@ describe('d3-security-tokens', function () {
              });
 
            });
-
          });
-
-      });
-    });
-  });
-
-  xit("tests the security checkpoints token usage limit1", function(done) {
-
-    this.timeout(20000);
-
-    var checkpoint = new CheckPoint({
-      logger: require('happn-logger')
-    });
-
-    var CacheService = require('../lib/services/cache/service');
-    var cacheInstance = new CacheService();
-
-    cacheInstance.initialize({}, function(e){
-
-      if (e) return done(e);
-
-      var securityService = {
-        happn: {
-          utils: require('../lib/utils')
-        },
-        cacheService:cacheInstance,
-        onDataChanged:function(){}
-      };
-
-      var testSession = {
-        id: 99,
-        type: 0,
-        timestamp: Date.now(),
-        policy: {
-          1: {
-            usage_limit:5,
-            ttl:2000
-          },
-          0: {
-            usage_limit:6,
-            ttl:2000
-          }
-        }
-      };
-
-      checkpoint.initialize({}, securityService, function(e){
-
-        if (e) return done(e);
-
-        async.timesSeries(6, function(index, cb){
-
-          checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function(e, passthrough) {
-
-            console.log('authorized:::', e, passthrough, index);
-
-            if (e){
-              if (index == 5 && e.toString() == "Error: session usage limit reached"){
-                console.log('OOOKKKKK!');
-                return cb();
-              }else cb(e);
-            } else cb();
-          });
-        }, function(e){
-
-          if (e) return done(e);
-
-          console.log('authorizing again:::', testSession);
-
-          testSession.type = 1;
-
-          async.times(5, function(index, cb){
-
-            console.log(index);
-
-            checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function(e, passthrough) {
-
-              if (e){
-                if (index == 4 && e.toString() == "Error: session usage limit reached"){
-                  console.log('OOOKKKKK');
-                  return cb();
-                }else cb(e);
-              } else cb();
-            });
-
-          }, done);
-        });
       });
     });
   });
@@ -1655,7 +1570,29 @@ describe('d3-security-tokens', function () {
     });
   });
 
+  it ('should test the policy ms settings', function(done){
 
+    var SecurityService = require('../lib/services/security/service.js');
+
+    var securityService = new SecurityService({logger: Logger});
+
+    securityService.happn = {
+      utils:require('../lib/utils')
+    };
+
+    securityService.__initializeProfiles(serviceConfig.services.security.config, function(e){
+
+      if (e) return done(e);
+
+      expect(securityService.__cache_Profiles[0].policy.ttl).to.be(4000);
+      expect(securityService.__cache_Profiles[0].policy.inactivity_threshold).to.be(2000);
+      expect(securityService.__cache_Profiles[1].policy.inactivity_threshold).to.be(60000 * 60 * 48);
+
+      done();
+
+    })
+
+  });
 
   require('benchmarket').stop();
 
