@@ -17,7 +17,7 @@ describe('b9_security_web_token', function () {
   var adminClient;
   var testClient;
 
-  function doRequest(path, token, query, callback) {
+  function doRequest(path, token, query, callback, excludeToken) {
 
     var request = require('request');
 
@@ -25,13 +25,15 @@ describe('b9_security_web_token', function () {
       url: 'http://127.0.0.1:55000' + path,
     };
 
-    if (!query)
-      options.headers = {'Cookie': ['happn_token=' + token]}
-    else
-      options.url += '?happn_token=' + token;
+    if (!excludeToken){
+      if (!query)
+        options.headers = {'Cookie': ['happn_token=' + token]}
+      else
+        options.url += '?happn_token=' + token;
+    }
 
     request(options, function (error, response, body) {
-      callback(response);
+      callback(response, body);
     });
 
   }
@@ -42,10 +44,14 @@ describe('b9_security_web_token', function () {
    the logon session. The utils setting will set the system to log non priority information
    */
 
+  var Crypto = require('happn-util-crypto');
+  var crypto = new Crypto();
+
+  var keyPair = crypto.createKeyPair();
+
   before('should initialize the service', function (callback) {
 
     this.timeout(20000);
-
 
     try {
       service.create({
@@ -56,6 +62,15 @@ describe('b9_security_web_token', function () {
               '/test/excluded/specific',
               '/test/excluded/wildcard/*',
             ]
+          }
+        },
+        services:{
+          security:{
+            config:{
+              adminUser:{
+                publicKey:keyPair.publicKey
+              }
+            }
           }
         }
       }, function (e, happnInst) {
@@ -306,6 +321,49 @@ describe('b9_security_web_token', function () {
       expect(response.statusCode).to.equal(200);
       callback();
     });
+
+  });
+
+  it('tests doing a request for a token using a GET with a username and password', function (callback) {
+
+    doRequest('/auth/login?username=_ADMIN&password=happn', null, true, function (response, body) {
+      expect(response.statusCode).to.equal(200);
+
+      var token = JSON.parse(body).data;
+
+      doRequest('/secure/route/qs', token, true, function (response) {
+
+        expect(response.statusCode).to.equal(200);
+        callback();
+
+      });
+
+    }, true);
+
+  });
+
+  it('tests doing a request for a nonce using a GET with a username and password, nonce is encrypted for a login', function (callback) {
+
+    var encodedPublicKey = encodeURIComponent(keyPair.publicKey)
+
+    doRequest('/auth/request-nonce?publicKey=' + encodedPublicKey + '&user=_ADMIN', null, true, function (response, body) {
+
+      expect(response.statusCode).to.equal(200);
+
+      var nonce = JSON.parse(body).data;
+
+      var digest = crypto.sign(nonce, keyPair.privateKey);
+
+      var encodedDigest = encodeURIComponent(digest);
+
+      doRequest('/auth/login?username=_ADMIN&digest=' + encodedDigest + '&publicKey=' + encodedPublicKey, null, true, function (response, body) {
+
+        expect(response.statusCode).to.equal(200);
+        callback();
+
+      }, true);
+
+    }, true);
 
   });
 

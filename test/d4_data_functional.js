@@ -4,7 +4,7 @@ describe('d3_data_functional', function() {
 
   var expect = require('expect.js');
 
-  var service = require('../lib/services/data_embedded/service');
+  var service = require('../lib/services/data/service');
   var serviceInstance = new service();
 
   var testId = require('shortid').generate();
@@ -86,6 +86,8 @@ describe('d3_data_functional', function() {
 
   it('merges data', function(callback) {
 
+    this.timeout(10000);
+
     var initialCreated;
 
     serviceInstance.upsert('/merge/' + testId, {"test":"data"}, {}, function(e, response){
@@ -94,27 +96,30 @@ describe('d3_data_functional', function() {
 
       initialCreated = response._meta.created;
 
-      serviceInstance.upsert('/merge/' + testId, {"test1":"data1"}, {merge:true}, function(e, response){
+      setTimeout(function(){
 
-        if (e) return callback(e);
-
-        expect(response._meta.created).to.equal(initialCreated);
-
-        serviceInstance.get('/merge/' + testId, {}, function(e, response){
+        serviceInstance.upsert('/merge/' + testId, {"test1":"data1"}, {merge:true}, function(e, response){
 
           if (e) return callback(e);
 
-          expect(response.data.test).to.equal("data");
-          expect(response.data.test1).to.equal("data1");
-          expect(response._meta.created).to.equal(initialCreated);
           expect(response._meta.modified >= initialCreated).to.equal(true);
 
-          callback();
+          serviceInstance.get('/merge/' + testId, {}, function(e, response){
+
+            if (e) return callback(e);
+
+            expect(response.data.test).to.equal("data");
+            expect(response.data.test1).to.equal("data1");
+            expect(response._meta.created).to.equal(initialCreated);
+            expect(response._meta.modified > initialCreated).to.equal(true);
+
+            callback();
+
+          });
 
         });
 
-      });
-
+      }, 1000);
 
     });
 
@@ -284,6 +289,39 @@ describe('d3_data_functional', function() {
 
   });
 
+  it('gets data with $not', function(done) {
+
+    var test_obj = {
+      data:'ok'
+    };
+
+    var test_obj1 = {
+      data:'notok'
+    };
+
+    serviceInstance.upsert('/not_get/' + testId + '/ok/1', test_obj, null, function (e) {
+      expect(e == null).to.be(true);
+
+      serviceInstance.upsert('/not_get/' + testId + '/_notok_/1' , test_obj1, null, function (e) {
+        expect(e == null).to.be(true);
+
+        var listCriteria = {criteria: {$not:{}}};
+
+        listCriteria.criteria.$not['_id'] = {$regex: new RegExp(".*_notok_.*")};
+
+        serviceInstance.get('/not_get/' + testId + '/*', listCriteria, function (e, search_result) {
+
+          expect(e == null).to.be(true);
+
+          expect(search_result.length == 1).to.be(true);
+
+          done();
+
+        });
+      });
+    });
+  });
+
   it('sets value data', function (callback) {
 
     try {
@@ -312,6 +350,97 @@ describe('d3_data_functional', function() {
     } catch (e) {
       callback(e);
     }
+  });
+
+  it('does a sort and limit', function(done){
+
+    var itemCount = 100;
+
+    var randomItems = [];
+
+    var test_string = require('shortid').generate();
+
+    var base_path = '/sort_and_limit/' + test_string + '/';
+
+    var async = require('async');
+
+    for (var i = 0; i < itemCount; i++){
+
+      var item = {
+        item_sort_id: i + (Math.floor( Math.random() * 1000000 ))
+      };
+
+      randomItems.push(item);
+    }
+
+    async.eachSeries(randomItems,
+
+      function(item, callback){
+
+        var testPath = base_path + item.item_sort_id;
+
+        serviceInstance.upsert(testPath, item, {noPublish: true}, function(e, upserted){
+
+          if (e) return callback(e);
+
+          callback();
+
+        });
+      },
+
+      function(e){
+
+        if (e) return done(e);
+
+        //ascending
+        randomItems.sort(function(a, b){
+
+          return a.item_sort_id - b.item_sort_id;
+
+        });
+
+        serviceInstance.get(base_path + '*', {options:{sort:{item_sort_id:1}}, limit:50}, function(e, items){
+
+          if (e) return done(e);
+
+          for (var itemIndex in items){
+
+            if (itemIndex >= 50) break;
+
+            var item_from_mongo = items[itemIndex];
+            var item_from_array = randomItems[itemIndex];
+
+            if (item_from_mongo.data.item_sort_id != item_from_array.item_sort_id) return done(new Error('ascending sort failed'));
+          }
+
+          //ascending
+          randomItems.sort(function(a, b){
+
+            return b.item_sort_id - a.item_sort_id;
+
+          });
+
+          serviceInstance.get(base_path + '/*', {sort:{"item_sort_id":-1}, limit:50}, function(e, items){
+
+            if (e) return done(e);
+
+            for (var itemIndex in items){
+
+              if (itemIndex >= 50) break;
+
+              var item_from_mongo = items[itemIndex];
+              var item_from_array = randomItems[itemIndex];
+
+              if (item_from_mongo.data.item_sort_id != item_from_array.item_sort_id) return done(new Error('descending sort failed'));
+            }
+
+            done();
+
+          });
+
+        });
+      }
+    );
   });
 
 });
