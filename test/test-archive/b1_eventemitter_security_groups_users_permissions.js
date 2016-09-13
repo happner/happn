@@ -27,7 +27,7 @@ describe('b1_eventemitter_security_groups', function () {
     happnMock.utils = require('../../lib/utils');
 
     testServices = {};
-    testServices.data = require('../../lib/services/data_embedded/service');
+    testServices.data = require('.././service');
     testServices.security = require('../../lib/services/security/service');
 
     var checkpoint = require('../../lib/services/security/checkpoint');

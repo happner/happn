@@ -76,6 +76,7 @@ describe('c3_websockets_embedded_sanity_encryptedpayloads', function () {
     this.timeout(default_timeout);
 
     try {
+
       happn_client.create({
         config: {
           username: '_ADMIN',
