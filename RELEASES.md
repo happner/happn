@@ -301,10 +301,16 @@
 
 - small changes to make mongo plugin backwards compatible
 
-2.13.0 2016-10-05
+2.13.0 2016-10-13
 ------------------------
 
 - caching service
 - security profiles
 - session management
+
+2.13.0 2016-10-13
+------------------------
+
+- fix to enforce policies that have permissions to limit access to those permissions
+
 

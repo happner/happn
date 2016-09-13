@@ -1126,17 +1126,18 @@ describe('d3-security-tokens', function () {
 
         if (e) return done(e);
 
-        checkpoint._authorizeSession(testSession, '/test/permission/24', 'on', function (e, authorized, reason, passthrough) {
+        checkpoint._authorizeSession(testSession, '/test/permission/24', 'on', function (e, authorized, reason, passthrough1) {
 
           if (e) return done(e);
 
-          expect(passthrough).to.be(true);
+          expect(passthrough1).to.be(true);
 
-          checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function (e, authorized, reason, passthrough) {
+          checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function (e, authorized, reason, passthrough2) {
 
             if (e) return done(e);
 
-            expect(passthrough).to.be(false);
+            expect(passthrough2).to.be(undefined);
+            expect(authorized).to.be(false);
 
             done();
 
