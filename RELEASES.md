@@ -308,9 +308,13 @@
 - security profiles
 - session management
 
-2.13.0 2016-10-13
+2.13.1 2016-10-13
 ------------------------
 
 - fix to enforce policies that have permissions to limit access to those permissions
 
+2.13.2 2016-10-13
+------------------------
+
+- fix to tests removed e1
 
