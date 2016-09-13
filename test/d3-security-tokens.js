@@ -50,11 +50,10 @@ describe('d3-security-tokens', function () {
               name:"rest-device",
               session:{
                 $and:[{ //filter by the security properties of the session - check if this session user belongs to a specific group
-                user:{groups:{
-                  "REST_DEVICES" : { $exists: true }
-                }},
+                user:{groups:{"REST_DEVICES" : { $exists: true }}},
                 type:{$eq:0} //token stateless
-              }]},
+              }]
+              },
               policy: {
                 ttl: 2000,//stale after 2 seconds
                 inactivity_threshold:'2 days' //stale after 2 days
@@ -775,18 +774,17 @@ describe('d3-security-tokens', function () {
 
           setTimeout(function(){
 
-            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e, authorized, reason){
 
-              if (!e) return done('this was not meant to happn');
-
-              expect(e.toString()).to.be('Error: expired session token');
+              expect(authorized).to.be(false);
+              expect(reason).to.be('expired session token');
 
               testSession.type = 0;
 
               //we have a more permissive ttl for stateless sessions
-              checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+              checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e, authorized){
 
-                expect(e).to.be(null);
+                expect(authorized).to.be(true);
 
                 done();
               });
@@ -843,18 +841,16 @@ describe('d3-security-tokens', function () {
 
         setTimeout(function () {
 
-          checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e) {
+          checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e, authorized, reason) {
 
-            if (!e) return done('this was not meant to happn');
-
-            expect(e.toString()).to.be('Error: session inactivity threshold reached');
+            expect(authorized).to.be(false);
+            expect(reason).to.be('session inactivity threshold reached');
 
             testSession.type = 0;//should be fine - plenty of time
 
-            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e) {
+            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e, authorized) {
 
-              if (e) return done(e);
-
+              expect(authorized).to.be(true);
               done();
 
             });
@@ -911,17 +907,18 @@ describe('d3-security-tokens', function () {
 
         if (e) return done(e);
 
-        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e) {
+        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e, authorized) {
 
           if (e) return done(e);
 
+          expect(authorized).to.be(true);
+
           setTimeout(function () {
 
-            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e) {
+            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e, authorized, reason) {
 
-              if (!e) return done('this was not meant to happn');
-
-              expect(e.toString()).to.be('Error: session inactivity threshold reached');
+              expect(authorized).to.be(false);
+              expect(reason).to.be('session inactivity threshold reached');
 
               done();
 
@@ -979,9 +976,9 @@ describe('d3-security-tokens', function () {
 
         var checkSessionIsAlive = function(){
 
-          checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+          checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e, authorized){
 
-            if (e) return done(e);
+            expect(authorized).to.be(true);
 
             if (counter < 3){
 
@@ -999,9 +996,11 @@ describe('d3-security-tokens', function () {
 
               setTimeout(function(){
 
-                return checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+                return checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e, authorized, reason){
 
-                  expect(e.toString()).to.be('Error: session inactivity threshold reached');
+                  expect(authorized).to.be(false);
+                  expect(reason).to.be('session inactivity threshold reached');
+
                   done();
                 });
 
@@ -1059,15 +1058,17 @@ describe('d3-security-tokens', function () {
 
         if (e) return done(e);
 
-        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e){
+        checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e, authorized){
 
-          if (e) return done(e);
+          expect(authorized).to.be(true);
 
           setTimeout(function(){
 
-            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e) {
+            checkpoint._authorizeSession(testSession, '/test/blah', 'on', function(e, authorized, reason) {
 
-              expect(e.toString()).to.be('Error: session inactivity threshold reached');
+              expect(authorized).to.be(false);
+              expect(reason).to.be('session inactivity threshold reached');
+
               done();
 
             });
@@ -1125,13 +1126,13 @@ describe('d3-security-tokens', function () {
 
         if (e) return done(e);
 
-        checkpoint._authorizeSession(testSession, '/test/permission/24', 'on', function (e, passthrough) {
+        checkpoint._authorizeSession(testSession, '/test/permission/24', 'on', function (e, authorized, reason, passthrough) {
 
           if (e) return done(e);
 
           expect(passthrough).to.be(true);
 
-          checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function (e, passthrough) {
+          checkpoint._authorizeSession(testSession, '/test1/permission/24', 'on', function (e, authorized, reason, passthrough) {
 
             if (e) return done(e);
 

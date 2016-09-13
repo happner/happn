@@ -173,7 +173,7 @@ describe('d8_session_management', function () {
       async.times(10, function(timeIndex, timeCB){
 
         var session = mockSession(1, 'TEST_SESSION' + timeIndex, 'TEST_USER' + timeIndex, null, happn.services.security);
-        happn.services.security.__logSessionActivity(session, 'testpath'  + timeIndex, 'testaction' + timeIndex, timeCB);
+        happn.services.security.__logSessionActivity(session, 'testpath'  + timeIndex, 'testaction' + timeIndex, null, true, null, timeCB);
       }, function(e){
 
         if (e) return done(e);
@@ -213,7 +213,7 @@ describe('d8_session_management', function () {
       async.times(10, function(timeIndex, timeCB){
 
         var session = mockSession(1, 'TEST_SESSION' + timeIndex, 'TEST_USER' + timeIndex, null, happn.services.security);
-        happn.services.security.__logSessionActivity(session, 'testpath'  + timeIndex, 'testaction' + timeIndex, timeCB);
+        happn.services.security.__logSessionActivity(session, 'testpath'  + timeIndex, 'testaction' + timeIndex, null, true, null, timeCB);
       }, function(e){
 
         if (e) return done(e);
@@ -238,11 +238,11 @@ describe('d8_session_management', function () {
 
       var session = mockSession(1, 'TEST_SESSION', 'TEST_USER', null, happn.services.security);
 
-      happn.services.security.__logSessionActivity(session, 'testpath1', 'testaction1', function(e){
+      happn.services.security.__logSessionActivity(session, 'testpath1', 'testaction1', null, true, null, function(e){
 
         if (e) return done(e);
 
-        happn.services.security.__logSessionActivity(session, 'testpath2', 'testaction2', function(e){
+        happn.services.security.__logSessionActivity(session, 'testpath2', 'testaction2', null, true, null, function(e){
 
           if (e) return done(e);
 
@@ -278,9 +278,10 @@ describe('d8_session_management', function () {
 
           expect(list.length).to.be(1);
 
-          happn.services.security.__checkRevocations('TEST_SESSION', function(e){
+          happn.services.security.__checkRevocations('TEST_SESSION', function(e, authorized, reason){
 
-            expect(e.toString()).to.be('Error: session with id TEST_SESSION has been revoked');
+            expect(authorized).to.be(false);
+            expect(reason).to.be('session with id TEST_SESSION has been revoked');
 
             happn.services.security.restoreSession('TEST_SESSION', function(e){
 
@@ -465,6 +466,7 @@ describe('d8_session_management', function () {
             expect(Object.keys(happn.services.security.__cache_revoked_sessions.__cache).length).to.be(0);
 
             delete happn.services.cache.__caches['cache_revoked_sessions'];
+            delete happn.services.security.__cache_revoked_sessions;
 
             happn.services.security.__loadRevokedSessions(function(e) {
 

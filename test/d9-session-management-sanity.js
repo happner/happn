@@ -177,11 +177,13 @@ describe('d9_session_management_sanity', function () {
 
                   clientInstance.set('/TEST/DATA', {}, function(e, result){
 
-                    expect(e.toString()).to.be('Error: session with id ' + session.id + ' has been revoked');
+                    expect(e.toString()).to.be('AccessDenied: unauthorized');
+                    expect(e.reason).to.be('session with id ' + session.id + ' has been revoked');
 
                     serviceInstance.services.security.restoreSession(session, function(e){
 
                       if (e) return callback(e);
+
                       clientInstance.set('/TEST/DATA', {}, callback);
                     });
                   });

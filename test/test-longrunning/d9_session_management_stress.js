@@ -170,9 +170,9 @@ describe('d9_session_management_sanity', function () {
     });
   });
 
-  it('tests session management, multiple clients in parallel', function (callback) {
+  it.only('tests session management, multiple clients in parallel', function (callback) {
 
-    var times = 100;
+    var times = 20;
 
     this.timeout(times * 6000 + 10000);
 
@@ -210,7 +210,7 @@ describe('d9_session_management_sanity', function () {
                 sessionData.results = aggregatedLog;
                 sessionData.client = instance;
 
-                console.log('collected data:::', aggregatedLog);
+                console.log('collected data:::', timeIndex + 1);
 
                 session_results.push(sessionData);
 
@@ -231,11 +231,15 @@ describe('d9_session_management_sanity', function () {
 
             if (e) return callback(e);
 
+            console.log('active sessions:::',list.length);
+
             expect(list.length).to.be(times + 1);//+1 for connected client
 
             serviceInstance.services.security.listSessionActivity(function(e, list){
 
               if (e) return callback(e);
+
+              console.log('sessions activity:::',list.length);
 
               expect(list.length).to.be(times);
 
