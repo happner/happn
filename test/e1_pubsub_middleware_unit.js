@@ -4,9 +4,13 @@ describe('d8_session_management', function () {
   after(require('benchmarket').store());
 
   var expect = require('expect.js');
-  var happn = require('../lib/index')
+  var happn = require('../lib/index');
+
   var service = happn.service;
   var async = require('async');
+
+  var Crypto = require('happn-util-crypto');
+  var crypto = new Crypto();
 
   it('tests the __initializeMiddeware function for pubsub', function (done) {
 
@@ -89,15 +93,122 @@ describe('d8_session_management', function () {
     });
   });
 
-  xit('tests the protocol transformer', function (done) {
+  it('tests the protocol transformer', function (done) {
+    var ProtocolTransformer = require('../lib/services/pubsub/transform-message-protocol');
+    var protocolTransformer = new ProtocolTransformer();
+
+    var packet = {
+      data:{}
+    };
+
+    protocolTransformer.initialize({}, function(e){
+      if (e) return done(e);
+
+      protocolTransformer.outgoing(packet, function(e){
+
+        if (e) return done(e);
+        expect(packet.data.headers.protocol).to.be('1.0.0');
+
+        done();
+
+      });
+    });
+  });
+
+  it('tests the message spy transformer', function (done) {
+
+    var MessageSpyTransformer = require('../lib/services/pubsub/transform-message-spy');
+    var messageSpyTransformer = new MessageSpyTransformer();
+
+    var packet = {
+      data:{
+        data:{
+          test:3
+        }
+      }
+    };
+
+    var loggedCount = 0;
+
+    messageSpyTransformer.initialize({
+
+      log:function(direction, packet){
+
+        expect(packet.data.data.test).to.be(3);
+
+        expect(['incoming','outgoing'].indexOf(direction) > -1).to.be(true);
+
+        loggedCount++;
+
+        if (loggedCount == 2) return done();
+      }
+
+    }, function(e){
+
+      if (e) return done(e);
+
+      messageSpyTransformer.incoming(packet, function(e){
+
+        if (e) return done(e);
+
+        messageSpyTransformer.outgoing(packet, function(e){
+
+          if (e) return done(e);
+
+        });
+      });
+    });
 
   });
 
-  xit('tests the message spy transformer', function (done) {
+  it('tests the message encryption transformer', function (done) {
 
-  });
+    var PayloadEncryptionTransformer = require('../lib/services/pubsub/transform-payload-encryption');
+    var payloadEncryptionTransformer = new PayloadEncryptionTransformer();
 
-  xit('tests the message encryption transformer', function (done) {
+    var Crypto = require('happn-util-crypto');
+    var crypto = new Crypto();
+
+    var serverKeyPair = crypto.createKeyPair();
+    var clientKeyPair = crypto.createKeyPair();
+
+    var packet = {
+      data:{
+
+      }
+    };
+
+    packet.data.encrypted =
+
+    payloadEncryptionTransformer.__pubsub = {
+
+      happn:{
+        services:{
+          crypto:{
+
+            asymmetricEncrypt:function(privateKey, publicKey, data){
+
+            },
+
+            symmetricEncryptObject: function(data, secret){
+
+            }
+          }
+        }
+      }
+
+    };
+
+    payloadEncryptionTransformer.incoming(packet, function(e){
+
+      if (e) return done(e);
+
+      payloadEncryptionTransformer.outgoing(packet, function(e){
+
+        if (e) return done(e);
+
+      });
+    });
 
   });
 
