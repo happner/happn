@@ -168,30 +168,38 @@ describe('d8_session_management', function () {
 
     var Crypto = require('happn-util-crypto');
     var crypto = new Crypto();
-
-    var serverKeyPair = crypto.createKeyPair();
-    var clientKeyPair = crypto.createKeyPair();
+    
+    var SECRET = "TEST_SECRET";
 
     var packet = {
-      data:{
-
-      }
+      data:{}
     };
 
-    packet.data.encrypted =
+    packet.data.encrypted = crypto.symmetricEncryptObject({
+      data:{test:"ok"},
+      _meta:{
+        sessionId:100
+      }
+    }, SECRET);
 
     payloadEncryptionTransformer.__pubsub = {
+
+      getSession:function(id){
+        return {
+          secret:SECRET
+        }
+      },
 
       happn:{
         services:{
           crypto:{
 
-            asymmetricEncrypt:function(privateKey, publicKey, data){
-
+            symmetricEncryptObject: function(data, secret){
+              return crypto.symmetricEncryptObject(data, secret);
             },
 
-            symmetricEncryptObject: function(data, secret){
-
+            symmetricDecryptObject: function(data, secret){
+              return crypto.symmetricDecryptObject(data, secret);
             }
           }
         }
@@ -203,9 +211,16 @@ describe('d8_session_management', function () {
 
       if (e) return done(e);
 
+      expect(packet.data.data.test).to.be("ok");
+
       payloadEncryptionTransformer.outgoing(packet, function(e){
 
         if (e) return done(e);
+
+        expect(packet.data.encrypted).to.not.be(undefined);
+        expect(packet.data.encrypted).to.not.be(null);
+
+        done();
 
       });
     });
