@@ -323,4 +323,9 @@
 
 - pubsub middleware functionality
 
+2.14.1 2016-10-15
+------------------------
+
+- update for bypassAuthUser in securityService.authorize
+
 

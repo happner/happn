@@ -1,7 +1,7 @@
 describe('d3-security-tokens', function () {
 
   // TODO:benchmarket stuff
-  // require('benchmarket').start();
+  require('benchmarket').start();
   after(require('benchmarket').store());
 
   var expect = require('expect.js');
@@ -343,6 +343,7 @@ describe('d3-security-tokens', function () {
     });
 
   });
+
 
   it('should test the default config settings', function(done){
 
@@ -723,6 +724,44 @@ describe('d3-security-tokens', function () {
       done();
 
     }, serviceConfig);
+
+  });
+
+  it('tests the security services authorize method', function(done){
+
+    mockServices(function(e, happnMock){
+
+      if (e) return done(e);
+
+      var session = {
+        type:0,
+        user:{
+          username:'BLAH'
+        },
+        policy: {
+          1: {
+            ttl: 2000
+          },
+          0: {
+            ttl: 4000
+          }
+        }
+      };
+
+      happnMock.services.security.__checkRevocations = function(session, cb){
+        cb(null, true);
+      };
+
+      happnMock.services.security.authorize(session, null, null, function(e){
+
+        expect(e).to.not.be(null);
+        expect(e).to.not.be(undefined);
+
+        session.bypassAuthUser = true;
+        happnMock.services.security.authorize(session, null, null, done);
+      });
+
+    });
 
   });
 
