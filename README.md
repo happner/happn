@@ -716,6 +716,86 @@ PAYLOAD ENCRYPTION
 
 *if the server is running in secure mode, it can also be configured to encrypt payloads between it and socket clients, this means that the client must include a keypair as part of its credentials on logging in, to see payload encryption in action plase go to the [following test](https://github.com/happner/happn/blob/master/test/c2_websockets_embedded_sanity_encryptedpayloads.js)*
 
+PUBSUB MIDDLEWARE
+------------------
+
+*incoming and outgoing packets delivery can be intercepted on the server side, this is how payload encryption works, to add a custom middleware you need to add it to the pubsub service's configuration, a middleware must adhere to a specific interface, as demonstrated below:*
+
+```javascript
+
+
+var testMiddleware = {
+
+  incomingCount:0,
+  outgoingCount:0,
+
+  incoming:function(packet, next){
+    //modify incoming packet here
+    packet.modified = true;
+    this.incomingCount++;
+    next();
+  },
+
+  outgoing:function(packet, next){
+    //modify outgoing packet here
+    packet.modified = true;
+    this.outgoingCount++;
+    next();
+  }
+};
+
+var happn_service = happn.service;
+var test_client = happn.client;
+
+var testConfig = {
+  secure: true,
+  port:44445,
+  services:{
+    pubsub:{
+      config:{
+        transformMiddleware:[{instance:testMiddleware}]//middelware added in the order it is required to run in
+                                                      // either as an instance or as a path {path:'my-middleware-module'}
+                                                      // path style middlewares are instantiated using require and new
+      }
+    }
+  }
+};
+
+service.create(testConfig,
+
+  function (e, happnInst) {
+    if (e)
+      return callback(e);
+
+    serviceInst = happnInst;
+
+    happn_client.create({
+      config: {
+        port:44445,
+        username: '_ADMIN',
+        password: 'happn'
+      },
+      info:{
+        from:'startup'
+      }
+    }, function (e, instance) {
+
+      if (e) return callback(e);
+
+      clientInst = instance;
+
+      //the login of the client generated traffic
+      expect(testMiddleware.incomingCount > 0).to.be(true);
+      expect(testMiddleware.outgoingCount > 0).to.be(true);
+
+      clientInst.disconnect(function(){
+        serviceInst.stop(callback);
+      });
+    });
+  }
+);
+
+```
 
 TESTING WITH KARMA
 ------------------

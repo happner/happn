@@ -1,14 +1,12 @@
-describe('e1_pubsub_middleware', function () {
+describe('e2_pubsub_middleware_sanity', function () {
 
-  //require('benchmarket').start();
-
-  //after(require('benchmarket').store());
+  require('benchmarket').start();
+  after(require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index')
   var service = happn.service;
   var happn_client = happn.client;
-  var async = require('async');
 
   var serviceInstance;
   var clientInstance;
@@ -37,18 +35,7 @@ describe('e1_pubsub_middleware', function () {
 
   });
 
-  var getService = function(activateSessionManagement, sessionActivityTTL, callback, sessionActivityLogging, port){
-
-    if (!port) port = 55556;
-
-    if (sessionActivityLogging == undefined) sessionActivityLogging = true;
-
-    if (typeof activateSessionManagement == 'function'){
-
-      callback = activateSessionManagement;
-      activateSessionManagement = true;
-      sessionActivityTTL = 60000 * 60 * 24 * 30;
-    }
+  var getService = function(middleware, callback){
 
     disconnectClient(function(e){
 
@@ -60,13 +47,11 @@ describe('e1_pubsub_middleware', function () {
 
         var serviceConfig = {
           secure: true,
-          port:port,
+          port:44444,
           services:{
-            security:{
+            pubsub:{
               config:{
-                activateSessionManagement:activateSessionManagement,
-                logSessionActivity:sessionActivityLogging,
-                sessionActivityTTL:sessionActivityTTL
+                transformMiddleware:middleware
               }
             }
           }
@@ -81,7 +66,7 @@ describe('e1_pubsub_middleware', function () {
 
             happn_client.create({
               config: {
-                port:port,
+                port:44444,
                 username: '_ADMIN',
                 password: 'happn'
               },
@@ -103,43 +88,168 @@ describe('e1_pubsub_middleware', function () {
     });
   };
 
-  before('starts up happn instance with session management switched on', function(callback){
-    getService(callback);
-  });
-
-  xit('tests injecting spy middleware into the pubsub service', function (callback) {
+  it('tests injecting spy middleware into the pubsub service, as an instance', function (callback) {
 
     this.timeout(6000);
 
-    var RandomActivityGenerator = require("happn-random-activity-generator");
+    var Spy = require('../lib/services/pubsub/transform-message-spy');
+    var spy = new Spy();
 
-    var randomActivity1 = new RandomActivityGenerator(clientInstance);
+    var packetsIn = [];
+    var packetsOut = [];
 
-    randomActivity1.generateActivityStart("test", function () {
+    var spyConfig = {
 
-      setTimeout(function () {
-        randomActivity1.generateActivityEnd("test", function (aggregatedLog) {
+      suppressPrint:true,
 
-          serviceInstance.services.security.listActiveSessions(function(e, list){
+      log:function(direction, packet){
 
-            if (e) return callback(e);
-            expect(list.length).to.be(1);
+        if (direction == 'incoming') packetsIn.push(packet);
+        if (direction == 'outgoing') packetsOut.push(packet);
 
-            serviceInstance.services.security.listSessionActivity(function(e, list){
+      }
+    };
 
-              if (e) return callback(e);
-              expect(list.length).to.be(1);
+    getService([{instance:spy, options:spyConfig}], function(e){
 
-              callback();
+      var RandomActivityGenerator = require("happn-random-activity-generator");
+      var randomActivity1 = new RandomActivityGenerator(clientInstance);
 
-            });
+      randomActivity1.generateActivityStart("test", function () {
+
+        setTimeout(function () {
+
+          randomActivity1.generateActivityEnd("test", function (aggregatedLog) {
+
+            expect(packetsIn.length > 0).to.be(true);
+            expect(packetsOut.length > 0).to.be(true);
+
+            callback();
+
           });
-        });
-      }, 3000);
+        }, 3000);
+      });
+    });
+
+  });
+
+  it('tests injecting spy middleware into the pubsub service, as a path', function (callback) {
+
+    this.timeout(6000);
+
+    var packetsIn = [];
+    var packetsOut = [];
+
+    var spyConfig = {
+
+      suppressPrint:true,//make this
+
+      log:function(direction, packet){
+
+        if (direction == 'incoming') packetsIn.push(packet);
+        if (direction == 'outgoing') packetsOut.push(packet);
+
+      }
+    };
+
+    getService([{path:'./transform-message-spy', options:spyConfig}], function(e){
+
+      var RandomActivityGenerator = require("happn-random-activity-generator");
+      var randomActivity1 = new RandomActivityGenerator(clientInstance);
+
+      randomActivity1.generateActivityStart("test", function () {
+
+        setTimeout(function () {
+
+          randomActivity1.generateActivityEnd("test", function (aggregatedLog) {
+
+            expect(packetsIn.length > 0).to.be(true);
+            expect(packetsOut.length > 0).to.be(true);
+
+            callback();
+
+          });
+        }, 3000);
+      });
     });
   });
 
+  it('tests injecting arbitrary middleware into the pubsub service, as an instance', function (callback) {
 
-  //require('benchmarket').stop();
+    var testMiddleware = {
+
+      incomingCount:0,
+      outgoingCount:0,
+
+      incoming:function(packet, next){
+        //modify incoming packet here
+        packet.modified = true;
+        this.incomingCount++;
+        next();
+      },
+
+      outgoing:function(packet, next){
+        //modify outgoing packet here
+        packet.modified = true;
+        this.outgoingCount++;
+        next();
+      }
+    };
+
+    var happn_service = happn.service;
+    var test_client = happn.client;
+
+    var testConfig = {
+      secure: true,
+      port:44445,
+      services:{
+        pubsub:{
+          config:{
+            transformMiddleware:[{instance:testMiddleware}]//middelware added in the order it is required to run in
+                                                          // either as an instance or as a path {path:'my-middleware-module'}
+                                                          // path style middlewares are instantiated using require and new
+          }
+        }
+      }
+    };
+
+    service.create(testConfig,
+
+      function (e, happnInst) {
+        if (e)
+          return callback(e);
+
+        serviceInst = happnInst;
+
+        happn_client.create({
+          config: {
+            port:44445,
+            username: '_ADMIN',
+            password: 'happn'
+          },
+          info:{
+            from:'startup'
+          }
+        }, function (e, instance) {
+
+          if (e) return callback(e);
+
+          clientInst = instance;
+
+          //the login of the client generated traffic
+          expect(testMiddleware.incomingCount > 0).to.be(true);
+          expect(testMiddleware.outgoingCount > 0).to.be(true);
+
+          clientInst.disconnect(function(){
+            serviceInst.stop(callback);
+          });
+        });
+      }
+    );
+    
+  });
+
+
+  require('benchmarket').stop();
 
 });
