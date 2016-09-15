@@ -45,7 +45,7 @@
     "primus": "4.0.5",
     "serve-static": "1.10.0",
     "shortid": "2.2.4",
-    "sift": "^3.2.6",
+    "sift": "3.2.6",
     "sillyname": "0.1.0",
     "traverse": "0.6.6",
     "underscore.string": "3.3.4",
