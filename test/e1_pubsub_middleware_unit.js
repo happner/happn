@@ -1,4 +1,4 @@
-describe('d8_session_management', function () {
+describe('e1_pubsub_middleware_unit', function () {
 
   require('benchmarket').start();
   after(require('benchmarket').store());
@@ -168,7 +168,7 @@ describe('d8_session_management', function () {
 
     var Crypto = require('happn-util-crypto');
     var crypto = new Crypto();
-    
+
     var SECRET = "TEST_SECRET";
 
     var packet = {
