@@ -170,7 +170,7 @@ describe('d9_session_management_sanity', function () {
     });
   });
 
-  it.only('tests session management, multiple clients in parallel', function (callback) {
+  it('tests session management, multiple clients in parallel', function (callback) {
 
     var times = 20;
 

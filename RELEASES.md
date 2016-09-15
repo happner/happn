@@ -318,3 +318,9 @@
 
 - fix to tests removed e1
 
+2.14.0 2016-10-15
+------------------------
+
+- pubsub middleware functionality
+
+
