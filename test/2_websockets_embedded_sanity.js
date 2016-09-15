@@ -850,7 +850,6 @@ describe('2_websockets_embedded_sanity', function () {
       });
     });
 
-
   });
 
   it('should unsubscribe from an event', function (callback) {

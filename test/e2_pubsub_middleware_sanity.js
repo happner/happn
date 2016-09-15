@@ -130,7 +130,6 @@ describe('e2_pubsub_middleware_sanity', function () {
         }, 3000);
       });
     });
-
   });
 
   it('tests injecting spy middleware into the pubsub service, as a path', function (callback) {
@@ -246,7 +245,7 @@ describe('e2_pubsub_middleware_sanity', function () {
         });
       }
     );
-    
+
   });
 
 
