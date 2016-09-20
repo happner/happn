@@ -107,7 +107,7 @@ describe('e1_pubsub_middleware_unit', function () {
       protocolTransformer.outgoing(packet, function(e){
 
         if (e) return done(e);
-        expect(packet.data.headers.protocol).to.be('1.0.0');
+        expect(packet.data.protocol).to.be(require('../package.json').protocol);
 
         done();
 
