@@ -338,4 +338,9 @@
 
 - fixed encrypted payload error login
 
+2.15.2 2016-10-20
+------------------------
+
+- fixed protocol heading on client file
+
 
