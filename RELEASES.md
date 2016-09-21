@@ -333,4 +333,9 @@
 
 - transport protocol 1.1.0
 
+2.15.1 2016-10-20
+------------------------
+
+- fixed encrypted payload error login
+
 
