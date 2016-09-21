@@ -328,4 +328,9 @@
 
 - update for bypassAuthUser in securityService.authorize
 
+2.15.0 2016-10-20
+------------------------
+
+- transport protocol 1.1.0
+
 
