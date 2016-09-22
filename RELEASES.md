@@ -343,4 +343,7 @@
 
 - fixed protocol heading on client file
 
+2.15.3 2016-10-22
+-----------------
 
+- fixed overlapping `this` in `happn.service.create()`
