@@ -1007,6 +1007,21 @@ describe('2_websockets_embedded_sanity', function () {
     });
   });
 
+  it('will do events in the order they are passed', function (done) {
+    publisherclient.set('/test_event_order', {property1: 'property1Value'}, {}, function () {
+      publisherclient.log.info('Done setting');
+    });
+    publisherclient.remove('/test_event_order', function (err) {
+      publisherclient.log.info('Done removing');
+      setTimeout(function () {
+        publisherclient.get('/test_event_order', null, function (e, result) {
+          expect(result).to.be(null);
+          done();
+        });
+      }, 1000);
+    });
+  });
+
   require('benchmarket').stop();
 
 });
