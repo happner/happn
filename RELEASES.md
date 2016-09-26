@@ -347,4 +347,8 @@
 -----------------
 
 - fixed overlapping `this` in `happn.service.create()`
+
+2.15.4 2016-10-22
+-----------------
+
 - fixed issue with setImmediate in client
