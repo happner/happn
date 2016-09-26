@@ -1122,6 +1122,45 @@ describe('1_eventemitter_embedded_sanity', function () {
 
   });
 
+  it('can remove multiple entries with a wildcard', function (done) {
+    publisherclient.get('/test_remove/*', null, function (e, result) {
+      expect(e).to.not.be.ok();
+      expect(result.length).to.be(0);
+      async.times(20, function (n, cb) {
+        publisherclient.set('/test_remove/' + n, {property1: 'propert1Value'}, {}, cb);
+      }, function (err) {
+        expect(err).to.not.be.ok();
+        publisherclient.get('/test_remove/*', null, function (e, result) {
+          expect(err).to.not.be.ok();
+          expect(result.length).to.be(20);
+          publisherclient.remove('/test_remove/*', function (err) {
+            expect(err).to.not.be.ok();
+            publisherclient.get('/test_remove/*', null, function (e, result) {
+              expect(e).to.not.be.ok();
+              expect(result.length).to.be(0);
+              done();
+            });
+          });
+        })
+      })
+    })
+  });
+
+  it('will do events in the order they are passed', function (done) {
+    publisherclient.set('/test_event_order', {property1: 'property1Value'}, {}, function () {
+      publisherclient.log.info('Done setting');
+    });
+    publisherclient.remove('/test_event_order', function (err) {
+      publisherclient.log.info('Done removing');
+      setTimeout(function () {
+        publisherclient.get('/test_event_order', null, function (e, result) {
+          expect(result).to.be(null);
+          done();
+        });
+      }, 1000);
+    });
+  });
+
   //require('benchmarket').stop();
 
 });
