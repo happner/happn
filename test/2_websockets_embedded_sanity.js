@@ -160,6 +160,8 @@ describe('2_websockets_embedded_sanity', function () {
 
         publisherclient.get('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
 
+          console.log('RESULTS:::', e, results);
+
           expect(results.property1 == 'property1').to.be(true);
           callback(e);
         });
@@ -510,8 +512,7 @@ describe('2_websockets_embedded_sanity', function () {
 
 //	We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 
-  it('the listener should pick up a single published event', function (callback) {
-
+  it.only('the listener should pick up a single published event', function (callback) {
 
     try {
 
@@ -526,7 +527,7 @@ describe('2_websockets_embedded_sanity', function () {
 
       }, function (e) {
 
-        //////////////////console.log('ON HAS HAPPENED: ' + e);
+        console.log('ON HAS HAPPENED: ' + e);
 
         if (!e) {
 
