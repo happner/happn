@@ -79,11 +79,9 @@ describe('2_websockets_embedded_sanity', function () {
     } catch (e) {
       callback(e);
     }
-
   });
 
   it('the listener should pick up a single wildcard event', function (callback) {
-
 
     try {
 
@@ -98,16 +96,9 @@ describe('2_websockets_embedded_sanity', function () {
 
       }, function (e) {
 
-        //////////////////console.log('ON HAS HAPPENED: ' + e);
-
         if (!e) {
 
           expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(1);
-          //////////////////console.log('on subscribed, about to publish');
-
-          var stats = happnInstance.stats();
-
-          //console.log(stats.pubsub.listeners_wildcard_SET);
 
           //then make the change
           publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/blah', {
@@ -115,11 +106,12 @@ describe('2_websockets_embedded_sanity', function () {
             property2: 'property2',
             property3: 'property3'
           }, null, function (e, result) {
-            //console.log('put happened - listening for result');
+
+            if (e) return callback(e);
+            console.log('put happened - listening for result:::');
           });
         }
-        else
-          callback(e);
+        else callback(e);
       });
 
     } catch (e) {
@@ -144,7 +136,7 @@ describe('2_websockets_embedded_sanity', function () {
   });
 
 
-  it('the publisher should set new data', function (callback) {
+  it.only('the publisher should set new data', function (callback) {
 
 
     try {
@@ -159,8 +151,6 @@ describe('2_websockets_embedded_sanity', function () {
         if (e) return callback(e);
 
         publisherclient.get('2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
-
-          console.log('RESULTS:::', e, results);
 
           expect(results.property1 == 'property1').to.be(true);
           callback(e);
