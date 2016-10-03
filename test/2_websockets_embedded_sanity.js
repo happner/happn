@@ -132,12 +132,10 @@ describe('2_websockets_embedded_sanity', function () {
       callback(e);
 
     });
-
   });
 
 
-  it.only('the publisher should set new data', function (callback) {
-
+  it('the publisher should set new data', function (callback) {
 
     try {
       var test_path_end = require('shortid').generate();
@@ -430,7 +428,7 @@ describe('2_websockets_embedded_sanity', function () {
   });
 
 
-  it('should tag some test data', function (callback) {
+  it.only('should tag some test data', function (callback) {
 
     var randomTag = require('shortid').generate();
 
@@ -473,8 +471,7 @@ describe('2_websockets_embedded_sanity', function () {
 
           results.map(function (tagged) {
 
-            if (found)
-              return;
+            if (found) return;
 
             if (tagged._meta.tag == randomTag) {
               expect(tagged.data.property1).to.be('property1');
@@ -491,18 +488,14 @@ describe('2_websockets_embedded_sanity', function () {
             callback();
 
         });
-
-
       });
-
     });
-
   });
 
 
 //	We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 
-  it.only('the listener should pick up a single published event', function (callback) {
+  it('the listener should pick up a single published event', function (callback) {
 
     try {
 
