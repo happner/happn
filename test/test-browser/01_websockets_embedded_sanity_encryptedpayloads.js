@@ -54,8 +54,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function () {
 
   });
 
-  it('attaches token as cookie with custom name and domain', function(callback) {
-    console.log(document.location.hostname);
+  it('attaches token as cookie with custom name', function(callback) {
     expect(document.cookie.indexOf('custom_cookie_name=')).to.equal(0);
     callback();
   });
