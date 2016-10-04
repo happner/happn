@@ -938,33 +938,40 @@ describe('1_eventemitter_embedded_sanity', function () {
 
     var currentListenerId;
 
-    listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+    listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test', {
       event_type: 'set',
       count: 0
     }, function (message) {
 
       //we detach all listeners from the path here
       ////console.log('ABOUT OFF PATH');
-      listenerclient.offPath('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', function (e) {
+      listenerclient.offPath('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test', function (e) {
 
         if (e)
           return callback(new Error(e));
 
-        listenerclient.on('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+        listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test', {
             event_type: 'set',
             count: 0
           },
           function (message) {
 
-            ////console.log('ON RAN');
-            ////console.log(message);
+            expect(happnInstance.services.pubsub.__listeners_SET['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test']).to.not.be(undefined);
+
+            var previousValue = happnInstance.services.pubsub.__listeners_SET['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test']["1"];
 
             listenerclient.off(currentListenerId, function (e) {
 
-              if (e)
-                return callback(new Error(e));
-              else
+              if (e) return callback(new Error(e));
+              else {
+
+                if (previousValue == 1) expect(happnInstance.services.pubsub.__listeners_SET['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test']).to.be(undefined);
+                else {
+                  currentValue = happnInstance.services.pubsub.__listeners_SET['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test']["1"];
+                  expect(currentValue).to.be(previousValue - 1);
+                }
                 return callback();
+              }
 
             });
 
@@ -974,7 +981,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
             currentListenerId = listenerId;
 
-            publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+            publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test', {
               property1: 'property1',
               property2: 'property2',
               property3: 'property3'
@@ -994,7 +1001,82 @@ describe('1_eventemitter_embedded_sanity', function () {
 
       currentListenerId = listenerId;
 
-      publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/on_off_test', {
+      publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test', {
+        property1: 'property1',
+        property2: 'property2',
+        property3: 'property3'
+      }, {}, function (e, setresult) {
+        if (e) return callback(new Error(e));
+      });
+    });
+  });
+
+  it('should unsubscribe from an event, using offPath', function (callback) {
+
+    var currentListenerId;
+
+    listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_path_test', {
+      event_type: 'set',
+      count: 0
+    }, function (message) {
+
+      //we detach all listeners from the path here
+      ////console.log('ABOUT OFF PATH');
+      listenerclient.offPath('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_path_test', function (e) {
+
+        if (e)
+          return callback(new Error(e));
+
+        listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_path_test', {
+            event_type: 'set',
+            count: 0
+          },
+          function (message) {
+
+            expect(happnInstance.services.pubsub.__listeners_SET['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_path_test']).to.not.be(undefined);
+
+            var previousValue = happnInstance.services.pubsub.__listeners_SET['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_path_test']["1"];
+
+            listenerclient.offPath('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_path_test', function (e) {
+
+              if (previousValue == 1) expect(happnInstance.services.pubsub.__listeners_SET['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_path_test']).to.be(undefined);
+              else {
+                currentValue = happnInstance.services.pubsub.__listeners_SET['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_path_test']["1"];
+                expect(currentValue).to.be(previousValue - 1);
+              }
+
+              if (e) return callback(new Error(e));
+              else return callback();
+
+            });
+
+          },
+          function (e, listenerId) {
+            if (e) return callback(new Error(e));
+
+            currentListenerId = listenerId;
+
+            publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_path_test', {
+              property1: 'property1',
+              property2: 'property2',
+              property3: 'property3'
+            }, {}, function (e, setresult) {
+              if (e) return callback(new Error(e));
+
+              ////console.log('DID ON SET');
+              ////console.log(setresult);
+            });
+
+          });
+
+      });
+
+    }, function (e, listenerId) {
+      if (e) return callback(new Error(e));
+
+      currentListenerId = listenerId;
+
+      publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_path_test', {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
@@ -1013,8 +1095,8 @@ describe('1_eventemitter_embedded_sanity', function () {
 
     listenerclient.onAll(function (eventData, meta) {
 
-      if (meta.action == '/REMOVE@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' ||
-        meta.action == '/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
+      if (meta.action == '/REMOVE@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all' ||
+        meta.action == '/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all')
         caughtCount++;
 
       if (caughtCount == 2)
@@ -1024,21 +1106,18 @@ describe('1_eventemitter_embedded_sanity', function () {
 
       if (e) return callback(e);
 
-      publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all', {
+      publisherclient.set('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all', {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
       }, null, function (e, put_result) {
 
-        publisherclient.remove('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all', null, function (e, del_result) {
+        publisherclient.remove('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/catch_all', null, function (e, del_result) {
 
 
         });
-
       });
-
     });
-
   });
 
   it('should unsubscribe from all events', function (callback) {
