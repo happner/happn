@@ -428,7 +428,7 @@ describe('2_websockets_embedded_sanity', function () {
   });
 
 
-  it.only('should tag some test data', function (callback) {
+  it('should tag some test data', function (callback) {
 
     var randomTag = require('shortid').generate();
 
@@ -474,9 +474,10 @@ describe('2_websockets_embedded_sanity', function () {
             if (found) return;
 
             if (tagged._meta.tag == randomTag) {
-              expect(tagged.data.property1).to.be('property1');
-              expect(tagged.data.property2).to.be('property2');
-              expect(tagged.data.property3).to.be('property3');
+
+              expect(tagged.data.data.property1).to.be('property1');
+              expect(tagged.data.data.property2).to.be('property2');
+              expect(tagged.data.data.property3).to.be('property3');
               found = true;
             }
 
@@ -509,8 +510,6 @@ describe('2_websockets_embedded_sanity', function () {
         callback();
 
       }, function (e) {
-
-        console.log('ON HAS HAPPENED: ' + e);
 
         if (!e) {
 
