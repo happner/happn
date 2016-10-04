@@ -15,6 +15,8 @@ gulp.task('default', function (done) {
       services: {
         security: {
           config: {
+            cookieName: 'custom_cookie_name',
+            // cookieDomain: '.localhost', // can't test this
             keyPair: {
               privateKey: 'Kd9FQzddR7G6S9nJ/BK8vLF83AzOphW2lqDOQ/LjU4M=',
               publicKey: 'AlHCtJlFthb359xOxR5kiBLJpfoC2ZLPLWYHN3+hdzf2'
