@@ -357,3 +357,8 @@
 -----------------
 
 - fixed off issue in pubsub
+
+2.15.6 2016-10-04
+-----------------
+
+- include cookieDomain and cookieName in login response where necessary
