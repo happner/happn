@@ -301,54 +301,59 @@
 
 - small changes to make mongo plugin backwards compatible
 
-2.13.0 2016-10-13
+2.13.0 2016-09-13
 ------------------------
 
 - caching service
 - security profiles
 - session management
 
-2.13.1 2016-10-13
+2.13.1 2016-09-13
 ------------------------
 
 - fix to enforce policies that have permissions to limit access to those permissions
 
-2.13.2 2016-10-13
+2.13.2 2016-09-13
 ------------------------
 
 - fix to tests removed e1
 
-2.14.0 2016-10-15
+2.14.0 2016-09-15
 ------------------------
 
 - pubsub middleware functionality
 
-2.14.1 2016-10-15
+2.14.1 2016-09-15
 ------------------------
 
 - update for bypassAuthUser in securityService.authorize
 
-2.15.0 2016-10-20
+2.15.0 2016-09-20
 ------------------------
 
 - transport protocol 1.1.0
 
-2.15.1 2016-10-20
+2.15.1 2016-09-20
 ------------------------
 
 - fixed encrypted payload error login
 
-2.15.2 2016-10-20
+2.15.2 2016-09-20
 ------------------------
 
 - fixed protocol heading on client file
 
-2.15.3 2016-10-22
+2.15.3 2016-09-22
 -----------------
 
 - fixed overlapping `this` in `happn.service.create()`
 
-2.15.4 2016-10-22
+2.15.4 2016-09-22
 -----------------
 
 - fixed issue with setImmediate in client
+
+2.15.5 2016-10-04
+-----------------
+
+- fixed off issue in pubsub
