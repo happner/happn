@@ -12,32 +12,32 @@ describe(filename, function() {
 
   var server;
 
-  var startServer = Promise.promisify(function(callback) {
+  var startServer = function(callback) {
     Happn.service.create()
       .then(function(_server) {
         server = _server;
       })
       .then(callback)
       .catch(callback);
-  });
+  };
 
-  var stopServerDisconnect = Promise.promisify(function(callback) {
+  var stopServerDisconnect = function(callback) {
     if (!server) return callback();
     server.stop({reconnect: false}, function(e) {
       if (e) return callback(e);
       server = undefined; // ?? perhaps also on e, messy
       callback();
     });
-  });
+  };
 
-  var stopServerReconnect = Promise.promisify(function(callback) {
+  var stopServerReconnect = function(callback) {
     if (!server) return callback();
     server.stop({reconnect: true}, function(e) {
       if (e) return callback(e);
       server = undefined;
       callback();
     });
-  });
+  };
 
   before('start server', startServer);
   after('stop server', stopServerDisconnect);
@@ -60,7 +60,7 @@ describe(filename, function() {
       .then(function() {
         // other tests may have left the server stopped.
         if (server) return;
-        return startServer();
+        return Promise.promisify(startServer)();
       })
 
       .then(function() {
@@ -78,7 +78,7 @@ describe(filename, function() {
       })
 
       .then(function() {
-        return stopServerReconnect();
+        return Promise.promisify(stopServerReconnect)();
       })
 
       .then(function() {
@@ -105,7 +105,7 @@ describe(filename, function() {
       .then(function() {
         // other tests may have left the server stopped.
         if (server) return;
-        return startServer();
+        return Promise.promisify(startServer)();
       })
 
       .then(function() {
@@ -123,11 +123,11 @@ describe(filename, function() {
       })
 
       .then(function() {
-        return stopServerReconnect();
+        return Promise.promisify(stopServerReconnect)();
       })
 
       .then(function() {
-        return startServer();
+        return Promise.promisify(startServer)();
       })
 
       .then(function() {
@@ -154,7 +154,7 @@ describe(filename, function() {
       .then(function() {
         // other tests may have left the server stopped.
         if (server) return;
-        return startServer();
+        return Promise.promisify(startServer)();
       })
 
       .then(function() {
@@ -194,7 +194,7 @@ describe(filename, function() {
       })
 
       .then(function() {
-        return stopServerReconnect();
+        return Promise.promisify(stopServerReconnect)();
       })
 
       .then(function() {
