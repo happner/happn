@@ -108,7 +108,6 @@ describe('2_websockets_embedded_sanity', function () {
           }, null, function (e, result) {
 
             if (e) return callback(e);
-            console.log('put happened - listening for result:::');
           });
         }
         else callback(e);
@@ -271,7 +270,8 @@ describe('2_websockets_embedded_sanity', function () {
     var object = {param1: 10, param2: 20};
     var firstTime = true;
 
-    listenerclient.on('mergeTest/object', {event_type: 'set', count: 2}, function (message) {
+    listenerclient.on('mergeTest/object', {event_type: 'set', count: 2}, function (message, meta) {
+
       expect(message).to.eql(object);
       if (firstTime) {
         firstTime = false;

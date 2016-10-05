@@ -13,7 +13,7 @@ describe('1_eventemitter_embedded_sanity', function () {
   var happnInstance = null;
   var test_id;
 
-  this.timeout(60000);
+  this.timeout(5000);
 
 
   /*
@@ -27,20 +27,13 @@ describe('1_eventemitter_embedded_sanity', function () {
     test_id = Date.now() + '_' + require('shortid').generate();
 
     try {
-      service.create({
-          mode: 'embedded',
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
+      service.create({},
         function (e, happnInst) {
-          if (e)
-            return callback(e);
+
+          if (e) return callback(e);
 
           happnInstance = happnInst;
           callback();
-
         });
     } catch (e) {
       callback(e);
@@ -63,26 +56,18 @@ describe('1_eventemitter_embedded_sanity', function () {
 
     try {
 
-      happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      }, function (e, instance) {
+      happnInstance.services.session.localClient(function(e, instance){
 
         if (e) return callback(e);
-
         publisherclient = instance;
 
-        happn_client.create({
-          plugin: happn.client_plugins.intra_process,
-          context: happnInstance
-        }, function (e, instance) {
+        happnInstance.services.session.localClient(function(e, instance){
 
           if (e) return callback(e);
           listenerclient = instance;
+
           callback();
-
         });
-
       });
 
     } catch (e) {
@@ -90,6 +75,37 @@ describe('1_eventemitter_embedded_sanity', function () {
     }
   });
 
+  it('the publisher should set new data', function (callback) {
+
+    try {
+      var test_path_end = require('shortid').generate();
+
+      publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
+        property1: 'property1',
+        property2: 'property2',
+        property3: 'property3'
+      }, {
+        noPublish: true
+      }, function (e, result) {
+
+        if (!e) {
+          publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
+
+            expect(results.property1 == 'property1').to.be(true);
+
+            if (mode != 'embedded')
+              expect(results.payload[0].created == results.payload[0].modified).to.be(true);
+
+            callback(e);
+          });
+        } else
+          callback(e);
+      });
+
+    } catch (e) {
+      callback(e);
+    }
+  });
 
   it('the listener should pick up a single wildcard event', function (callback) {
 
@@ -141,38 +157,6 @@ describe('1_eventemitter_embedded_sanity', function () {
 
     });
 
-  });
-
-  it('the publisher should set new data', function (callback) {
-
-    try {
-      var test_path_end = require('shortid').generate();
-
-      publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
-        property1: 'property1',
-        property2: 'property2',
-        property3: 'property3'
-      }, {
-        noPublish: true
-      }, function (e, result) {
-
-        if (!e) {
-          publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, null, function (e, results) {
-
-            expect(results.property1 == 'property1').to.be(true);
-
-            if (mode != 'embedded')
-              expect(results.payload[0].created == results.payload[0].modified).to.be(true);
-
-            callback(e);
-          });
-        } else
-          callback(e);
-      });
-
-    } catch (e) {
-      callback(e);
-    }
   });
 
   it('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
@@ -317,16 +301,11 @@ describe('1_eventemitter_embedded_sanity', function () {
   });
 
   it('should contain the same payload between a merge and a normal store for first store', function (done) {
-    var object = {
-      param1: 10,
-      param2: 20
-    };
+    var object = {param1: 10, param2: 20};
     var firstTime = true;
 
-    listenerclient.on('mergeTest/object', {
-      event_type: 'set',
-      count: 2
-    }, function (message) {
+    listenerclient.on('mergeTest/object', {event_type: 'set', count: 2}, function (message, meta) {
+
       expect(message).to.eql(object);
       if (firstTime) {
         firstTime = false;
@@ -335,18 +314,47 @@ describe('1_eventemitter_embedded_sanity', function () {
       done();
     }, function (err) {
       expect(err).to.not.be.ok();
-      publisherclient.set('mergeTest/object', object, {
-        merge: true
-      }, function (err) {
+      publisherclient.set('mergeTest/object', object, {merge: true}, function (err) {
         expect(err).to.not.be.ok();
-        publisherclient.set('mergeTest/object', object, {
-          merge: true
-        }, function (err) {
+        publisherclient.set('mergeTest/object', object, {merge: true}, function (err) {
           expect(err).to.not.be.ok();
         });
       });
     })
   });
+
+
+  // it('should contain the same payload between a merge and a normal store for first store', function (done) {
+  //   var object = {
+  //     param1: 10,
+  //     param2: 20
+  //   };
+  //   var firstTime = true;
+  //
+  //   listenerclient.on('mergeTest/object', {
+  //     event_type: 'set',
+  //     count: 2
+  //   }, function (message) {
+  //     expect(message).to.eql(object);
+  //     if (firstTime) {
+  //       firstTime = false;
+  //       return;
+  //     }
+  //     done();
+  //   }, function (err) {
+  //     expect(err).to.not.be.ok();
+  //     publisherclient.set('mergeTest/object', object, {
+  //       merge: true
+  //     }, function (err) {
+  //       expect(err).to.not.be.ok();
+  //       publisherclient.set('mergeTest/object', object, {
+  //         merge: true
+  //       }, function (err) {
+  //         expect(err).to.not.be.ok();
+  //       });
+  //     });
+  //   })
+  // });
 
 
   it('should search for a complex object', function (callback) {
@@ -609,9 +617,9 @@ describe('1_eventemitter_embedded_sanity', function () {
               return;
 
             if (tagged._meta.tag == randomTag) {
-              expect(tagged.data.property1).to.be('property1');
-              expect(tagged.data.property2).to.be('property2');
-              expect(tagged.data.property3).to.be('property3');
+              expect(tagged.data.data.property1).to.be('property1');
+              expect(tagged.data.data.property2).to.be('property2');
+              expect(tagged.data.data.property3).to.be('property3');
               found = true;
             }
 

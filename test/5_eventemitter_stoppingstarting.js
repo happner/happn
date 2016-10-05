@@ -75,7 +75,7 @@ describe('5_eventemitter_stoppingstarting', function () {
         callback(null, instance);
 
       });
-    }
+    };
 
     before('should initialize the service', function (callback) {
 
