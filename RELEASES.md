@@ -362,3 +362,8 @@
 -----------------
 
 - include cookieDomain and cookieName in login response where necessary
+
+2.15.7 2016-10-05
+-----------------
+
+- fix inability of client.offEvent() to unsubscribe
