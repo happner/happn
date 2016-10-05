@@ -67,7 +67,7 @@ describe(filename, function() {
         return Happn.client.create();
       })
 
-      .then(function(_client){
+      .then(function(_client) {
         client = _client;
       })
 
@@ -112,7 +112,7 @@ describe(filename, function() {
         return Happn.client.create();
       })
 
-      .then(function(_client){
+      .then(function(_client) {
         client = _client;
       })
 
@@ -145,7 +145,34 @@ describe(filename, function() {
   });
 
   it('enables subscribe and unsubscribe', function(done) {
-    done();
+    var client;
+    var events = {};
+
+    Promise.resolve()
+
+      .then(function() {
+        // other tests may have left the server stopped.
+        if (server) return;
+        return startServer();
+      })
+
+      .then(function() {
+        return Happn.client.create();
+      })
+
+      .then(function(_client) {
+        client = _client;
+      })
+
+      .then(function() {
+        expect(events).to.eql({});
+      })
+
+      .then(done)
+
+      .catch(done);
+
+
   });
 
   after(benchmarket.store());
