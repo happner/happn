@@ -144,7 +144,7 @@ describe(filename, function() {
 
   });
 
-  it.only('enables subscribe and unsubscribe', function(done) {
+  it('enables subscribe and unsubscribe', function(done) {
     var client;
     var events = {};
     var expectedEvents;
