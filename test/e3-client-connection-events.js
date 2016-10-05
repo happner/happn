@@ -144,7 +144,7 @@ describe(filename, function() {
 
   });
 
-  it('enables subscribe and unsubscribe', function(done) {
+  it.only('enables subscribe and unsubscribe', function(done) {
     var client;
     var events = {};
 
@@ -162,6 +162,12 @@ describe(filename, function() {
 
       .then(function(_client) {
         client = _client;
+      })
+
+      .then(function() {
+        var subscriptionId = client.onEvent('reconnect-successful', function() {});
+        // expect(subscriptionId).to.equal('reconnect-successful|0');
+        expect(typeof subscriptionId).to.equal('string');
       })
 
       .then(function() {
