@@ -147,6 +147,7 @@ describe(filename, function() {
   it.only('enables subscribe and unsubscribe', function(done) {
     var client;
     var events = {};
+    var expectedEvents;
 
     Promise.resolve()
 
@@ -171,14 +172,43 @@ describe(filename, function() {
       })
 
       .then(function() {
-        expect(events).to.eql({});
+        var subscription1 = client.onEvent('reconnect-scheduled', function() {
+          events[1] = true;
+        });
+        var subscription2 = client.onEvent('reconnect-scheduled', function() {
+          events[2] = true;
+        });
+        var subscription3 = client.onEvent('reconnect-scheduled', function() {
+          events[3] = true;
+        });
+        var subscription4 = client.onEvent('reconnect-scheduled', function() {
+          events[4] = true;
+        });
+
+        client.offEvent(subscription2);
+        client.offEvent(subscription3);
+        expectedEvents = {
+          1: true,
+          4: true
+        }
+      })
+
+      .then(function() {
+        return stopServerReconnect();
+      })
+
+      .then(function() {
+        return Promise.delay(200);
+      })
+
+      .then(function() {
+        expect(events).to.eql(expectedEvents);
       })
 
       .then(done)
 
       .catch(done);
-
-
+    
   });
 
   after(benchmarket.store());
