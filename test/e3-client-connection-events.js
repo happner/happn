@@ -12,32 +12,32 @@ describe(filename, function() {
 
   var server;
 
-  function startServer(callback) {
+  var startServer = Promise.promisify(function(callback) {
     Happn.service.create()
       .then(function(_server) {
         server = _server;
       })
       .then(callback)
       .catch(callback);
-  }
+  });
 
-  function stopServerDisconnect(callback) {
+  var stopServerDisconnect = Promise.promisify(function(callback) {
     if (!server) return callback();
     server.stop({reconnect: false}, function(e) {
       if (e) return callback(e);
       server = undefined; // ?? perhaps also on e, messy
       callback();
     });
-  }
+  });
 
-  function stopServerReconnect(callback) {
+  var stopServerReconnect = Promise.promisify(function(callback) {
     if (!server) return callback();
     server.stop({reconnect: true}, function(e) {
       if (e) return callback(e);
       server = undefined;
       callback();
     });
-  }
+  });
 
   before('start server', startServer);
   after('stop server', stopServerDisconnect);
@@ -53,14 +53,14 @@ describe(filename, function() {
 
   it('emits reconnect-scheduled', function(done) {
     var client;
-    var reconnectFired = false;
+    var reconnectScheduledFired = false;
 
     Promise.resolve()
 
       .then(function() {
-        if (server) return;
         // other tests may have left the server stopped.
-        return Promise.promisify(startServer)();
+        if (server) return;
+        return startServer();
       })
 
       .then(function() {
@@ -73,12 +73,12 @@ describe(filename, function() {
 
       .then(function() {
         client.onEvent('reconnect-scheduled', function() {
-          reconnectFired = true;
+          reconnectScheduledFired = true;
         });
       })
 
       .then(function() {
-        return Promise.promisify(stopServerReconnect)();
+        return stopServerReconnect();
       })
 
       .then(function() {
@@ -86,7 +86,7 @@ describe(filename, function() {
       })
 
       .then(function() {
-        expect(reconnectFired).to.eql(true);
+        expect(reconnectScheduledFired).to.eql(true);
       })
 
       .then(done)
@@ -96,7 +96,52 @@ describe(filename, function() {
 
 
   it('emits reconnect-successful', function(done) {
-    done();
+    var client;
+    var reconnectSuccessfulFired = false;
+
+
+    Promise.resolve()
+
+      .then(function() {
+        // other tests may have left the server stopped.
+        if (server) return;
+        return startServer();
+      })
+
+      .then(function() {
+        return Happn.client.create();
+      })
+
+      .then(function(_client){
+        client = _client;
+      })
+
+      .then(function() {
+        client.onEvent('reconnect-successful', function() {
+          reconnectSuccessfulFired = true;
+        });
+      })
+
+      .then(function() {
+        return stopServerReconnect();
+      })
+
+      .then(function() {
+        return startServer();
+      })
+
+      .then(function() {
+        return Promise.delay(500);
+      })
+
+      .then(function() {
+        expect(reconnectSuccessfulFired).to.eql(true);
+      })
+
+      .then(done)
+
+      .catch(done);
+
   });
 
   it('enables subscribe and unsubscribe', function(done) {
