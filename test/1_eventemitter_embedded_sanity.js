@@ -156,10 +156,9 @@ describe('1_eventemitter_embedded_sanity', function () {
       callback(e);
 
     });
-
   });
 
-  it.only('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
+  it('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
 
     var timesCount = 10;
 
@@ -613,13 +612,12 @@ describe('1_eventemitter_embedded_sanity', function () {
 
           results.map(function (tagged) {
 
-            if (found)
-              return;
+            if (found) return;
 
             if (tagged._meta.tag == randomTag) {
-              expect(tagged.data.data.property1).to.be('property1');
-              expect(tagged.data.data.property2).to.be('property2');
-              expect(tagged.data.data.property3).to.be('property3');
+              expect(tagged.data.property1).to.be('property1');
+              expect(tagged.data.property2).to.be('property2');
+              expect(tagged.data.property3).to.be('property3');
               found = true;
             }
 

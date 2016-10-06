@@ -487,9 +487,9 @@ describe('2_websockets_embedded_sanity', function () {
 
             if (tagged._meta.tag == randomTag) {
 
-              expect(tagged.data.data.property1).to.be('property1');
-              expect(tagged.data.data.property2).to.be('property2');
-              expect(tagged.data.data.property3).to.be('property3');
+              expect(tagged.data.property1).to.be('property1');
+              expect(tagged.data.property2).to.be('property2');
+              expect(tagged.data.property3).to.be('property3');
               found = true;
             }
 
