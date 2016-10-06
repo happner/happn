@@ -45,30 +45,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
     this.timeout(20000);
 
     try {
-      service.create({
-          mode: 'embedded',
-          services: {
-            auth: {
-              path: './services/auth/service.js',
-              config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
-              }
-            },
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
-            },
-            pubsub: {
-              path: './services/pubsub/service.js'
-            }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
-        function (e, happnInst) {
+      service.create(function (e, happnInst) {
           if (e)
             return callback(e);
 
@@ -103,29 +80,20 @@ describe('1_eventemitter_embedded_benchmarks', function () {
 
     try {
 
-      happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      }, function (e, instance) {
+      happnInstance.services.session.localClient(function(e, instance){
 
         if (e) return callback(e);
-
         publisherclient = instance;
         testClients.push(publisherclient);
 
-        happn_client.create({
-          plugin: happn.client_plugins.intra_process,
-          context: happnInstance
-        }, function (e, instance) {
+        happnInstance.services.session.localClient(function(e, instance){
 
           if (e) return callback(e);
           listenerclient = instance;
           testClients.push(listenerclient);
 
           callback();
-
         });
-
       });
 
     } catch (e) {
@@ -137,11 +105,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      },
-      function (e, stressTestClient) {
+    happnInstance.services.session.localClient(function(e, stressTestClient){
 
         if (e) return callback(e);
         testClients.push(stressTestClient);
@@ -161,7 +125,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
           }, function (e, result) {
             writeData();
           });
-        }
+        };
 
         stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {
             event_type: 'set',
@@ -242,11 +206,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      },
-      function (e, stressTestClient) {
+    happnInstance.services.session.localClient(function(e, stressTestClient){
 
         if (e) return callback(e);
         testClients.push(stressTestClient);
@@ -303,11 +263,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      },
-      function (e, stressTestClient) {
+    happnInstance.services.session.localClient(function(e, stressTestClient){
 
         if (e) return callback(e);
         testClients.push(stressTestClient);
@@ -369,11 +325,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      },
-      function (e, stressTestClient) {
+    happnInstance.services.session.localClient(function(e, stressTestClient){
 
         if (e) return callback(e);
         testClients.push(stressTestClient);
@@ -449,11 +401,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      },
-      function (e, stressTestClient) {
+    happnInstance.services.session.localClient(function(e, stressTestClient){
 
         if (e) return callback(e);
         testClients.push(stressTestClient);
@@ -515,11 +463,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      },
-      function (e, stressTestClient) {
+    happnInstance.services.session.localClient(function(e, stressTestClient){
 
         if (e) return callback(e);
         testClients.push(stressTestClient);
@@ -616,11 +560,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      },
-      function (e, stressTestClient) {
+    happnInstance.services.session.localClient(function(e, stressTestClient){
 
         if (e) return callback(e);
 
@@ -717,11 +657,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
 
     this.timeout(default_timeout);
 
-    happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      },
-      function (e, stressTestClient) {
+    happnInstance.services.session.localClient(function(e, stressTestClient){
 
         if (e) return callback(e);
 
