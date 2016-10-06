@@ -390,7 +390,7 @@ describe('9_eventemitter_meta.js', function () {
     });
   });
 
-  it.only('searches by timestamps', function (callback) {
+  it('searches by timestamps', function (callback) {
 
     this.timeout(5000);
 
@@ -446,9 +446,6 @@ describe('9_eventemitter_meta.js', function () {
                 if (e) return callback(e);
 
                 expect(items.length == 1).to.be(true);
-
-                console.log('items:::', items);
-
                 expect(items[0].ind).to.be(10);
 
                 setTimeout(function () {

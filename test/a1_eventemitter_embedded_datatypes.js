@@ -29,31 +29,7 @@ describe('a1_eventemitter_embedded_datatypes', function () {
     test_id = Date.now() + '_' + require('shortid').generate();
 
     try {
-      service.create({
-          mode: 'embedded',
-          services: {
-            auth: {
-              path: './services/auth/service.js',
-              config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
-              }
-            },
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
-            },
-            pubsub: {
-              path: './services/pubsub/service.js',
-              config: {}
-            }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
-        function (e, happnInst) {
+      service.create(function (e, happnInst) {
 
           if (e)
             return callback(e);
@@ -85,26 +61,18 @@ describe('a1_eventemitter_embedded_datatypes', function () {
 
     try {
 
-      happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      }, function (e, instance) {
+      happnInstance.services.session.localClient(function(e, instance){
 
         if (e) return callback(e);
-
         publisherclient = instance;
 
-        happn_client.create({
-          plugin: happn.client_plugins.intra_process,
-          context: happnInstance
-        }, function (e, instance) {
+        happnInstance.services.session.localClient(function(e, instance){
 
           if (e) return callback(e);
           listenerclient = instance;
+
           callback();
-
         });
-
       });
 
     } catch (e) {
@@ -224,13 +192,13 @@ describe('a1_eventemitter_embedded_datatypes', function () {
 
         if (!e) {
 
-          expect(result.value).to.be(test_date);
+          expect(new Date(result.value).toString()).to.be(test_date.toString());
 
           publisherclient.get(test_base_url, null, function (e, result) {
 
             if (e) return callback(e);
 
-            expect(result.value).to.be(test_date);
+            expect(new Date(result.value).toString()).to.be(test_date.toString());
 
             callback(e);
           });
@@ -283,20 +251,19 @@ describe('a1_eventemitter_embedded_datatypes', function () {
 
     try {
 
-      var test_undefined = undefined;
       var test_base_url = '/a1_eventemitter_embedded_datatypes/' + test_id + '/set/undefined';
 
-      publisherclient.set(test_base_url, test_undefined, {noPublish: true}, function (e, result) {
+      publisherclient.set(test_base_url, undefined, {noPublish: true}, function (e, result) {
 
         if (!e) {
 
-          expect(result.value).to.be(test_undefined);
+          expect(result.value).to.be(null);
 
           publisherclient.get(test_base_url, null, function (e, result) {
 
             if (e) return callback(e);
 
-            expect(result.value).to.be(test_undefined);
+            expect(result.value).to.be(null);
 
             callback(e);
           });
