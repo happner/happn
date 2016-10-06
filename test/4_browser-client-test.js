@@ -24,33 +24,8 @@ describe('4_browser-client-test', function () {
     this.timeout(20000);
 
     try {
-      service.create({
-          mode: 'embedded',
-          services: {
-            auth: {
-              path: './services/auth/service.js',
-              config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
-              }
-            },
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
-            },
-            pubsub: {
-              path: './services/pubsub/service.js',
-              config: {"security-mode": 'unsecure'}
-            }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
-        function (e, happnInst) {
-          if (e)
-            return callback(e);
+      service.create(function (e, happnInst) {
+          if (e) return callback(e);
 
           happnInstance = happnInst;
           callback();
@@ -77,13 +52,13 @@ describe('4_browser-client-test', function () {
         function (e, r, b) {
 
           if (!e) {
+            
             var path = require('path');
             var happnPath = path.dirname(path.resolve(require.resolve('../lib/index'), '..' + path.sep));
             var happnVersion = require(happnPath + path.sep + 'package.json').version;
             expect(b.indexOf('\/\/happn client v' + happnVersion)).to.be(0);
             callback();
-          } else
-            callback(e);
+          } else callback(e);
 
 
         });

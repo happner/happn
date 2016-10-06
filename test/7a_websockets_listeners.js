@@ -85,7 +85,6 @@ describe('7a_websockets_listeners', function () {
         if (!e) {
 
           expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event/*'].length).to.be(1);
-          var stats = happnInstance.stats();
 
           //then make the change
           publisherclient.set('/e2e_test1/testsubscribe/data/event/blah', {

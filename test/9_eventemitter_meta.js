@@ -42,31 +42,7 @@ describe('9_eventemitter_meta.js', function () {
     this.timeout(20000);
 
     try {
-      service.create({
-          mode: 'embedded',
-          services: {
-            auth: {
-              path: './services/auth/service.js',
-              config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
-              }
-            },
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
-            },
-            pubsub: {
-              path: './services/pubsub/service.js',
-              config: {}
-            }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
-        function (e, happnInst) {
+      service.create(function (e, happnInst) {
           if (e)
             return callback(e);
 
@@ -87,33 +63,24 @@ describe('9_eventemitter_meta.js', function () {
 
     try {
 
-      happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      }, function (e, instance) {
+      happnInstance.services.session.localClient(function(e, instance){
 
         if (e) return callback(e);
-
         publisherclient = instance;
 
-        happn_client.create({
-          plugin: happn.client_plugins.intra_process,
-          context: happnInstance
-        }, function (e, instance) {
+        happnInstance.services.session.localClient(function(e, instance){
 
           if (e) return callback(e);
           listenerclient = instance;
+
           callback();
-
         });
-
       });
 
     } catch (e) {
       callback(e);
     }
   });
-
 
   var test_path = '/test/meta/' + require('shortid').generate();
   var test_path_remove = '/test/meta/remove' + require('shortid').generate();
@@ -423,7 +390,7 @@ describe('9_eventemitter_meta.js', function () {
     });
   });
 
-  it('searches by timestamps', function (callback) {
+  it.only('searches by timestamps', function (callback) {
 
     this.timeout(5000);
 
@@ -461,7 +428,7 @@ describe('9_eventemitter_meta.js', function () {
                 '$gte': windowStart,
                 '$lt': windowEnd
               }
-            }
+            };
 
             publisherclient.get('*', {criteria: searchCriteria}, function (e, items) {
 
@@ -472,13 +439,16 @@ describe('9_eventemitter_meta.js', function () {
                 '_meta.created': {
                   '$gte': windowEnd
                 }
-              }
+              };
 
               publisherclient.get('*', {criteria: searchCriteria}, function (e, items) {
 
                 if (e) return callback(e);
 
                 expect(items.length == 1).to.be(true);
+
+                console.log('items:::', items);
+
                 expect(items[0].ind).to.be(10);
 
                 setTimeout(function () {
@@ -507,20 +477,12 @@ describe('9_eventemitter_meta.js', function () {
                       callback();
 
                     });
-
                   });
-
                 }, 1000);
-
               });
-
             });
-
           });
-
-
         }, 2000);
-
       });
 
   });

@@ -52,6 +52,7 @@ describe('2_websockets_embedded_sanity', function () {
 
   var publisherclient;
   var listenerclient;
+  var disconnectclient;
 
   /*
    We are initializing 2 clients to test saving data against the database, one client will push data into the
@@ -64,21 +65,32 @@ describe('2_websockets_embedded_sanity', function () {
       happn_client.create(function (e, instance) {
 
         if (e) return callback(e);
-
         publisherclient = instance;
+
         happn_client.create(function (e, instance) {
 
           if (e) return callback(e);
           listenerclient = instance;
-          callback();
 
+          happn_client.create(function (e, instance) {
+
+            if (e) return callback(e);
+            disconnectclient = instance;
+            callback();
+
+          });
         });
-
       });
 
     } catch (e) {
       callback(e);
     }
+  });
+
+  it('should disconnect the disconnect client', function (callback) {
+
+    disconnectclient.disconnect().then(callback);
+
   });
 
   it('the listener should pick up a single wildcard event', function (callback) {

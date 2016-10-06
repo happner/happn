@@ -159,7 +159,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
   });
 
-  it('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
+  it.only('set_multiple, the publisher should set multiple data items, then do a wildcard get to return them', function (callback) {
 
     var timesCount = 10;
 
@@ -204,8 +204,8 @@ describe('1_eventemitter_embedded_sanity', function () {
                path: '/1_eventemitter_embedded_sanity/1443606046555_VkyH6cE1l/set_multiple/E17kSpqE1l' } }
                */
 
+              expect(result.property1).to.be('property1');
               expect(result._meta.path.indexOf(testBasePath) == 0).to.be(true);
-
 
               return true;
             });

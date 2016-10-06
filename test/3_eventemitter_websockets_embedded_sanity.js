@@ -26,30 +26,7 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
     this.timeout(20000);
 
     try {
-      service.create({
-          mode: 'embedded',
-          services: {
-            auth: {
-              path: './services/auth/service.js',
-              config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
-              }
-            },
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
-            },
-            pubsub: {
-              path: './services/pubsub/service.js'
-            }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
-        function (e, happnInst) {
+      service.create(function (e, happnInst) {
           if (e)
             return callback(e);
 
@@ -86,14 +63,13 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
 
         publisherclient = instance;
 
-        happn_client.create({plugin: happn.client_plugins.intra_process, context: happnInstance},
-          function (e, instance) {
+        happnInstance.services.session.localClient(function(e, instance){
 
-            if (e) return callback(e);
-            listenerclient = instance;
-            callback();
+          if (e) return callback(e);
+          listenerclient = instance;
 
-          });
+          callback();
+        });
       });
     } catch (e) {
       callback(e);

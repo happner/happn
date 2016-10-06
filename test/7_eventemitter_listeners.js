@@ -6,12 +6,8 @@ describe('7_eventemitter_listeners', function () {
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
-  var happn_client = happn.client;
   var async = require('async');
-
-  var testport = 8000;
   var test_secret = 'test_secret';
-  var mode = "embedded";
   var default_timeout = 10000;
   var happnInstance = null;
   /*
@@ -29,31 +25,7 @@ describe('7_eventemitter_listeners', function () {
     this.timeout(20000);
 
     try {
-      service.create({
-          mode: 'embedded',
-          services: {
-            auth: {
-              path: './services/auth/service.js',
-              config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
-              }
-            },
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
-            },
-            pubsub: {
-              path: './services/pubsub/service.js',
-              config: {}
-            }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
-        function (e, happnInst) {
+      service.create(function (e, happnInst) {
           if (e)
             return callback(e);
 
@@ -78,26 +50,18 @@ describe('7_eventemitter_listeners', function () {
 
     try {
 
-      happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      }, function (e, instance) {
+      happnInstance.services.session.localClient(function(e, instance){
 
         if (e) return callback(e);
-
         publisherclient = instance;
 
-        happn_client.create({
-          plugin: happn.client_plugins.intra_process,
-          context: happnInstance
-        }, function (e, instance) {
+        happnInstance.services.session.localClient(function(e, instance){
 
           if (e) return callback(e);
           listenerclient = instance;
+
           callback();
-
         });
-
       });
 
     } catch (e) {
@@ -121,7 +85,6 @@ describe('7_eventemitter_listeners', function () {
         if (!e) {
 
           expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event/*'].length).to.be(1);
-          var stats = happnInstance.stats();
 
           //then make the change
           publisherclient.set('/e2e_test1/testsubscribe/data/event/blah', {
@@ -434,9 +397,11 @@ describe('7_eventemitter_listeners', function () {
     var caughtEmitted = 0;
 
     listenerclient.set('/e2e_test1/testsubscribe/data/values_emitted_test/1', {"test": "data"}, function (e) {
+
       if (e) return callback(e);
 
       listenerclient.set('/e2e_test1/testsubscribe/data/values_emitted_test/2', {"test": "data1"}, function (e) {
+
         if (e) return callback(e);
 
         listenerclient.on('/e2e_test1/testsubscribe/data/values_emitted_test/*', {

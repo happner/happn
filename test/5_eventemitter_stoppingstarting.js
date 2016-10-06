@@ -26,28 +26,22 @@ describe('5_eventemitter_stoppingstarting', function () {
           callback();
         });
       } else callback();
-    }
+    };
 
     var initService = function (filename, name, callback) {
 
       var doInitService = function () {
 
         var serviceConfig = {
-          mode: 'embedded',
-          services: {
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
+          name:name,
+          services:{
+            data:{
+              config:{
+                filename:filename
+              }
             }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
           }
-        }
-
-        serviceConfig.services.data.config.filename = filename;
-        serviceConfig.name = name;
+        };
 
         happn.service.create(serviceConfig,
           function (e, happnService) {
@@ -56,25 +50,16 @@ describe('5_eventemitter_stoppingstarting', function () {
             callback();
           }
         );
-      }
+      };
 
       stopService(function (e) {
         if (e) return callback(e);
         doInitService();
       });
-    }
+    };
 
     var getClient = function (service, callback) {
-      happn.client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: service
-      }, function (e, instance) {
-
-        if (e) return callback(e);
-
-        callback(null, instance);
-
-      });
+      currentService.services.session.localClient(callback);
     };
 
     before('should initialize the service', function (callback) {
