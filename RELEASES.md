@@ -367,3 +367,8 @@
 -----------------
 
 - fix inability of client.offEvent() to unsubscribe
+
+2.15.8 2016-10-06
+-----------------
+
+- updated happn-util-crypto v0.2.1
