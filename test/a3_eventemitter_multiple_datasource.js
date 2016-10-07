@@ -30,20 +30,16 @@ describe('a3_eventemitter_multiple_datasource', function () {
     happn.service.create(config,
       callback
     );
-  }
+  };
 
   var getClient = function (service, callback) {
-    happn.client.create({
-      plugin: happn.client_plugins.intra_process,
-      context: service
-    }, function (e, instance) {
+    service.services.session.localClient(function(e, instance){
 
       if (e) return callback(e);
-
       callback(null, instance);
 
     });
-  }
+  };
 
   before('should initialize the services', function (callback) {
 
@@ -52,41 +48,10 @@ describe('a3_eventemitter_multiple_datasource', function () {
     var serviceConfigs = [
       {
         port: 55001,
-        services: {
-          auth: {
-            path: './services/auth/service.js',
-            config: {
-              authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-              systemSecret: test_secret
-            }
-          },
-          data: {
-            path: './services/data_embedded/service.js',
-            config: {
-              filename: tempFile
-            }
-          },
-          pubsub: {
-            path: './services/pubsub/service.js',
-            config: {}
-          }
-        },
-        utils: {
-          log_level: 'info|error|warning',
-          log_component: 'prepare'
-        }
       },
       {
         services: {
-          auth: {
-            path: './services/auth/service.js',
-            config: {
-              authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-              systemSecret: test_secret
-            }
-          },
           data: {
-            path: './services/data_embedded/service.js',
             config: {
               datastores: [
                 {
@@ -109,15 +74,7 @@ describe('a3_eventemitter_multiple_datasource', function () {
                 }
               ]
             }
-          },
-          pubsub: {
-            path: './services/pubsub/service.js',
-            config: {}
           }
-        },
-        utils: {
-          log_level: 'info|error|warning',
-          log_component: 'prepare'
         }
       }
     ];

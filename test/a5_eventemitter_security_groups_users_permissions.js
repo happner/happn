@@ -27,40 +27,40 @@ describe('a5_eventemitter_security_groups', function () {
 
     var testServices = {};
 
+    testServices.cache = require('../lib/services/cache/service');
+    testServices.crypto = require('../lib/services/crypto/service');
+    testServices.data = require('../lib/services/data/service');
+    testServices.security = require('../lib/services/security/service');
+    testServices.utils = require('../lib/services/utils/service');
+    testServices.error = require('../lib/services/error/service');
+    testServices.log = require('../lib/services/log/service');
+
+    var checkpoint = require('../lib/services/security/checkpoint');
+    testServices.checkpoint = new checkpoint({logger: Logger});
+
     var initializeMockServices = function (callback) {
 
       var happnMock = {services: {}};
 
-      happnMock.utils = require('../lib/utils');
-
-      testServices = {};
-
-      //delete require.cache['/Users/simonbishop/Documents/Projects/happn/node_modules/nedb/index.js'];
-      //delete require.cache['/Users/simonbishop/Documents/Projects/happn/lib/services/data_embedded/service.js'];
-
-      testServices.crypto = require('../lib/services/crypto/service');
-      testServices.data = require('../lib/services/data/service');
-      testServices.security = require('../lib/services/security/service');
-
-      var checkpoint = require('../lib/services/security/checkpoint');
-      testServices.checkpoint = new checkpoint({logger: Logger});
-
-      async.eachSeries(['crypto', 'data', 'security'], function (serviceName, eachServiceCB) {
+      async.eachSeries(['log','error','utils','data', 'crypto', 'cache', 'security'], function (serviceName, eachServiceCB) {
 
         testServices[serviceName] = new testServices[serviceName]({logger: Logger});
         testServices[serviceName].happn = happnMock;
 
-        testServices[serviceName].initialize(testConfigs[serviceName], function (e, instance) {
-          if (e)  return eachServiceCB(e);
+        happnMock.services[serviceName] = testServices[serviceName];
 
-          happnMock.services[serviceName] = testServices[serviceName];
+        if (serviceName == 'error') happnMock.services[serviceName].handleFatal = function(message, e){
+          console.log('FATAL FAILURE:::', message);
+          throw e;
+        };
 
-          eachServiceCB();
+        if (!happnMock.services[serviceName].initialize) return eachServiceCB();
 
-        });
+        else testServices[serviceName].initialize(happnMock.services[serviceName], eachServiceCB);
+
       }, callback);
 
-    }
+    };
 
     before('should initialize the service', initializeMockServices);
 
@@ -81,14 +81,14 @@ describe('a5_eventemitter_security_groups', function () {
 
       it(' should compare wildcards', function (callback) {
 
-        expect(testServices.security.happn.utils.wildcardMatch('/test/compare1*', '/test/compare1/blah/*')).to.be(true);
-        expect(testServices.security.happn.utils.wildcardMatch('/test/compare1/*', '/test/compare1/blah/*')).to.be(true);
-        expect(testServices.security.happn.utils.wildcardMatch('/test/compare2/compare3/*', '/test/compare2/compare3/blah')).to.be(true);
-        expect(testServices.security.happn.utils.wildcardMatch('/test/compare3/compare4/*', '/test/compare3/compare4/blah/blah')).to.be(true);
-        expect(testServices.security.happn.utils.wildcardMatch('/test/compare4/*/compare5/*', '/test/compare4/blah/compare5/blah')).to.be(true);
+        expect(testServices.utils.wildcardMatch('/test/compare1*', '/test/compare1/blah/*')).to.be(true);
+        expect(testServices.utils.wildcardMatch('/test/compare1/*', '/test/compare1/blah/*')).to.be(true);
+        expect(testServices.utils.wildcardMatch('/test/compare2/compare3/*', '/test/compare2/compare3/blah')).to.be(true);
+        expect(testServices.utils.wildcardMatch('/test/compare3/compare4/*', '/test/compare3/compare4/blah/blah')).to.be(true);
+        expect(testServices.utils.wildcardMatch('/test/compare4/*/compare5/*', '/test/compare4/blah/compare5/blah')).to.be(true);
 
-        expect(testServices.security.happn.utils.wildcardMatch('/test/compare1/*', '/dodge/*')).to.be(false);
-        expect(testServices.security.happn.utils.wildcardMatch('/test/compare2/*', '/dodge/explicit')).to.be(false);
+        expect(testServices.utils.wildcardMatch('/test/compare1/*', '/dodge/*')).to.be(false);
+        expect(testServices.utils.wildcardMatch('/test/compare2/*', '/dodge/explicit')).to.be(false);
 
         callback();
 
@@ -105,7 +105,7 @@ describe('a5_eventemitter_security_groups', function () {
           '/test/3deep/4deep/5deep/*': "5deep",
         }
 
-        var aggregated = testServices.security.happn.utils.wildcardAggregate(testWildcardDict);
+        var aggregated = testServices.utils.wildcardAggregate(testWildcardDict);
 
         expect(aggregated['/test/1deep/*']).to.be("1deep");
         expect(aggregated['/test/1deep/2deep*']).to.be(undefined);
@@ -148,7 +148,7 @@ describe('a5_eventemitter_security_groups', function () {
     var addedGroup;
 
     it('should create a group', function (callback) {
-      testServices.security.upsertGroup(testGroup, function (e, result) {
+      testServices.security.users.upsertGroup(testGroup, function (e, result) {
 
         if (e) return callback(e);
 
@@ -163,7 +163,7 @@ describe('a5_eventemitter_security_groups', function () {
     });
 
     it('should create a sub group', function (callback) {
-      testServices.security.upsertGroup(subGroup, {parent: addedGroup}, function (e, result) {
+      testServices.security.users.upsertGroup(subGroup, {parent: addedGroup}, function (e, result) {
 
         if (e) return callback(e);
 
@@ -178,7 +178,7 @@ describe('a5_eventemitter_security_groups', function () {
     });
 
     it('should fail to create a group as it already exists', function (callback) {
-      testServices.security.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
+      testServices.security.users.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
 
         if (e && e.toString() == 'Error: validation failure: group by the name ' + testGroup.name + ' already exists')
           return callback();
@@ -190,7 +190,7 @@ describe('a5_eventemitter_security_groups', function () {
 
     it('should get groups by group name', function (callback) {
 
-      testServices.security.listGroups('TEST*', function (e, results) {
+      testServices.security.users.listGroups('TEST*', function (e, results) {
 
         if (e) return callback(e);
 
@@ -203,7 +203,7 @@ describe('a5_eventemitter_security_groups', function () {
 
     it('gets a specific group', function (callback) {
 
-      testServices.security.getGroup(testGroup.name, function (e, group) {
+      testServices.security.users.getGroup(testGroup.name, function (e, group) {
         if (e) return callback(e);
 
         expect(group.name).to.be(testGroup.name);
@@ -244,7 +244,7 @@ describe('a5_eventemitter_security_groups', function () {
       //add multiple permissions to a group
       testGroup.permissions['/' + test_id + '/permission_wildcard/multiple'] = {action: ['set', 'on']};
 
-      testServices.security.upsertGroup(testGroup, function (e, result) {
+      testServices.security.users.upsertGroup(testGroup, function (e, result) {
 
         expect(result.permissions['/a5_eventemitter_security_groups/' + test_id + '/permission_set'].action[0]).to.be('set');
         expect(result.permissions['/a5_eventemitter_security_groups/' + test_id + '/permission_get'].action[0]).to.be('get');
@@ -274,17 +274,17 @@ describe('a5_eventemitter_security_groups', function () {
 
     it('should delete a group', function (callback) {
 
-      testServices.security.upsertGroup(groupToRemove, function (e, result) {
+      testServices.security.users.upsertGroup(groupToRemove, function (e, result) {
 
         if (e) return callback(e);
 
-        testServices.security.deleteGroup(result, function (e, result) {
+        testServices.security.users.deleteGroup(result, function (e, result) {
 
           if (e) return callback(e);
 
           expect(result.removed).to.be(1);
 
-          testServices.security.listGroups(groupToRemove.name, function (e, results) {
+          testServices.security.users.listGroups(groupToRemove.name, function (e, results) {
 
             if (e) return callback(e);
 
@@ -304,7 +304,7 @@ describe('a5_eventemitter_security_groups', function () {
 
       it('should add a user', function (callback) {
 
-        testServices.security.upsertUser(testUser, {overwrite: false}, function (e, result) {
+        testServices.security.users.upsertUser(testUser, {overwrite: false}, function (e, result) {
           if (e) return callback(e);
 
           expect(result.password).to.equal(undefined);
@@ -345,13 +345,13 @@ describe('a5_eventemitter_security_groups', function () {
         testUser.username += '.org';
         testUser.password = 'TSTPWD';
 
-        testServices.security.upsertUser(testUser, {overwrite: false}, function (e, result) {
+        testServices.security.users.upsertUser(testUser, {overwrite: false}, function (e, result) {
           if (e) return callback(e);
 
           var user = result;
           user.password = 'TSTPWD';
 
-          testServices.security.upsertUser(user, {overwrite: false}, function (e, result) {
+          testServices.security.users.upsertUser(user, {overwrite: false}, function (e, result) {
 
             expect(e.toString()).to.equal('Error: validation failure: user by the name ' + user.username + ' already exists');
             callback();
@@ -367,7 +367,7 @@ describe('a5_eventemitter_security_groups', function () {
         testUser.username += '.net';
         testUser.password = 'TSTPWD';
 
-        testServices.security.upsertUser(testUser, function (e, result) {
+        testServices.security.users.upsertUser(testUser, function (e, result) {
           if (e) return callback(e);
 
           var user = result;
@@ -375,7 +375,7 @@ describe('a5_eventemitter_security_groups', function () {
           user.custom_data = {};
           user.password = 'XXX';
 
-          testServices.security.upsertUser(user, function (e, result) {
+          testServices.security.users.upsertUser(user, function (e, result) {
             if (e) return callback(e);
 
             expect(result.custom_data).to.eql({});
@@ -405,13 +405,13 @@ describe('a5_eventemitter_security_groups', function () {
 
       it('should list users', function (callback) {
 
-        testServices.security.listUsers(testUser.username, function (e, users) {
+        testServices.security.users.listUsers(testUser.username, function (e, users) {
 
           if (e) return callback(e);
 
           expect(users.length).to.be(1);
 
-          testServices.security.listUsers('*', function (e, users) {
+          testServices.security.users.listUsers('*', function (e, users) {
 
             if (e) return callback(e);
 
@@ -430,14 +430,14 @@ describe('a5_eventemitter_security_groups', function () {
         testUser.username += '.xx';
         testUser.password = 'TST';
 
-        testServices.security.upsertUser(testUser, function (e, user) {
+        testServices.security.users.upsertUser(testUser, function (e, user) {
           if (e) return callback(e);
 
           testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + user.username, {},
             function (e, result) {
               if (e) return callback(e);
 
-              testServices.security.deleteUser(user, function (e, result) {
+              testServices.security.users.deleteUser(user, function (e, result) {
                 if (e) return callback(e);
 
                 expect(result.obj.data).to.eql({removed: 1});
@@ -459,7 +459,7 @@ describe('a5_eventemitter_security_groups', function () {
         });
 
 
-        // testServices.security.deleteUser(testUser, function(e, result){
+        // testServices.security.users.deleteUser(testUser, function(e, result){
         //    if (e) return callback(e);
         //    addedUser = result;
         // });
@@ -510,11 +510,11 @@ describe('a5_eventemitter_security_groups', function () {
       }
 
       before('should create link between users and groups', function (done) {
-        testServices.security.upsertGroup(linkGroup, function (e, result) {
+        testServices.security.users.upsertGroup(linkGroup, function (e, result) {
           if (e) return done(e);
           linkGroup = result;
 
-          testServices.security.upsertUser(linkUser, function (e, result) {
+          testServices.security.users.upsertUser(linkUser, function (e, result) {
             if (e) return done(e);
             linkUser = result;
             done();
@@ -524,7 +524,7 @@ describe('a5_eventemitter_security_groups', function () {
 
       it('links a group to a user', function (callback) {
 
-        testServices.security.linkGroup(linkGroup, linkUser, function (e) {
+        testServices.security.users.linkGroup(linkGroup, linkUser, function (e) {
 
           if (e) return callback(e);
 
@@ -544,7 +544,7 @@ describe('a5_eventemitter_security_groups', function () {
 
       it('gets a specific user - ensuring the group is now part of the return object', function (callback) {
 
-        testServices.security.getUser(linkUser.username, function (e, user) {
+        testServices.security.users.getUser(linkUser.username, function (e, user) {
 
           if (e) return callback(e);
           expect(user.groups[linkGroup.name] != null).to.be(true);
@@ -556,7 +556,7 @@ describe('a5_eventemitter_security_groups', function () {
 
       it('unlinks a group from a user', function (callback) {
 
-        testServices.security.unlinkGroup(linkGroup, linkUser, function (e) {
+        testServices.security.users.unlinkGroup(linkGroup, linkUser, function (e) {
 
           testServices.data.get('/_SYSTEM/_SECURITY/_USER/' + linkUser.username + '/_USER_GROUP/' + linkGroup.name, {},
             function (e, result) {
@@ -574,7 +574,7 @@ describe('a5_eventemitter_security_groups', function () {
 
       it('fails to link a non-existant group to a user', function (callback) {
 
-        testServices.security.linkGroup(nonExistantGroup, linkUser, function (e) {
+        testServices.security.users.linkGroup(nonExistantGroup, linkUser, function (e) {
 
           if (!e) return callback(new Error('user linked to non existant group'));
 

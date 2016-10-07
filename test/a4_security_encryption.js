@@ -23,28 +23,24 @@ describe('a4_security_encryption.js', function () {
 
   testServices.data = require('../lib/services/data/service');
   testServices.crypto = require('../lib/services/crypto/service');
+  testServices.utils = require('../lib/services/utils/service');
 
   before('should initialize the service', function (callback) {
 
     var happnMock = {services: {}};
 
-    happnMock.utils = require('../lib/utils');
-
-    async.eachSeries(['data', 'crypto'], function (serviceName, eachServiceCB) {
+    async.eachSeries(['utils','data', 'crypto'], function (serviceName, eachServiceCB) {
 
       testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;
 
-      testServices[serviceName].initialize(testConfigs[serviceName], function (e, instance) {
-        if (e)  return eachServiceCB(e);
+      happnMock.services[serviceName] = testServices[serviceName];
 
-        happnMock.services[serviceName] = testServices[serviceName];
+      if (!happnMock.services[serviceName].initialize) return eachServiceCB();
 
-        eachServiceCB();
+      else testServices[serviceName].initialize(happnMock.services[serviceName], eachServiceCB);
 
-      });
     }, callback);
-
   });
 
   var bobKeyPair = crypto.createKeyPair();

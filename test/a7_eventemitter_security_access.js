@@ -25,7 +25,6 @@ describe('a7_eventemitter_security_access', function () {
       done();
 
     });
-
   });
 
   after('should delete the temp data file', function (callback) {
@@ -36,12 +35,7 @@ describe('a7_eventemitter_security_access', function () {
 
     it('authenticates with the _ADMIN user, using the default password', function (done) {
 
-      happn.client.create({
-          config: {username: '_ADMIN', password: 'happn'},
-          plugin: happn.client_plugins.intra_process,
-          context: serviceInstance,
-          secure: true
-        })
+      serviceInstance.services.session.localClient({username: '_ADMIN', password: 'happn'})
 
         .then(function (clientInstance) {
           adminClient = clientInstance;
@@ -56,14 +50,9 @@ describe('a7_eventemitter_security_access', function () {
 
     it('fails to authenticate with the _ADMIN user, using a bad password', function (done) {
 
-      happn.client.create({
-          config: {username: '_ADMIN', password: 'bad'},
-          plugin: happn.client_plugins.intra_process,
-          context: serviceInstance,
-          secure: true
-        })
+      serviceInstance.services.session.localClient({username: '_ADMIN', password: 'bollocks'})
 
-        .then(function (clientInstance) {
+        .then(function () {
           done(new Error('this was not meant to happn...'));
         })
 
@@ -84,7 +73,7 @@ describe('a7_eventemitter_security_access', function () {
         customString: 'custom1',
         customNumber: 0
       }
-    }
+    };
 
     var testUser = {
       username: 'TEST USER@blah.com' + test_id,
@@ -92,7 +81,7 @@ describe('a7_eventemitter_security_access', function () {
       custom_data: {
         something: 'usefull'
       }
-    }
+    };
 
     var addedTestGroup;
     var addedTestuser;
@@ -101,26 +90,21 @@ describe('a7_eventemitter_security_access', function () {
 
     before('creates a group and a user, adds the group to the user, logs in with test user', function (done) {
 
-      serviceInstance.services.security.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
+      serviceInstance.services.security.users.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
 
         if (e) return done(e);
         addedTestGroup = result;
 
-        serviceInstance.services.security.upsertUser(testUser, {overwrite: false}, function (e, result) {
+        serviceInstance.services.security.users.upsertUser(testUser, {overwrite: false}, function (e, result) {
 
           if (e) return done(e);
           addedTestuser = result;
 
-          serviceInstance.services.security.linkGroup(addedTestGroup, addedTestuser, function (e) {
+          serviceInstance.services.security.users.linkGroup(addedTestGroup, addedTestuser, function (e) {
 
             if (e) return done(e);
 
-            happn.client.create({
-                config: {username: testUser.username, password: 'TEST PWD'},
-                plugin: happn.client_plugins.intra_process,
-                context: serviceInstance,
-                secure: true
-              })
+            serviceInstance.services.session.localClient({username: testUser.username, password: 'TEST PWD'})
 
               .then(function (clientInstance) {
                 testClient = clientInstance;
@@ -156,7 +140,7 @@ describe('a7_eventemitter_security_access', function () {
       testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/set_not_get'] = {actions: ['set']};
       testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/set_not_on'] = {actions: ['set']};
 
-      serviceInstance.services.security.upsertGroup(testGroup, {}, function (e, group) {
+      serviceInstance.services.security.users.upsertGroup(testGroup, {}, function (e, group) {
         if (e) return done(e);
         expect(group.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/all_access']).to.eql({actions: ['*']});
         return done();
@@ -168,7 +152,7 @@ describe('a7_eventemitter_security_access', function () {
 
       testClient.on('/TEST/a7_eventemitter_security_access/' + test_id + '/on', {}, function (message) {
       }, function (e) {
-        
+
         if (e) return done(e);
 
         testClient.on('/TEST/a7_eventemitter_security_access/dodge/' + test_id + '/on', {}, function (message) {
@@ -180,9 +164,7 @@ describe('a7_eventemitter_security_access', function () {
           done();
 
         });
-
       });
-
     });
 
     it('checks allowed set, and prevented from set', function (done) {
@@ -200,9 +182,7 @@ describe('a7_eventemitter_security_access', function () {
           done();
 
         });
-
       });
-
     });
 
     it('checks allowed get, and prevented from get', function (done) {
@@ -225,7 +205,6 @@ describe('a7_eventemitter_security_access', function () {
           });
         });
       });
-
     });
 
     it('checks allowed get but not set', function (done) {
@@ -240,9 +219,7 @@ describe('a7_eventemitter_security_access', function () {
           expect(e.toString()).to.be('AccessDenied: unauthorized');
           done();
         });
-
       });
-
     });
 
     it('checks allowed get and on but not set', function (done) {
@@ -270,7 +247,6 @@ describe('a7_eventemitter_security_access', function () {
           });
         });
       });
-
     });
 
     it('checks allowed get but not on', function (done) {
@@ -293,7 +269,6 @@ describe('a7_eventemitter_security_access', function () {
           });
         });
       });
-
     });
 
     it('checks allowed on but not get', function (done) {
@@ -326,7 +301,6 @@ describe('a7_eventemitter_security_access', function () {
 
         });
       });
-
     });
 
     it('checks allowed set but not on', function (done) {
@@ -344,7 +318,6 @@ describe('a7_eventemitter_security_access', function () {
 
         });
       });
-
     });
 
     it('checks allowed get all', function (done) {
@@ -371,7 +344,7 @@ describe('a7_eventemitter_security_access', function () {
     });
 
     it('unlinks the test group from the user, checks that the user no longer has access', function (done) {
-      serviceInstance.services.security.unlinkGroup(addedTestGroup, addedTestuser, function (e) {
+      serviceInstance.services.security.users.unlinkGroup(addedTestGroup, addedTestuser, function (e) {
 
         testClient.set('/TEST/a7_eventemitter_security_access/' + test_id + '/set', {test: 'data'}, {}, function (e, result) {
 
@@ -385,7 +358,7 @@ describe('a7_eventemitter_security_access', function () {
     });
 
     it('re-links the test group to the test user, tests we have access again', function (done) {
-      serviceInstance.services.security.linkGroup(addedTestGroup, addedTestuser, function (e) {
+      serviceInstance.services.security.users.linkGroup(addedTestGroup, addedTestuser, function (e) {
 
         if (e) return done(e);
 
@@ -399,6 +372,7 @@ describe('a7_eventemitter_security_access', function () {
       testClient.onSystemMessage(function (eventType, data) {
 
         if (eventType == 'server-side-disconnect') {
+
           expect(data).to.be('security directory update: user deleted');
 
           testClient.set('/TEST/a7_eventemitter_security_access/' + test_id + '/set', {test: 'data'}, {}, function (e, result) {
@@ -410,10 +384,9 @@ describe('a7_eventemitter_security_access', function () {
 
           });
         }
-
       });
 
-      serviceInstance.services.security.deleteUser(addedTestuser, function (e) {
+      serviceInstance.services.security.users.deleteUser(addedTestuser, function (e) {
 
         if (e) return done(e);
       });

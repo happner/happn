@@ -18,39 +18,40 @@ describe('a6_eventemitter_security_groups', function () {
 
   var testServices = {};
 
+  testServices.cache = require('../lib/services/cache/service');
+  testServices.crypto = require('../lib/services/crypto/service');
+  testServices.data = require('../lib/services/data/service');
+  testServices.security = require('../lib/services/security/service');
+  testServices.utils = require('../lib/services/utils/service');
+  testServices.error = require('../lib/services/error/service');
+  testServices.log = require('../lib/services/log/service');
+
+  var checkpoint = require('../lib/services/security/checkpoint');
+  testServices.checkpoint = new checkpoint({logger: Logger});
+
   var initializeMockServices = function (callback) {
 
-    this.timeout(10000);
+    var happnMock = {services: {}};
 
-    var happnMock = {services: {}, utils: require('../lib/utils')};
-    testServices = {};
-
-    testServices.crypto = require('../lib/services/crypto/service');
-    testServices.data = require('../lib/services/data/service');
-    testServices.security = require('../lib/services/security/service');
-
-    async.eachSeries(['crypto', 'data', 'security'], function (serviceName, eachServiceCB) {
+    async.eachSeries(['log','error','utils','data', 'crypto', 'cache', 'security'], function (serviceName, eachServiceCB) {
 
       testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;
 
-      testServices[serviceName].initialize(testConfigs[serviceName], function (e, instance) {
-        if (e)  return eachServiceCB(e);
+      happnMock.services[serviceName] = testServices[serviceName];
 
-        happnMock.services[serviceName] = testServices[serviceName];
+      if (serviceName == 'error') happnMock.services[serviceName].handleFatal = function(message, e){
+        console.log('FATAL FAILURE:::', message);
+        throw e;
+      };
 
-        eachServiceCB();
+      if (!happnMock.services[serviceName].initialize) return eachServiceCB();
 
-      });
-    }, function (e) {
+      else testServices[serviceName].initialize(happnMock.services[serviceName], eachServiceCB);
 
-      testServices.data.get('/*', {}, function (e, resp) {
-        callback();
-      });
+    }, callback);
 
-    });
-
-  }
+  };
 
   before('should initialize the service', initializeMockServices);
 
