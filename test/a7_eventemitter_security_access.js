@@ -75,6 +75,24 @@ describe('a7_eventemitter_security_access', function () {
       }
     };
 
+    testGroup.permissions = {};
+
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/all_access'] = {actions: ['*']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/on'] = {actions: ['on']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/on_all/*'] = {actions: ['on']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/remove'] = {actions: ['remove']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/remove_all/*'] = {actions: ['remove']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/get'] = {actions: ['get']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/get_all/*'] = {actions: ['get']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/set'] = {actions: ['set']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/set_all/*'] = {actions: ['set']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/all/*'] = {actions: ['*']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/get_on'] = {actions: ['get', 'on']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/get_not_on'] = {actions: ['get']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/on_not_get'] = {actions: ['on']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/set_not_get'] = {actions: ['set']};
+    testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/set_not_on'] = {actions: ['set']};
+
     var testUser = {
       username: 'TEST USER@blah.com' + test_id,
       password: 'TEST PWD',
@@ -120,30 +138,16 @@ describe('a7_eventemitter_security_access', function () {
       });
     });
 
-    it('adds permissions to the upserted group', function (done) {
+    it('adds new permissions to the upserted group', function (done) {
 
-      testGroup.permissions = {};
+      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/new_permission'] = {actions: ['get','set']};
 
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/all_access'] = {actions: ['*']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/on'] = {actions: ['on']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/on_all/*'] = {actions: ['on']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/remove'] = {actions: ['remove']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/remove_all/*'] = {actions: ['remove']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/get'] = {actions: ['get']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/get_all/*'] = {actions: ['get']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/set'] = {actions: ['set']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/set_all/*'] = {actions: ['set']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/all/*'] = {actions: ['*']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/get_on'] = {actions: ['get', 'on']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/get_not_on'] = {actions: ['get']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/on_not_get'] = {actions: ['on']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/set_not_get'] = {actions: ['set']};
-      testGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/comp/set_not_on'] = {actions: ['set']};
+      serviceInstance.services.security.users.upsertGroup(testGroup, {}, function (e, upsertedGroup) {
 
-      serviceInstance.services.security.users.upsertGroup(testGroup, {}, function (e, group) {
         if (e) return done(e);
-        expect(group.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/all_access']).to.eql({actions: ['*']});
+        expect(upsertedGroup.permissions['/TEST/a7_eventemitter_security_access/' + test_id + '/new_permission']).to.eql({actions: ['get','set']});
         return done();
+
       });
 
     });
@@ -156,6 +160,7 @@ describe('a7_eventemitter_security_access', function () {
         if (e) return done(e);
 
         testClient.on('/TEST/a7_eventemitter_security_access/dodge/' + test_id + '/on', {}, function (message) {
+
         }, function (e) {
 
           if (!e) return done(new Error('you managed to subscribe, which should be impossible based on your permissions'));
