@@ -26,7 +26,6 @@ describe(filename, function() {
       .then(function(client) {
         normalClient = client;
         normalClient.onAsync = Promise.promisify(normalClient.on);
-        normalClient.getAsync = Promise.promisify(normalClient.get);
         done();
       })
       .catch(done);
