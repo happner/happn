@@ -29,8 +29,12 @@ describe('b8_security_https_websockets_sanity', function () {
 
     try {
       service.create({
-        transport: {
-          mode: 'https'
+        services:{
+          transport:{
+            config:{
+              mode: 'https'
+            }
+          }
         }
       }, function (e, happnInst) {
         if (e)
@@ -119,8 +123,6 @@ describe('b8_security_https_websockets_sanity', function () {
 
           expect(listenerclient.events['/SET@/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(1);
           //////////////////console.log('on subscribed, about to publish');
-
-          var stats = happnInstance.stats();
 
           //console.log(stats.pubsub.listeners_wildcard_SET);
 

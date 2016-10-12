@@ -35,10 +35,7 @@ describe('b6_eventemitter_search', function () {
 
   before('authenticates with the _ADMIN user, using the default password', function (done) {
 
-    happn.client.create(config = {
-        plugin: happn.client_plugins.intra_process,
-        context: serviceInstance,
-      })
+    serviceInstance.services.session.localClient({username:'_ADMIN', password:'happn'})
 
       .then(function (clientInstance) {
         searchClient = clientInstance;

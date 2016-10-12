@@ -73,45 +73,36 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function () {
    database whilst another listens for changes.
    */
   before('should initialize the clients', function (callback) {
+    
     this.timeout(default_timeout);
 
-    try {
-      happn_client.create({
-        config: {
-          username: '_ADMIN',
-          password: 'happn',
-          keyPair: socketClientKeyPair
-        }
-      }, function (e, instance) {
+    happnInstance.services.session.localClient({
 
-        if (e) return callback(e);
+        username: '_ADMIN',
+        password: 'happn',
+        keyPair: eventEmitterClientKeyPair
 
-        socketClient = instance;
+      })
 
-        happn.client.create({
-            config: {
-              username: '_ADMIN',
-              password: 'happn',
-              keyPair: eventEmitterClientKeyPair
-            },
-            plugin: happn.client_plugins.intra_process,
-            context: happnInstance,
-            secure: true
-          })
+      .then(function (instance) {
 
-          .then(function (clientInstance) {
-            eventEmitterClient = instance;
-            callback();
-          })
+        eventEmitterClient = instance;
 
-          .catch(function (e) {
-            callback(e);
-          });
+        happn_client.create({
+          config: {
+            username: '_ADMIN',
+            password: 'happn',
+            keyPair: socketClientKeyPair
+          }
+        }, function (e, instance) {
+
+          if (e) return callback(e);
+
+          socketClient = instance;
+          callback();
+        });
 
       });
-    } catch (e) {
-      callback(e);
-    }
 
   });
 
@@ -144,7 +135,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function () {
             property2: 'property2',
             property3: 'property3'
           }, null, function (e, result) {
-            ////////////////////////////console.log('put happened - listening for result');
+            console.log('put happened - listening for result');
           });
         } else
           callback(e);

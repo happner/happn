@@ -384,7 +384,7 @@ describe('a7_eventemitter_security_access', function () {
 
             if (!e) return done(new Error('this should not have been allowed...'));
 
-            expect(e.toString()).to.be('AccessDenied: unauthorized');
+            expect(e.toString()).to.be('Error: client is disconnected');
             done();
 
           });

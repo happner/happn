@@ -56,15 +56,19 @@ describe('b9_security_web_token', function () {
     try {
       service.create({
         secure: true,
-        middleware: {
-          security: {
-            exclusions: [
-              '/test/excluded/specific',
-              '/test/excluded/wildcard/*',
-            ]
-          }
-        },
         services:{
+          connect:{
+            config:{
+              middleware:{
+                security: {
+                  exclusions: [
+                    '/test/excluded/specific',
+                    '/test/excluded/wildcard/*',
+                  ]
+                }
+              }
+            }
+          },
           security:{
             config:{
               adminUser:{
@@ -177,17 +181,17 @@ describe('b9_security_web_token', function () {
 
   before('creates a group and a user, adds the group to the user, logs in with test user', function (done) {
 
-    happnInstance.services.security.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
+    happnInstance.services.security.users.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
 
       if (e) return done(e);
       addedTestGroup = result;
 
-      happnInstance.services.security.upsertUser(testUser, {overwrite: false}, function (e, result) {
+      happnInstance.services.security.users.upsertUser(testUser, {overwrite: false}, function (e, result) {
 
         if (e) return done(e);
         addedTestuser = result;
 
-        happnInstance.services.security.linkGroup(addedTestGroup, addedTestuser, function (e) {
+        happnInstance.services.security.users.linkGroup(addedTestGroup, addedTestuser, function (e) {
 
           if (e) return done(e);
 
@@ -264,7 +268,7 @@ describe('b9_security_web_token', function () {
 
       testGroup.permissions = {'/@HTTP/secure/route/test': {actions: ['get']}};
 
-      happnInstance.services.security.upsertGroup(testGroup, {}, function (e, group) {
+      happnInstance.services.security.users.upsertGroup(testGroup, {}, function (e, group) {
         if (e) return done(e);
         expect(group.permissions['/@HTTP/secure/route/test']).to.eql({actions: ['get']});
 
@@ -287,7 +291,7 @@ describe('b9_security_web_token', function () {
 
       testGroup.permissions = {'/@HTTP/secure/route/test': {actions: ['get']}};
 
-      happnInstance.services.security.upsertGroup(testGroup, {}, function (e, group) {
+      happnInstance.services.security.users.upsertGroup(testGroup, {}, function (e, group) {
         if (e) return done(e);
         expect(group.permissions['/@HTTP/secure/route/test']).to.eql({actions: ['get']});
 
@@ -327,6 +331,7 @@ describe('b9_security_web_token', function () {
   it('tests doing a request for a token using a GET with a username and password', function (callback) {
 
     doRequest('/auth/login?username=_ADMIN&password=happn', null, true, function (response, body) {
+
       expect(response.statusCode).to.equal(200);
 
       var token = JSON.parse(body).data;

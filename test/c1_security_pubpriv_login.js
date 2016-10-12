@@ -69,9 +69,8 @@ describe('c1_security_pubpriv_login', function () {
             }
           }
         }, function (e, happnInst) {
-          if (e)
-            return callback(e);
 
+          if (e) return callback(e);
           encryptedPayloadInstance = happnInst;
           callback();
 
@@ -103,11 +102,9 @@ describe('c1_security_pubpriv_login', function () {
     // var encrypted = crypto.asymmetricEncrypt(serverKeyPair.privateKey,  clientKeyPair.publicKey, message);
     // var decrypted = crypto.asymmetricDecrypt(clientKeyPair.privateKey, serverKeyPair.publicKey, encrypted);
 
-    if (message == encrypted)
-      throw new Error('encrypted data matches secret message');
+    if (message == encrypted) throw new Error('encrypted data matches secret message');
 
-    if (message != decrypted)
-      throw new Error('decrypted data does not match secret message');
+    if (message != decrypted) throw new Error('decrypted data does not match secret message');
 
     callback();
 
@@ -127,8 +124,6 @@ describe('c1_security_pubpriv_login', function () {
       throw new Error('decrypted data does not match secret message');
 
     callback();
-
-
   });
 
   it('logs in with the test client, supplying a public key - we check that we have a session secret', function (callback) {

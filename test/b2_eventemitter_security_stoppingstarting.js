@@ -33,19 +33,15 @@ describe('b2_eventemitter_security_stoppingstarting', function () {
       var doInitService = function () {
 
         var serviceConfig = {
-          secure: true,
-          mode: 'embedded',
-          services: {
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
+          services:{
+            data:{
+              config:{
+
+              }
             }
           },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        }
+          secure: true
+        };
 
         serviceConfig.services.data.config.filename = filename;
         serviceConfig.name = name;
@@ -57,28 +53,22 @@ describe('b2_eventemitter_security_stoppingstarting', function () {
             callback();
           }
         );
-      }
+      };
 
       stopService(function (e) {
         if (e) return callback(e);
         doInitService();
       });
-    }
+    };
 
     var getClient = function (service, callback) {
-      happn.client.create({
-        config: {username: '_ADMIN', password: 'happn'},
-        plugin: happn.client_plugins.intra_process,
-        context: service,
-        secure: true
-      }, function (e, instance) {
 
+      service.services.session.localClient({username:'_ADMIN', password:'happn'}, function(e, instance){
         if (e) return callback(e);
 
         callback(null, instance);
-
       });
-    }
+    };
 
     before('should initialize the service', function (callback) {
 

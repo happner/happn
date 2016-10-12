@@ -73,46 +73,37 @@ describe('c3_websockets_embedded_sanity_encryptedpayloads', function () {
    database whilst another listens for changes.
    */
   before('should initialize the clients', function (callback) {
+
     this.timeout(default_timeout);
 
-    try {
+    happnInstance.services.session.localClient({
 
-      happn_client.create({
-        config: {
-          username: '_ADMIN',
-          password: 'happn'
-        }
-      }, function (e, instance) {
+        username: '_ADMIN',
+        password: 'happn'
 
-        if (e) return callback(e);
+      })
 
-        socketClient = instance;
+      .then(function (instance) {
 
-        happn.client.create({
-            config: {
-              username: '_ADMIN',
-              password: 'happn'
-            },
-            plugin: happn.client_plugins.intra_process,
-            context: happnInstance,
-            secure: true
-          })
+        eventEmitterClient = instance;
 
-          .then(function (clientInstance) {
-            eventEmitterClient = clientInstance;
-            callback();
-          })
+        happn_client.create({
+          config: {
+            username: '_ADMIN',
+            password: 'happn'
+          }
+        }, function (e, instance) {
 
-          .catch(function (e) {
-            callback(e);
-          });
+          if (e) return callback(e);
+
+          socketClient = instance;
+          callback();
+        });
 
       });
-    } catch (e) {
-      callback(e);
-    }
 
   });
+
 
   //  We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 

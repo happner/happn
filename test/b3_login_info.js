@@ -23,7 +23,6 @@ context('b3_login_info', function () {
         secure: true,
         services: {
           security: {
-            path: './services/security/service.js',
             config: {
               adminUser: {
                 username: '_ADMIN',
@@ -59,14 +58,20 @@ context('b3_login_info', function () {
     var sessionId;
 
     it('login info is carried across login', function (done) {
+
       var events = {};
 
-      server1.services.pubsub.on('authentic', function (evt) {
+      server1.services.session.on('connect', function (evt) {
         sessionId = evt.session.id;
+        events['connect'] = evt;
+      });
+
+      server1.services.session.on('authentic', function (evt) {
         events['authentic'] = evt;
       });
 
-      server1.services.pubsub.on('disconnect', function (evt) {
+
+      server1.services.session.on('disconnect', function (evt) {
         events['disconnect'] = evt;
       });
 
@@ -76,38 +81,41 @@ context('b3_login_info', function () {
 
       setTimeout(function RunAfterClientHasLoggedInAndOut() {
 
-        expect(events.authentic.info.happn.name).to.equal(service1Name);
-        expect(events.disconnect.info.happn.name).to.equal(service1Name);
+        expect(events.connect.happn.name).to.equal(service1Name);
+        expect(events.disconnect.happn.name).to.equal(service1Name);
 
-        expect(events.authentic.info.KEY).to.equal("VALUE");
-        expect(events.disconnect.info.KEY).to.equal("VALUE");
+        expect(events.disconnect.session.info.KEY).to.equal("VALUE");
+        expect(events.authentic.session.info.KEY).to.equal("VALUE");
+        expect(events.disconnect.session.info._local).to.equal(false);
 
-        expect(events.authentic.info._browser).to.equal(false);
-        expect(events.disconnect.info._local).to.equal(false);
-
-        expect(events.authentic.session.id).to.equal(sessionId);
+        expect(events.connect.session.id).to.equal(sessionId);
         expect(events.disconnect.session.id).to.equal(sessionId);
 
         done();
 
-      }, 500);
+      }, 1000);
 
     });
 
   });
 
   context('secure server', function () {
+
     var sessionId;
 
     it('login info is carried across login', function (done) {
       var events = {};
 
-      server2.services.pubsub.on('authentic', function (evt) {
+      server2.services.session.on('authentic', function (evt) {
         sessionId = evt.session.id;
         events['authentic'] = evt;
       });
 
-      server2.services.pubsub.on('disconnect', function (evt) {
+      server2.services.session.on('connect', function (evt) {
+        events['connect'] = evt;
+      });
+
+      server2.services.session.on('disconnect', function (evt) {
         events['disconnect'] = evt;
       });
 
@@ -124,15 +132,19 @@ context('b3_login_info', function () {
 
       setTimeout(function RunAfterClientHasLoggedInAndOut() {
 
-        expect(events.authentic.info.happn.name).to.equal(service2Name);
-        expect(events.disconnect.info.happn.name).to.equal(service2Name);
+        expect(events.connect.happn.name).to.equal(service2Name);
+        expect(events.authentic.happn.name).to.equal(service2Name);
+        expect(events.disconnect.happn.name).to.equal(service2Name);
 
-        expect(events.authentic.info.KEY).to.equal("VALUE");
-        expect(events.disconnect.info.KEY).to.equal("VALUE");
+        expect(events.connect.happn.name).to.equal(service2Name);
+        expect(events.authentic.session.info.KEY).to.equal("VALUE");
+        expect(events.disconnect.session.info.KEY).to.equal("VALUE");
 
-        expect(events.authentic.info._browser).to.equal(false);
-        expect(events.disconnect.info._local).to.equal(false);
+        expect(events.connect.happn.name).to.equal(service2Name);
+        expect(events.authentic.session.info._browser).to.equal(false);
+        expect(events.disconnect.session.info._local).to.equal(false);
 
+        expect(events.connect.happn.name).to.equal(service2Name);
         expect(events.authentic.session.id).to.equal(sessionId);
         expect(events.disconnect.session.id).to.equal(sessionId);
 

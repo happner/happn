@@ -22,7 +22,7 @@ describe('b7_security_https', function () {
       protocol: 'https',
       allowSelfSignedCerts: true
     }
-  }
+  };
 
   var getService = function (config, callback) {
     happn.service.create(config,
@@ -32,7 +32,7 @@ describe('b7_security_https', function () {
         callback();
       }
     );
-  }
+  };
 
   var getClient = function (config, callback) {
     happn_client.create(config,
@@ -43,7 +43,7 @@ describe('b7_security_https', function () {
         callback();
 
       });
-  }
+  };
 
   this.timeout(15000);
 
@@ -69,6 +69,8 @@ describe('b7_security_https', function () {
     getService(serviceConfig, function (e) {
 
       if (e) return done(e);
+
+      console.log('got service:::');
 
       getClient(clientConfig, done);
 
@@ -106,14 +108,14 @@ describe('b7_security_https', function () {
 
         if (e) return done(e);
 
-        var certStats = fs.statSync(serviceConfig.transport.certPath);
-        var keyStats = fs.statSync(serviceConfig.transport.keyPath)
+        var certStats = fs.statSync(serviceConfig.config.certPath);
+        var keyStats = fs.statSync(serviceConfig.config.keyPath)
 
         expect(certStats.isFile()).to.equal(true);
         expect(keyStats.isFile()).to.equal(true);
 
-        fs.unlinkSync(serviceConfig.transport.certPath);
-        fs.unlinkSync(serviceConfig.transport.keyPath);
+        fs.unlinkSync(serviceConfig.config.certPath);
+        fs.unlinkSync(serviceConfig.config.keyPath);
 
         done();
 
@@ -189,7 +191,7 @@ describe('b7_security_https', function () {
     var serviceConfig = config.test8_config;
 
     getService(serviceConfig, function (e) {
-      expect(e.toString()).to.equal('Error: missing key file: ' + serviceConfig.transport.keyPath);
+      expect(e.toString()).to.equal('Error: missing key file: ' + serviceConfig.services.transport.config.keyPath);
       done();
     });
 
@@ -198,13 +200,12 @@ describe('b7_security_https', function () {
 
   it('it fails to start an https server, missing cert file path', function (done) {
 
-    if (process.env.TRAVIS)
-      return done();
+    if (process.env.TRAVIS) return done();
 
     var serviceConfig = config.test9_config;
 
     getService(serviceConfig, function (e) {
-      expect(e.toString()).to.equal('Error: missing cert file: ' + serviceConfig.transport.certPath);
+      expect(e.toString()).to.equal('Error: missing cert file: ' + serviceConfig.services.transport.config.certPath);
       done();
     });
 

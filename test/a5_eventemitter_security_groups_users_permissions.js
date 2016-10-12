@@ -31,6 +31,7 @@ describe('a5_eventemitter_security_groups', function () {
     testServices.crypto = require('../lib/services/crypto/service');
     testServices.data = require('../lib/services/data/service');
     testServices.security = require('../lib/services/security/service');
+    testServices.session = require('../lib/services/session/service');
     testServices.utils = require('../lib/services/utils/service');
     testServices.error = require('../lib/services/error/service');
     testServices.log = require('../lib/services/log/service');
@@ -42,7 +43,7 @@ describe('a5_eventemitter_security_groups', function () {
 
       var happnMock = {services: {}};
 
-      async.eachSeries(['log','error','utils','data', 'crypto', 'cache', 'security'], function (serviceName, eachServiceCB) {
+      async.eachSeries(['log','error','utils', 'crypto', 'cache', 'session','data', 'security'], function (serviceName, eachServiceCB) {
 
         testServices[serviceName] = new testServices[serviceName]({logger: Logger});
         testServices[serviceName].happn = happnMock;
@@ -53,6 +54,11 @@ describe('a5_eventemitter_security_groups', function () {
           console.log('FATAL FAILURE:::', message);
           throw e;
         };
+
+        if (serviceName == 'session') {
+          happnMock.services[serviceName].config = {};
+          return happnMock.services[serviceName].initializeCaches(eachServiceCB);
+        }
 
         if (!happnMock.services[serviceName].initialize) return eachServiceCB();
 
