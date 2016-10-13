@@ -44,18 +44,22 @@ describe('d6_test_cache_service', function() {
 
     var key = testId + 'test1';
 
-    serviceInstance.set(key, {"dkey":key}, function(e, result){
+    serviceInstance.set(key, {"dkey":key})
 
-      if (e) return done(e);
+      .then(function(result){
 
-      expect(result.key).to.be(key);
-      expect(result.data.dkey).to.be(key);
+        expect(result.key).to.be(key);
+        expect(result.data.dkey).to.be(key);
 
-      expect(serviceInstance.__defaultCache.get(key).dkey).to.be(key);
+        serviceInstance.__defaultCache.get(key)
+          .then(function(result){
+            expect(result.dkey).to.be(key);
+            done();
+          })
+          .catch(done)
+      })
 
-      done();
-
-    });
+      .catch(done)
   });
 
   it('gets data, default cache', function(done) {
