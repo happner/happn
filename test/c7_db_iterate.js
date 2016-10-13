@@ -11,10 +11,6 @@ describe('c7_ds_iterate', function () {
 
   this.timeout(20000);
 
-  var initialFileSize = 0;
-
-  var testFiles = [];
-
   var test_file1 = __dirname + '/test-resources/c7/test/' + test_id + '1.test';
   var test_file2 = __dirname + '/test-resources/c7/test/' + test_id + '2.test';
   var test_file2a = __dirname + '/test-resources/c7/test/' + test_id + '2a.test';
@@ -24,7 +20,6 @@ describe('c7_ds_iterate', function () {
     port: 4444,
     services: {
       data: {
-        path: './services/data_embedded/service.js',
         config: {
           filename: test_file1
         }
@@ -37,7 +32,6 @@ describe('c7_ds_iterate', function () {
     port: 4447,
     services: {
       data: {
-        path: './services/data_embedded/service.js',
         config: {
           datastores: [
             {
@@ -62,7 +56,7 @@ describe('c7_ds_iterate', function () {
         }
       }
     }
-  }
+  };
 
   var clientConfig1 = {
     config: {
@@ -71,7 +65,7 @@ describe('c7_ds_iterate', function () {
       username: '_ADMIN',
       password: 'happn'
     }
-  }
+  };
 
   var clientConfig2 = {
     config: {
@@ -80,7 +74,7 @@ describe('c7_ds_iterate', function () {
       username: '_ADMIN',
       password: 'happn'
     }
-  }
+  };
 
   var serviceInstance1;
 
@@ -94,11 +88,11 @@ describe('c7_ds_iterate', function () {
         callback(null, service);
       }
     );
-  }
+  };
 
   var getClient = function (config, callback) {
     happn_client.create(config, callback);
-  }
+  };
 
   before('it creates 2 test dss', function (callback) {
     this.timeout(4000);

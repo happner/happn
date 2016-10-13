@@ -23,9 +23,6 @@ describe('d3-security-tokens', function () {
 
   var serviceConfig = {
     services:{
-      data:{
-
-      },
       security: {
         config: {
           sessionTokenSecret:"TESTTOKENSECRET",
@@ -151,28 +148,43 @@ describe('d3-security-tokens', function () {
     var testServices = {};
 
     testServices.cache = require('../lib/services/cache/service');
-    testServices.data = require('../lib/services/data/service');
     testServices.crypto = require('../lib/services/crypto/service');
+    testServices.data = require('../lib/services/data/service');
     testServices.security = require('../lib/services/security/service');
+    testServices.session = require('../lib/services/session/service');
+    testServices.utils = require('../lib/services/utils/service');
+    testServices.error = require('../lib/services/error/service');
+    testServices.log = require('../lib/services/log/service');
+
+    var checkpoint = require('../lib/services/security/checkpoint');
+
+    testServices.checkpoint = new checkpoint({logger: Logger});
 
     var happnMock = {services: {}};
 
     if (servicesConfig) testConfig = servicesConfig;
 
-    happnMock.utils = require('../lib/utils');
-
-    async.eachSeries(['cache', 'data', 'crypto', 'security'], function (serviceName, eachServiceCB) {
+    async.eachSeries(['log','error','utils', 'crypto', 'cache', 'session','data', 'security'], function (serviceName, eachServiceCB) {
 
       testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;
 
-      testServices[serviceName].initialize(serviceConfig.services[serviceName], function (e, instance) {
-        if (e)  return eachServiceCB(e);
+      happnMock.services[serviceName] = testServices[serviceName];
 
-        happnMock.services[serviceName] = testServices[serviceName];
-        eachServiceCB();
+      if (serviceName == 'error') happnMock.services[serviceName].handleFatal = function(message, e){
+        console.log('FATAL FAILURE:::', message);
+        throw e;
+      };
 
-      });
+      if (serviceName == 'session') {
+        happnMock.services[serviceName].config = {};
+        return happnMock.services[serviceName].initializeCaches(eachServiceCB);
+      }
+
+      if (!happnMock.services[serviceName].initialize) return eachServiceCB();
+
+      else testServices[serviceName].initialize(happnMock.services[serviceName], eachServiceCB);
+
     }, function(e){
 
       if (e) return callback(e);
@@ -566,6 +578,12 @@ describe('d3-security-tokens', function () {
       logger:require('happn-logger')
     });
 
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
     checkpoint.securityService = {
       getGroup:function(groupName, opts, callback){
 
@@ -573,7 +591,9 @@ describe('d3-security-tokens', function () {
 
       },
       happn:{
-        utils:require('../lib/utils')
+        services:{
+          utils:utils
+        }
       }
     };
 
@@ -619,14 +639,24 @@ describe('d3-security-tokens', function () {
       logger:require('happn-logger')
     });
 
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
     checkpoint.securityService = {
-      getGroup:function(groupName, opts, callback){
+      users:{
+        getGroup:function(groupName, opts, callback){
 
-        if (groups[groupName]) callback(null, groups[groupName]);
+          if (groups[groupName]) callback(null, groups[groupName]);
 
+        }
       },
       happn:{
-        utils:require('../lib/utils')
+        services:{
+          utils:utils
+        }
       }
     };
 
@@ -671,14 +701,24 @@ describe('d3-security-tokens', function () {
       logger:require('happn-logger')
     });
 
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
     checkpoint.securityService = {
-      getGroup:function(groupName, opts, callback){
+      users:{
+        getGroup:function(groupName, opts, callback){
 
-        if (groups[groupName]) callback(null, groups[groupName]);
+          if (groups[groupName]) callback(null, groups[groupName]);
 
+        }
       },
       happn:{
-        utils:require('../lib/utils')
+        services:{
+          utils:utils
+        }
       }
     };
 
@@ -776,17 +816,35 @@ describe('d3-security-tokens', function () {
     var CacheService = require('../lib/services/cache/service');
     var cacheInstance = new CacheService();
 
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
+    cacheInstance.happn = {
+      services:{
+        utils:utils
+      }
+    };
+
     cacheInstance.initialize({}, function(e) {
 
       if (e) return done(e);
 
       var securityService = {
-        happn: {
-          utils: require('../lib/utils')
+        users:{
+          getGroup:function(groupName, opts, callback){
+            if (groups[groupName]) callback(null, groups[groupName]);
+          }
+        },
+        happn:{
+          services:{
+            utils:utils
+          }
         },
         cacheService: cacheInstance,
-        onDataChanged: function () {
-        }
+        onDataChanged: function () {}
       };
 
       var testSession = {
@@ -800,6 +858,13 @@ describe('d3-security-tokens', function () {
           0: {
             ttl: 4000
           }
+        }
+      };
+
+      checkpoint.happn = {
+        services:{
+          utils:utils,
+          cache:cacheInstance
         }
       };
 
@@ -830,9 +895,7 @@ describe('d3-security-tokens', function () {
             });
           }, 2500);
         });
-
       })
-
     });
   });
 
@@ -847,17 +910,35 @@ describe('d3-security-tokens', function () {
     var CacheService = require('../lib/services/cache/service');
     var cacheInstance = new CacheService();
 
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
+    cacheInstance.happn = {
+      services:{
+        utils:utils
+      }
+    };
+
     cacheInstance.initialize({}, function(e) {
 
       if (e) return done(e);
 
       var securityService = {
-        happn: {
-          utils: require('../lib/utils')
+        users:{
+          getGroup:function(groupName, opts, callback){
+            if (groups[groupName]) callback(null, groups[groupName]);
+          }
+        },
+        happn:{
+          services:{
+            utils:utils
+          }
         },
         cacheService: cacheInstance,
-        onDataChanged: function () {
-        }
+        onDataChanged: function () {}
       };
 
       var testSession = {
@@ -876,11 +957,22 @@ describe('d3-security-tokens', function () {
         }
       };
 
+      checkpoint.happn = {
+        services:{
+          utils:utils,
+          cache:cacheInstance
+        }
+      };
+
       checkpoint.initialize({}, securityService, function (e) {
+
+        if (e) return done(e);
 
         setTimeout(function () {
 
           checkpoint._authorizeSession(testSession, '/test/blah', 'on', function (e, authorized, reason) {
+
+            if (e) return done(e);
 
             expect(authorized).to.be(false);
             expect(reason).to.be('session inactivity threshold reached');
@@ -895,11 +987,8 @@ describe('d3-security-tokens', function () {
             });
           });
         }, 1500);
-
       });
-
     });
-
   });
 
   it("tests the security checkpoints _authorizeSession inactivity_threshold active then timed out", function(done){
@@ -913,17 +1002,35 @@ describe('d3-security-tokens', function () {
     var CacheService = require('../lib/services/cache/service');
     var cacheInstance = new CacheService();
 
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
+    cacheInstance.happn = {
+      services:{
+        utils:utils
+      }
+    };
+
     cacheInstance.initialize({}, function(e) {
 
       if (e) return done(e);
 
       var securityService = {
-        happn: {
-          utils: require('../lib/utils')
+        users:{
+          getGroup:function(groupName, opts, callback){
+            if (groups[groupName]) callback(null, groups[groupName]);
+          }
+        },
+        happn:{
+          services:{
+            utils:utils
+          }
         },
         cacheService: cacheInstance,
-        onDataChanged: function () {
-        }
+        onDataChanged: function () {}
       };
 
       var testSession = {
@@ -939,6 +1046,13 @@ describe('d3-security-tokens', function () {
             ttl:5000,
             inactivity_threshold:10000
           }
+        }
+      };
+
+      checkpoint.happn = {
+        services:{
+          utils:utils,
+          cache:cacheInstance
         }
       };
 
@@ -980,17 +1094,35 @@ describe('d3-security-tokens', function () {
     var CacheService = require('../lib/services/cache/service');
     var cacheInstance = new CacheService();
 
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
+    cacheInstance.happn = {
+      services:{
+        utils:utils
+      }
+    };
+
     cacheInstance.initialize({}, function(e) {
 
       if (e) return done(e);
 
       var securityService = {
-        happn: {
-          utils: require('../lib/utils')
+        users:{
+          getGroup:function(groupName, opts, callback){
+            if (groups[groupName]) callback(null, groups[groupName]);
+          }
+        },
+        happn:{
+          services:{
+            utils:utils
+          }
         },
         cacheService: cacheInstance,
-        onDataChanged: function () {
-        }
+        onDataChanged: function () {}
       };
 
       var testSession = {
@@ -1004,6 +1136,13 @@ describe('d3-security-tokens', function () {
           0: {
             inactivity_threshold:2000
           }
+        }
+      };
+
+      checkpoint.happn = {
+        services:{
+          utils:utils,
+          cache:cacheInstance
         }
       };
 
@@ -1054,7 +1193,6 @@ describe('d3-security-tokens', function () {
     });
   });
 
-
   it("tests the security checkpoints _authorizeSession inactivity_threshold", function(done){
 
     this.timeout(20000);
@@ -1066,32 +1204,58 @@ describe('d3-security-tokens', function () {
     var CacheService = require('../lib/services/cache/service');
     var cacheInstance = new CacheService();
 
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
+    cacheInstance.happn = {
+      services:{
+        utils:utils
+      }
+    };
+
+    var testSession = {
+      id: 99,
+      type: 1,
+      timestamp: Date.now(),
+      policy: {
+        1: {
+          inactivity_threshold:2000
+        },
+        0: {
+          inactivity_threshold:2000
+        }
+      }
+    };
+
+    var securityService = {
+      users:{
+        getGroup:function(groupName, opts, callback){
+          if (groups[groupName]) callback(null, groups[groupName]);
+        }
+      },
+      happn:{
+        services:{
+          utils:utils
+        }
+      },
+      cacheService: cacheInstance,
+      onDataChanged: function () {}
+    };
+
+    checkpoint.happn = {
+      services:{
+        utils:utils,
+        cache:cacheInstance,
+        security:securityService
+      }
+    };
+
     cacheInstance.initialize({}, function(e) {
 
       if (e) return done(e);
-
-      var securityService = {
-        happn: {
-          utils: require('../lib/utils')
-        },
-        cacheService: cacheInstance,
-        onDataChanged: function () {
-        }
-      };
-
-      var testSession = {
-        id: 99,
-        type: 1,
-        timestamp: Date.now(),
-        policy: {
-          1: {
-            inactivity_threshold:2000
-          },
-          0: {
-            inactivity_threshold:2000
-          }
-        }
-      };
 
       checkpoint.initialize({}, securityService, function(e) {
 
@@ -1129,37 +1293,63 @@ describe('d3-security-tokens', function () {
     var CacheService = require('../lib/services/cache/service');
     var cacheInstance = new CacheService();
 
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
+    cacheInstance.happn = {
+      services:{
+        utils:utils
+      }
+    };
+
+    var testSession = {
+      id: 99,
+      type: 0,
+      timestamp: Date.now(),
+      policy: {
+        1: {
+          ttl: 6000,
+          inactivity_threshold: 1000
+        },
+        0: {
+          ttl: 15000,
+          inactivity_threshold: 2000,
+          permissions:{
+            '/test/permission/*':{actions:['*']}
+          }
+        }
+      }
+    };
+
+    var securityService = {
+      users:{
+        getGroup:function(groupName, opts, callback){
+          if (groups[groupName]) callback(null, groups[groupName]);
+        }
+      },
+      happn:{
+        services:{
+          utils:utils
+        }
+      },
+      cacheService: cacheInstance,
+      onDataChanged: function () {}
+    };
+
+    checkpoint.happn = {
+      services:{
+        utils:utils,
+        cache:cacheInstance,
+        security:securityService
+      }
+    };
+
     cacheInstance.initialize({}, function(e) {
 
       if (e) return done(e);
-
-      var securityService = {
-        happn: {
-          utils: require('../lib/utils')
-        },
-        cacheService: cacheInstance,
-        onDataChanged: function () {
-        }
-      };
-
-      var testSession = {
-        id: 99,
-        type: 0,
-        timestamp: Date.now(),
-        policy: {
-          1: {
-            ttl: 6000,
-            inactivity_threshold: 1000
-          },
-          0: {
-            ttl: 15000,
-            inactivity_threshold: 2000,
-            permissions:{
-              '/test/permission/*':{actions:['*']}
-            }
-          }
-        }
-      };
 
       checkpoint.initialize({}, securityService, function (e) {
 
@@ -1190,6 +1380,8 @@ describe('d3-security-tokens', function () {
 
     this.timeout(20000);
 
+    this.timeout(20000);
+
     var checkpoint = new CheckPoint({
       logger: require('happn-logger')
     });
@@ -1197,60 +1389,86 @@ describe('d3-security-tokens', function () {
     var CacheService = require('../lib/services/cache/service');
     var cacheInstance = new CacheService();
 
-    cacheInstance.initialize({}, function(e){
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
+    cacheInstance.happn = {
+      services:{
+        utils:utils
+      }
+    };
+
+    var testSession = {
+      id: 99,
+      type: 0,
+      timestamp: Date.now(),
+      policy: {
+        1: {
+          usage_limit:2,
+          ttl:2000
+        },
+        0: {
+          usage_limit:1,
+          ttl:2000
+        }
+      }
+    };
+
+    var securityService = {
+      users:{
+        getGroup:function(groupName, opts, callback){
+          if (groups[groupName]) callback(null, groups[groupName]);
+        }
+      },
+      happn:{
+        services:{
+          utils:utils
+        }
+      },
+      cacheService: cacheInstance,
+      onDataChanged: function () {}
+    };
+
+    checkpoint.happn = {
+      services:{
+        utils:utils,
+        cache:cacheInstance,
+        security:securityService
+      }
+    };
+
+    cacheInstance.initialize({}, function(e) {
 
       if (e) return done(e);
 
-      var securityService = {
-        happn: {
-          utils: require('../lib/utils')
-        },
-        cacheService:cacheInstance,
-        onDataChanged:function(){}
-      };
-
-      var testSession = {
-        id: 99,
-        type: 0,
-        timestamp: Date.now(),
-        policy: {
-          1: {
-            usage_limit:2,
-            ttl:2000
-          },
-          0: {
-            usage_limit:1,
-            ttl:2000
-          }
-        }
-      };
-
       checkpoint.initialize({}, securityService, function(e){
+
+        if (e) return done(e);
+
+        checkpoint.__checkUsageLimit(testSession, testSession.policy[1], function(e, ok){
 
           if (e) return done(e);
 
-         checkpoint.__checkUsageLimit(testSession, testSession.policy[1], function(e, ok){
+          expect(ok).to.be(true);
 
-           if (e) return done(e);
+          checkpoint.__checkUsageLimit(testSession, testSession.policy[1], function(e, ok){
 
-           expect(ok).to.be(true);
+            if (e) return done(e);
 
-           checkpoint.__checkUsageLimit(testSession, testSession.policy[1], function(e, ok){
+            checkpoint.__checkUsageLimit(testSession, testSession.policy[1], function(e, ok){
 
-             if (e) return done(e);
+              if (e) return done(e);
 
-             checkpoint.__checkUsageLimit(testSession, testSession.policy[1], function(e, ok){
+              expect(ok).to.be(false);
 
-               if (e) return done(e);
+              done();
 
-               expect(ok).to.be(false);
-
-               done();
-
-             });
-
-           });
-         });
+            });
+          });
+        });
       });
     });
   });
@@ -1430,7 +1648,7 @@ describe('d3-security-tokens', function () {
     });
   });
 
-  it('should create a user with a public key, then login to a using a signature', function (done) {
+  it('should create a user with a public key, then login using a signature', function (done) {
 
     this.timeout(20000);
 
@@ -1474,17 +1692,17 @@ describe('d3-security-tokens', function () {
       var testClient;
       var serviceInstance = instance;
 
-      serviceInstance.services.security.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
+      serviceInstance.services.security.users.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
 
         if (e) return done(e);
         addedTestGroup = result;
 
-        serviceInstance.services.security.upsertUser(testUser, {overwrite: false}, function (e, result) {
+        serviceInstance.services.security.users.upsertUser(testUser, {overwrite: false}, function (e, result) {
 
           if (e) return done(e);
           addedTestuser = result;
 
-          serviceInstance.services.security.linkGroup(addedTestGroup, addedTestuser, function (e) {
+          serviceInstance.services.security.users.linkGroup(addedTestGroup, addedTestuser, function (e) {
 
             if (e) return done(e);
 
@@ -1566,17 +1784,17 @@ describe('d3-security-tokens', function () {
 
         var serviceInstance = instance;
 
-        serviceInstance.services.security.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
+        serviceInstance.services.security.users.upsertGroup(testGroup, {overwrite: false}, function (e, result) {
 
           if (e) return done(e);
           addedTestGroup = result;
 
-          serviceInstance.services.security.upsertUser(testUser, {overwrite: false}, function (e, result) {
+          serviceInstance.services.security.users.upsertUser(testUser, {overwrite: false}, function (e, result) {
 
             if (e) return done(e);
             addedTestuser = result;
 
-            serviceInstance.services.security.linkGroup(addedTestGroup, addedTestuser, function (e) {
+            serviceInstance.services.security.users.linkGroup(addedTestGroup, addedTestuser, function (e) {
 
               if (e) return done(e);
 
@@ -1617,8 +1835,16 @@ describe('d3-security-tokens', function () {
 
     var securityService = new SecurityService({logger: Logger});
 
+    var Utils = require('../lib/services/utils/service.js');
+
+    var utils = new Utils({
+      logger:require('happn-logger')
+    });
+
     securityService.happn = {
-      utils:require('../lib/utils')
+      services:{
+        utils:utils
+      }
     };
 
     securityService.__initializeProfiles(serviceConfig.services.security.config, function(e){

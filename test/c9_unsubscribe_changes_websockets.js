@@ -9,10 +9,7 @@ describe('c9_unsubscribe_changes_websockets', function () {
   var happn_client = happn.client;
   var async = require('async');
 
-  var testport = 8000;
   var test_secret = 'test_secret';
-  var mode = "embedded";
-  var default_timeout = 10000;
   var happnInstance = null;
 
   this.timeout(20000);
@@ -30,31 +27,7 @@ describe('c9_unsubscribe_changes_websockets', function () {
   before('should initialize the service', function (callback) {
 
     try {
-      service.create({
-          mode: 'embedded',
-          services: {
-            auth: {
-              path: './services/auth/service.js',
-              config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
-              }
-            },
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
-            },
-            pubsub: {
-              path: './services/pubsub/service.js',
-              config: {}
-            }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
-        function (e, happnInst) {
+      service.create(function (e, happnInst) {
           if (e)
             return callback(e);
 

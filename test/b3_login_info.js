@@ -62,14 +62,13 @@ context('b3_login_info', function () {
       var events = {};
 
       server1.services.session.on('connect', function (evt) {
-        sessionId = evt.session.id;
+        sessionId = evt.id;
         events['connect'] = evt;
       });
 
       server1.services.session.on('authentic', function (evt) {
         events['authentic'] = evt;
       });
-
 
       server1.services.session.on('disconnect', function (evt) {
         events['disconnect'] = evt;
@@ -84,12 +83,12 @@ context('b3_login_info', function () {
         expect(events.connect.happn.name).to.equal(service1Name);
         expect(events.disconnect.happn.name).to.equal(service1Name);
 
-        expect(events.disconnect.session.info.KEY).to.equal("VALUE");
-        expect(events.authentic.session.info.KEY).to.equal("VALUE");
-        expect(events.disconnect.session.info._local).to.equal(false);
+        expect(events.disconnect.info.KEY).to.equal("VALUE");
+        expect(events.authentic.info.KEY).to.equal("VALUE");
+        expect(events.disconnect.info._local).to.equal(false);
 
-        expect(events.connect.session.id).to.equal(sessionId);
-        expect(events.disconnect.session.id).to.equal(sessionId);
+        expect(events.connect.id).to.equal(sessionId);
+        expect(events.disconnect.id).to.equal(sessionId);
 
         done();
 
@@ -107,7 +106,7 @@ context('b3_login_info', function () {
       var events = {};
 
       server2.services.session.on('authentic', function (evt) {
-        sessionId = evt.session.id;
+        sessionId = evt.id;
         events['authentic'] = evt;
       });
 
@@ -133,20 +132,19 @@ context('b3_login_info', function () {
       setTimeout(function RunAfterClientHasLoggedInAndOut() {
 
         expect(events.connect.happn.name).to.equal(service2Name);
-        expect(events.authentic.happn.name).to.equal(service2Name);
         expect(events.disconnect.happn.name).to.equal(service2Name);
 
         expect(events.connect.happn.name).to.equal(service2Name);
-        expect(events.authentic.session.info.KEY).to.equal("VALUE");
-        expect(events.disconnect.session.info.KEY).to.equal("VALUE");
+        expect(events.authentic.info.KEY).to.equal("VALUE");
+        expect(events.disconnect.info.KEY).to.equal("VALUE");
 
         expect(events.connect.happn.name).to.equal(service2Name);
-        expect(events.authentic.session.info._browser).to.equal(false);
-        expect(events.disconnect.session.info._local).to.equal(false);
+        expect(events.authentic.info._browser).to.equal(false);
+        expect(events.disconnect.info._local).to.equal(false);
 
         expect(events.connect.happn.name).to.equal(service2Name);
-        expect(events.authentic.session.id).to.equal(sessionId);
-        expect(events.disconnect.session.id).to.equal(sessionId);
+        expect(events.authentic.id).to.equal(sessionId);
+        expect(events.disconnect.id).to.equal(sessionId);
 
         done();
 

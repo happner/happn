@@ -84,10 +84,9 @@ describe('c8_deferred_listen', function () {
   var intraProcClientInstance;
 
   it('should connect to the service with an intra-proc client, perform a set, get and remove', function (callback) {
-    happn_client.create({
-      plugin: happn.client_plugins.intra_process,
-      context: happnInstance
-    }, function (e, instance) {
+
+    happnInstance.services.session.localClient(function (e, instance) {
+
       if (e) return callback(e);
       intraProcClientInstance = instance;
 
@@ -104,11 +103,10 @@ describe('c8_deferred_listen', function () {
             expect(response.removed).to.be(1);
             callback();
           });
-        })
-
+        });
       });
-
     });
+
   });
 
   it('should stop the service, even though it hasnt started listening', function (callback) {

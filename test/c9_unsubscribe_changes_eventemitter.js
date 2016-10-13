@@ -6,12 +6,8 @@ describe('c9_unsubscribe_changes_eventemitter', function () {
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
-  var happn_client = happn.client;
   var async = require('async');
-
-  var testport = 8000;
   var test_secret = 'test_secret';
-  var mode = "embedded";
   var default_timeout = 10000;
   var happnInstance = null;
 
@@ -30,31 +26,8 @@ describe('c9_unsubscribe_changes_eventemitter', function () {
   before('should initialize the service', function (callback) {
 
     try {
-      service.create({
-          mode: 'embedded',
-          services: {
-            auth: {
-              path: './services/auth/service.js',
-              config: {
-                authTokenSecret: 'a256a2fd43bf441483c5177fc85fd9d3',
-                systemSecret: test_secret
-              }
-            },
-            data: {
-              path: './services/data_embedded/service.js',
-              config: {}
-            },
-            pubsub: {
-              path: './services/pubsub/service.js',
-              config: {}
-            }
-          },
-          utils: {
-            log_level: 'info|error|warning',
-            log_component: 'prepare'
-          }
-        },
-        function (e, happnInst) {
+
+      service.create(function (e, happnInst) {
           if (e)
             return callback(e);
 
@@ -75,30 +48,24 @@ describe('c9_unsubscribe_changes_eventemitter', function () {
    database whilst another listens for changes.
    */
   before('should initialize the clients', function (callback) {
+
     this.timeout(default_timeout);
 
     try {
 
-      happn_client.create({
-        plugin: happn.client_plugins.intra_process,
-        context: happnInstance
-      }, function (e, instance) {
+      happnInstance.services.session.localClient(function (e, instance) {
 
         if (e) return callback(e);
 
         publisherclient = instance;
 
-        happn_client.create({
-          plugin: happn.client_plugins.intra_process,
-          context: happnInstance
-        }, function (e, instance) {
+        happnInstance.services.session.localClient(function (e, instance) {
 
           if (e) return callback(e);
           listenerclient = instance;
           callback();
 
         });
-
       });
 
     } catch (e) {
@@ -176,8 +143,6 @@ describe('c9_unsubscribe_changes_eventemitter', function () {
 
   it('should unsubscribe from an event path', function (callback) {
 
-    var currentListenerId;
-    var onRan = false;
     var pathOnRan = false;
 
     listenerclient.on('/e2e_test1/testsubscribe/data/path_off_test', {event_type: 'set', count: 0}, function (message) {
