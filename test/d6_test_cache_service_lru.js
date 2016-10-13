@@ -23,6 +23,15 @@ describe('d6_test_cache_service', function() {
 
   before('should initialize the service', function(callback) {
 
+    var UtilService = require('../lib/services/utils/service');
+    var utilService = new UtilService();
+
+    serviceInstance.happn = {
+      services:{
+        utils:utilService
+      }
+    };
+
     serviceInstance.initialize(config, callback);
   });
 
@@ -31,7 +40,7 @@ describe('d6_test_cache_service', function() {
     serviceInstance.stop(done);
   });
 
-  it('sets data, default cache', function(done) {
+  it.only('sets data, default cache', function(done) {
 
     var key = testId + 'test1';
 
@@ -594,7 +603,7 @@ describe('d6_test_cache_service', function() {
       specific.all(function(e, items){
 
         if (e) return done(e);
-        
+
         expect(items.length).to.be(5);
 
         //backwards because LRU

@@ -15,6 +15,15 @@ describe('d5_test_cache_service', function() {
 
   before('should initialize the service', function(callback) {
 
+    var UtilService = require('../lib/services/utils/service');
+    var utilService = new UtilService();
+
+    serviceInstance.happn = {
+      services:{
+        utils:utilService
+      }
+    };
+
     serviceInstance.initialize(config, callback);
   });
 
@@ -28,6 +37,8 @@ describe('d5_test_cache_service', function() {
     var key = testId + 'test1';
 
     serviceInstance.set(key, {"dkey":key}, function(e, result){
+
+      if (e) return done(e);
 
       expect(result.key).to.be(key);
       expect(result.data.dkey).to.be(key);
