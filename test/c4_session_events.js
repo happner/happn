@@ -16,47 +16,42 @@ describe('c4_session_events', function () {
       "disconnect-eventemitter": false,
       "authentic-socket": false,
       "disconnect-socket": false
-    }
+    };
 
     var serviceInstance;
     var stopped = false;
 
     var checkAllEventsFired = function (cb) {
 
-      for (var eventName in eventsFired)
-        if (!eventsFired[eventName]) return;
+      for (var eventName in eventsFired) if (!eventsFired[eventName]) return;
 
       if (!stopped) {
         stopped = true;
         serviceInstance.stop({reconnect: false}, callback);
       }
-
-    }
+    };
 
     service.create(serviceConfig,
+
       function (e, happnInst) {
         if (e)
           return callback(e);
 
         serviceInstance = happnInst;
 
-        happnInst.services.pubsub.on('authentic', function (data) {
+        serviceInstance.services.session.on('authentic', function (data) {
 
-          if (data.info._local)
-            eventsFired['authentic-eventemitter'] = true;
-          else
-            eventsFired['authentic-socket'] = true;
+          if (data.info._local) eventsFired['authentic-eventemitter'] = true;
+          else eventsFired['authentic-socket'] = true;
 
           checkAllEventsFired(callback);
 
         });
 
-        happnInst.services.pubsub.on('disconnect', function (data) {
+        serviceInstance.services.session.on('disconnect', function (data) {
 
-          if (data.info._local)
-            eventsFired['disconnect-eventemitter'] = true;
-          else
-            eventsFired['disconnect-socket'] = true;
+          if (data.info._local) eventsFired['disconnect-eventemitter'] = true;
+          else eventsFired['disconnect-socket'] = true;
 
           checkAllEventsFired(callback);
 
@@ -76,27 +71,24 @@ describe('c4_session_events', function () {
 
           socketClient = instance;
 
-          happn.client.create({
-              config: {
-                username: '_ADMIN',
-                password: 'happn'
-              },
-              plugin: happn.client_plugins.intra_process,
-              context: happnInst,
-              secure: true
-            })
+          serviceInstance.services.session.localClient({
 
-            .then(function (clientInstance) {
-              eventEmitterClient = clientInstance;
+            username: '_ADMIN',
+            password: 'happn'
 
-              socketClient.disconnect();
-              eventEmitterClient.disconnect();
+          })
 
-            })
+          .then(function (clientInstance) {
 
-            .catch(function (e) {
-              callback(e);
-            });
+            eventEmitterClient = clientInstance;
+
+            socketClient.disconnect();
+            eventEmitterClient.disconnect();
+          })
+
+          .catch(function (e) {
+            callback(e);
+          });
 
         });
 
