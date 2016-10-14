@@ -14,6 +14,7 @@ describe('d8_session_management', function () {
   var CryptoService = require('../lib/services/crypto/service');
   var PubSubService = require('../lib/services/pubsub/service');
   var UtilsService = require('../lib/services/utils/service');
+  var SessionService = require('../lib/services/session/service');
 
   var Logger = require('happn-logger');
 
@@ -30,6 +31,7 @@ describe('d8_session_management', function () {
     var cryptoService = new CryptoService({logger: Logger});
     var pubsubService = new PubSubService({logger: Logger});
     var utilsService = new UtilsService({logger: Logger});
+    var sessionService = new SessionService({logger: Logger});
 
     var happn = {services:{}};
 
@@ -54,32 +56,42 @@ describe('d8_session_management', function () {
 
           happn.services.cache = cacheService;
 
-          securityService.happn = happn;
+          sessionService.happn = happn;
+          sessionService.config = {};
 
-          securityService.dataService = dataService;
-          securityService.cacheService = cacheService;
-          securityService.cryptoService = cryptoService;
-
-          securityService.initialize({
-            activateSessionManagement:sessionManagementActive,
-            logSessionActivity:true,
-            sessionActivityTTL:3000,
-            secure:true
-          }, function(e){
+          sessionService.initializeCaches(function(e){
 
             if (e) return callback(e);
 
-            happn.services.security = securityService;
+            happn.services.session = sessionService;
 
-            pubsubService.happn = happn;
-            pubsubService.securityService = securityService;
-            pubsubService.config = {secure:true};
+            securityService.happn = happn;
 
-            pubsubService.securityService.onDataChanged(pubsubService.securityDirectoryChanged.bind(pubsubService));
+            securityService.dataService = dataService;
+            securityService.cacheService = cacheService;
+            securityService.cryptoService = cryptoService;
 
-            happn.services.pubsub = pubsubService;
-            callback(null, happn);
+            securityService.initialize({
+              activateSessionManagement:sessionManagementActive,
+              logSessionActivity:true,
+              sessionActivityTTL:3000,
+              secure:true
+            }, function(e){
 
+              if (e) return callback(e);
+
+              happn.services.security = securityService;
+
+              pubsubService.happn = happn;
+              pubsubService.securityService = securityService;
+              pubsubService.config = {secure:true};
+
+              //pubsubService.securityService.onDataChanged(pubsubService.securityDirectoryChanged.bind(pubsubService));
+
+              happn.services.pubsub = pubsubService;
+              callback(null, happn);
+
+            });
           });
         });
       });
@@ -109,7 +121,7 @@ describe('d8_session_management', function () {
     return session;
   };
 
-  it.only('tests sessionActivity activation', function (done) {
+  it('tests sessionActivity activation', function (done) {
 
     mockServices(function(e, happn){
 
@@ -127,7 +139,7 @@ describe('d8_session_management', function () {
 
   });
 
-  it('tests security services addActiveSession and removeActiveSession', function (done) {
+  it.only('tests security services addActiveSession and removeActiveSession', function (done) {
 
     mockServices(function(e, happn){
 
@@ -174,7 +186,8 @@ describe('d8_session_management', function () {
       async.times(10, function(timeIndex, timeCB){
 
         var session = mockSession(1, 'TEST_SESSION' + timeIndex, 'TEST_USER' + timeIndex, null, happn.services.security);
-        happn.services.security.__logSessionActivity(session, 'testpath'  + timeIndex, 'testaction' + timeIndex, null, true, null, timeCB);
+        happn.services.security.__logSessionActivity(session.id, 'testpath'  + timeIndex, 'testaction' + timeIndex, null, true, null, timeCB);
+
       }, function(e){
 
         if (e) return done(e);
@@ -214,7 +227,7 @@ describe('d8_session_management', function () {
       async.times(10, function(timeIndex, timeCB){
 
         var session = mockSession(1, 'TEST_SESSION' + timeIndex, 'TEST_USER' + timeIndex, null, happn.services.security);
-        happn.services.security.__logSessionActivity(session, 'testpath'  + timeIndex, 'testaction' + timeIndex, null, true, null, timeCB);
+        happn.services.security.__logSessionActivity(session.id, 'testpath'  + timeIndex, 'testaction' + timeIndex, null, true, null, timeCB);
       }, function(e){
 
         if (e) return done(e);
@@ -239,11 +252,11 @@ describe('d8_session_management', function () {
 
       var session = mockSession(1, 'TEST_SESSION', 'TEST_USER', null, happn.services.security);
 
-      happn.services.security.__logSessionActivity(session, 'testpath1', 'testaction1', null, true, null, function(e){
+      happn.services.security.__logSessionActivity(session.id, 'testpath1', 'testaction1', null, true, null, function(e){
 
         if (e) return done(e);
 
-        happn.services.security.__logSessionActivity(session, 'testpath2', 'testaction2', null, true, null, function(e){
+        happn.services.security.__logSessionActivity(session.id, 'testpath2', 'testaction2', null, true, null, function(e){
 
           if (e) return done(e);
 
@@ -317,7 +330,7 @@ describe('d8_session_management', function () {
 
       var session = mockSession(1, 'TEST_SESSION', 'TEST_USER', null, happn.services.security);
 
-      happn.services.pubsub.attachSession(mockSocket, session);
+      happn.services.session.attachSession(session.id, session);
 
       setTimeout(function () {
 
