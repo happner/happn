@@ -33,6 +33,15 @@ describe('d7_test_cache_service_persisted', function() {
 
       config.defaultCacheOpts.cache.dataStore = dataServiceInstance;
 
+      var UtilService = require('../lib/services/utils/service');
+      var utilService = new UtilService();
+
+      serviceInstance.happn = {
+        services:{
+          utils:utilService
+        }
+      };
+
       serviceInstance.initialize(config, callback);
     })
   });

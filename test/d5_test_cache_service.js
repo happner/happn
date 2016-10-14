@@ -177,14 +177,14 @@ describe('d5_test_cache_service', function() {
   it('gets no data, specific cache', function(done) {
 
     var key = testId + 'test3';
-    var specific = serviceInstance.new('specific');
+    var specific = serviceInstance.new('specific-no-data');
 
     specific.set(key, {"dkey":key}, function(e, result){
 
       expect(result.key).to.be(key);
       expect(result.data.dkey).to.be(key);
 
-      expect(serviceInstance.__caches['specific'].__cache[key].key).to.be(key);
+      expect(serviceInstance.__caches['specific-no-data'].__cache[key].key).to.be(key);
 
       specific.get('totally-non-existent', function(e, data){
 
@@ -192,7 +192,7 @@ describe('d5_test_cache_service', function() {
 
         expect(data).to.be(null);
 
-        serviceInstance.clear('specific');
+        serviceInstance.clear('specific-no-data');
 
         done();
 

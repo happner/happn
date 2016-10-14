@@ -40,7 +40,7 @@ describe('d6_test_cache_service', function() {
     serviceInstance.stop(done);
   });
 
-  it.only('sets data, default cache', function(done) {
+  it('sets data, default cache', function(done) {
 
     var key = testId + 'test1';
 
@@ -66,24 +66,22 @@ describe('d6_test_cache_service', function() {
 
     var key = testId + 'test1';
 
-    serviceInstance.set(key, {"dkey":key}, function(e, result){
+    serviceInstance.set(key, {"dkey":key})
 
-      if (e) return done(e);
+      .then(function(result){
 
-      expect(result.key).to.be(key);
-      expect(result.data.dkey).to.be(key);
+        expect(result.key).to.be(key);
+        expect(result.data.dkey).to.be(key);
 
-      expect(serviceInstance.__defaultCache.get(key).dkey).to.be(key);
+        serviceInstance.get(key)
+          .then(function(result){
+            expect(result.dkey).to.be(key);
+            done();
+          })
+          .catch(done)
+      })
 
-      serviceInstance.get(key, function(e, data){
-
-        if (e) return done(e);
-
-        expect(data.dkey).to.be(key);
-        done();
-
-      });
-    });
+      .catch(done)
   });
 
   it('gets no data, default cache', function(done) {
@@ -97,16 +95,14 @@ describe('d6_test_cache_service', function() {
       expect(result.key).to.be(key);
       expect(result.data.dkey).to.be(key);
 
-      expect(serviceInstance.__defaultCache.get(key).dkey).to.be(key);
+      serviceInstance.__defaultCache.get(key + 'blah')
 
-      serviceInstance.get(key + 'blah', function(e, data){
+        .then(function(result){
+          expect(result).to.be(null);
+          done();
+        })
+        .catch(done)
 
-        if (e) return done(e);
-
-        expect(data).to.be(null);
-        done();
-
-      });
     });
   });
 
@@ -114,35 +110,34 @@ describe('d6_test_cache_service', function() {
 
     var key = testId + 'test1';
 
-    serviceInstance.set(key, {"dkey":key}, function(e, result){
+    serviceInstance.set(key, {"dkey":key})
 
-      if (e) return done(e);
+      .then(function(result){
 
-      expect(result.key).to.be(key);
-      expect(result.data.dkey).to.be(key);
+        expect(result.key).to.be(key);
+        expect(result.data.dkey).to.be(key);
 
-      expect(serviceInstance.__defaultCache.get(key).dkey).to.be(key);
+        serviceInstance.get(key)
+          .then(function(result){
+            expect(result.dkey).to.be(key);
 
-      serviceInstance.get(key, function(e, data){
+            serviceInstance.remove(key, function(e){
 
-        if (e) return done(e);
+              if (e) return done(e);
 
-        expect(data.dkey).to.be(key);
+              serviceInstance.get(key, function(e, data){
 
-        serviceInstance.remove(key, function(e){
+                if (e) return done(e);
 
-          if (e) return done(e);
+                expect(data).to.be(null);
+                done();
+              });
+            });
+          })
+          .catch(done)
+      })
 
-          serviceInstance.get(key, function(e, data){
-
-            if (e) return done(e);
-
-            expect(data).to.be(null);
-            done();
-          });
-        });
-      });
-    });
+      .catch(done)
   });
 
   it('retrieves unfound data, default cache', function(done) {
@@ -158,9 +153,14 @@ describe('d6_test_cache_service', function() {
       if (e) return done(e);
 
       expect(item.data).to.be('foundMe');
-      expect(serviceInstance.__defaultCache.get('totallyCrazyPath').data).to.be('foundMe');
 
-      done();
+      serviceInstance.get('totallyCrazyPath')
+        .then(function(result){
+          expect(result.data).to.be('foundMe');
+          done();
+        })
+        .catch(done)
+
     });
   });
 
@@ -174,33 +174,33 @@ describe('d6_test_cache_service', function() {
       expect(result.key).to.be(key);
       expect(result.data.dkey).to.be(key);
 
-      expect(serviceInstance.__caches['specific'].get(key).dkey).to.be(key);
+      serviceInstance.__caches['specific'].get(key)
+        .then(function(data){
+          expect(data.dkey).to.be(key);
 
-      specific.get(key, function(e, data){
+          specific.get(key)
+            .then(function(data){
+              expect(data.dkey).to.be(key);
+              done();
 
-        if (e) return done(e);
+            })
+            .catch(done)
 
-        expect(data.dkey).to.be(key);
+        })
+        .catch(done)
 
-        serviceInstance.clear('specific');
-
-        done();
-
-      });
     });
   });
 
   it('gets no data, specific cache', function(done) {
 
     var key = testId + 'test3';
-    var specific = serviceInstance.new('specific');
+    var specific = serviceInstance.new('specific-no-data');
 
     specific.set(key, {"dkey":key}, function(e, result){
 
       expect(result.key).to.be(key);
       expect(result.data.dkey).to.be(key);
-
-      expect(serviceInstance.__caches['specific'].get(key).dkey).to.be(key);
 
       specific.get('totally-non-existent', function(e, data){
 
@@ -208,7 +208,7 @@ describe('d6_test_cache_service', function() {
 
         expect(data).to.be(null);
 
-        serviceInstance.clear('specific');
+        serviceInstance.clear('specific-no-data');
 
         done();
 
@@ -219,14 +219,12 @@ describe('d6_test_cache_service', function() {
   it('removes data, specific cache', function(done) {
 
     var key = testId + 'test3';
-    var specific = serviceInstance.new('specific');
+    var specific = serviceInstance.new('specific-remove');
 
     specific.set(key, {"dkey":key}, function(e, result){
 
       expect(result.key).to.be(key);
       expect(result.data.dkey).to.be(key);
-
-      expect(serviceInstance.__caches['specific'].get(key).dkey).to.be(key);
 
       specific.get(key, function(e, data){
 
@@ -246,9 +244,9 @@ describe('d6_test_cache_service', function() {
 
             expect(data).to.be(null);
 
-            expect(serviceInstance.__caches['specific']).to.not.be(undefined);
-            serviceInstance.clear('specific');
-            expect(serviceInstance.__caches['specific']).to.be(undefined);
+            expect(serviceInstance.__caches['specific-remove']).to.not.be(undefined);
+            serviceInstance.clear('specific-remove');
+            expect(serviceInstance.__caches['specific-remove']).to.be(undefined);
 
             done();
 
@@ -260,7 +258,7 @@ describe('d6_test_cache_service', function() {
 
   it('retrieves unfound data, specific cache', function(done) {
 
-    var specific = serviceInstance.new('specific');
+    var specific = serviceInstance.new('specific-retrieve');
 
     var opts = {
       retrieveMethod:function(callback){
@@ -273,7 +271,6 @@ describe('d6_test_cache_service', function() {
       if (e) return done(e);
 
       expect(item.data).to.be('foundMe');
-      expect(serviceInstance.__caches['specific'].get('totallyCrazyPath').data).to.be('foundMe');
       done();
     });
 
@@ -291,8 +288,6 @@ describe('d6_test_cache_service', function() {
 
       expect(result.key).to.be(key);
       expect(result.data.dkey).to.be(key);
-
-      expect(serviceInstance.__caches['default'].get(key).dkey).to.be(key);
 
       serviceInstance.get(key, function(e, data){
 
@@ -370,8 +365,6 @@ describe('d6_test_cache_service', function() {
       expect(result.key).to.be(key);
       expect(result.data.dkey).to.be(key);
 
-      expect(serviceInstance.__defaultCache.get(key).dkey).to.be(key);
-
       serviceInstance.get(key, function(e, data){
 
         if (e) return done(e);
@@ -435,8 +428,6 @@ describe('d6_test_cache_service', function() {
       expect(result.key).to.be(key);
       expect(result.data.dkey).to.be(key);
 
-      expect(serviceInstance.__defaultCache.get(key).dkey).to.be(key);
-
       serviceInstance.get(key, function(e, data){
 
         if (e) return done(e);
@@ -493,15 +484,23 @@ describe('d6_test_cache_service', function() {
           if (e) return done(e);
           expect(data).to.be(30);
 
-          expect(serviceInstance.__defaultCache.get('nonexistantItem')).to.not.be(null);
+          serviceInstance.__defaultCache.get('nonexistantItem')
+            .then(function(data){
+              expect(data).to.not.be(null);
 
-          setTimeout(function(){
+              setTimeout(function(){
 
-            expect(serviceInstance.__defaultCache.get('nonexistantItem')).to.be(null);
+                serviceInstance.__defaultCache.get('nonexistantItem')
+                  .then(function(data){
+                    expect(data).to.be(null);
+                    done();
+                  })
+                  .catch(done)
 
-            done();
+              }, 2000);
 
-          }, 2000);
+            })
+            .catch(done)
         });
       });
     });
@@ -584,7 +583,6 @@ describe('d6_test_cache_service', function() {
       });
     });
   });
-
 
   it('tests the all function, specific cache', function(done){
 

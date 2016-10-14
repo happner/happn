@@ -13,6 +13,7 @@ describe('d8_session_management', function () {
   var DataService = require('../lib/services/data/service');
   var CryptoService = require('../lib/services/crypto/service');
   var PubSubService = require('../lib/services/pubsub/service');
+  var UtilsService = require('../lib/services/utils/service');
 
   var Logger = require('happn-logger');
 
@@ -28,16 +29,16 @@ describe('d8_session_management', function () {
     var securityService = new SecurityService({logger: Logger});
     var cryptoService = new CryptoService({logger: Logger});
     var pubsubService = new PubSubService({logger: Logger});
+    var utilsService = new UtilsService({logger: Logger});
 
     var happn = {services:{}};
-
-    happn.utils = require('../lib/utils');
 
     cryptoService.initialize({}, function(e){
 
       if (e) return callback(e);
 
       happn.services.crypto = cryptoService;
+      happn.services.utils = utilsService;
 
       dataService.initialize({}, function(e){
 
@@ -108,7 +109,7 @@ describe('d8_session_management', function () {
     return session;
   };
 
-  it('tests sessionActivity activation', function (done) {
+  it.only('tests sessionActivity activation', function (done) {
 
     mockServices(function(e, happn){
 
