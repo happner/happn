@@ -118,22 +118,16 @@ describe('a3_eventemitter_multiple_datasource', function () {
   });
 
   after('should delete the temp data files', function (callback) {
-
-    fs.unlink(tempFile, function (e) {
+    fs.unlink(tempFile1, function (e) {
       if (e) return callback(e);
-      fs.unlink(tempFile1, function (e) {
-        if (e) return callback(e);
 
-        async.each(services,
-          function (currentService, eachServiceCB) {
-            currentService.stop(eachServiceCB);
-          },
-          callback);
-
-      });
+      async.each(services,
+        function (currentService, eachServiceCB) {
+          currentService.stop(eachServiceCB);
+        },
+        callback);
 
     });
-
   });
 
 
