@@ -537,9 +537,10 @@ describe('1_eventemitter_embedded_sanity', function () {
 
   });
 
-  it('the publisher should set new data then update the data', function (callback) {
+  it('the publisher should set new data then update the data - and pull no duplicates', function (callback) {
 
     try {
+
       var test_path_end = require('shortid').generate();
 
       publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
@@ -563,10 +564,17 @@ describe('1_eventemitter_embedded_sanity', function () {
 
           expect(e).to.be(null);
           expect(updateResult._meta.id == insertResult._meta.id).to.be(true);
-          callback();
 
+          publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end + '*', function(e, items){
+
+            expect(e).to.be(null);
+
+            expect(items.length).to.be(1);
+
+            callback();
+
+          });
         });
-
       });
 
     } catch (e) {
@@ -792,6 +800,41 @@ describe('1_eventemitter_embedded_sanity', function () {
       callback(e);
     }
   });
+
+  it('the publisher should push 2 items with a similar path, different prefix - check we only get multiple based on the path with no prefix', function (callback) {
+
+    try {
+
+      var test_path_end = require('shortid').generate();
+
+      publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/path_prefix/' + test_path_end, {
+        property1: 'sib_post_property1',
+        property2: 'sib_post_property2'
+      }, function (e, results) {
+
+        expect(e == null).to.be(true);
+
+        publisherclient.set('/test/1_eventemitter_embedded_sanity/' + test_id + '/path_prefix/' + test_path_end, {
+          property1: 'sib_post_property1',
+          property2: 'sib_post_property2'
+        }, function (e, results) {
+
+          expect(e == null).to.be(true);
+
+          //the child method returns a child in the collection with a specified id
+          publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/path_prefix/*', null, function (e, getresults) {
+            expect(e == null).to.be(true);
+            expect(getresults.length).to.be(1);
+            callback(e);
+          });
+        });
+      });
+
+    } catch (e) {
+      callback(e);
+    }
+  });
+
 
 
   //  We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.

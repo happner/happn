@@ -372,3 +372,8 @@
 -----------------
 
 - updated happn-util-crypto v0.2.1
+
+2.15.9 2016-10-26
+-----------------
+
+- fixed issue where keys with non-matching prefixes were being returned
