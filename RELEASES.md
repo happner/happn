@@ -377,3 +377,10 @@
 -----------------
 
 - fixed issue where keys with non-matching prefixes were being returned
+
+2.16.0 2016-10-27
+-----------------
+
+- allow 3rd party services in config
+- emit whole session on pubsub 'authentic' and 'disconnect' events
+- add noCluster option on publish to not emit to clients attached with clusterName in login.info

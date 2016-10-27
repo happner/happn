@@ -235,48 +235,6 @@ describe(filename, function() {
 
       Promise.resolve()
 
-        // .then(function() {
-        //   return normalClient.onAsync('/*', function(data, meta) {
-        //     console.log('data', data);
-        //     console.log('meta', meta);
-        //   });
-        // })
-        //
-        // .then(function() {
-        //   console.log('SET\n');
-        //   return normalClient.set('/some/data/to/tag', {some1: 'data1'});
-        // })
-        //
-        // .then(function() {
-        //   console.log('TAG\n');
-        //   return normalClient.set('/some/data/to/tag', null, {tag: 'tagName'});
-        // })
-        //
-        // .then(function() {
-        //   return Promise.delay(200);
-        // })
-        //
-        // .then(function() { // what's at the data?
-        //   return normalClient.get('/some/data/to/tag');
-        // })
-        //
-        // .then(function(data) {
-        //   console.log('at the data', data);
-        // })
-        //
-        // .then(function() { // what's at the tag?
-        //   // return normalClient.get('/some/data/to/tag/tagName');
-        //   return normalClient.get('/_TAGS/*');
-        // })
-        //
-        // .then(function(data) {
-        //   console.log('at the tag', data);
-        // })
-        //
-        // .then(function() {
-        //   // ok, so tagging does emit
-        // })
-
         .then(function() {
           return normalClient.set('/some/data/to/tag', {some: 'data'});
         })
@@ -287,35 +245,17 @@ describe(filename, function() {
           });
         })
 
-        // .then(function() {
-        //   return normalClient.onAsync('/_TAGS/*', function(data, meta) {
-        //     emitted['normalClient /_TAGS/*'] = 1;
-        //   });
-        // })
-
         .then(function() {
           return intraProcessClient.onAsync('/some/data/to/tag', function(data, meta) {
             emitted['intraProcessClient /some/path/to/remove/on'] = 1;
           });
         })
 
-        // .then(function() {
-        //   return intraProcessClient.onAsync('/_TAGS/*', function(data, meta) {
-        //     emitted['intraProcessClient /_TAGS/*'] = 1;
-        //   });
-        // })
-
         .then(function() {
           return clusterPeer.onAsync('/some/data/to/tag', function(data, meta) {
             emitted['clusterPeer /some/path/to/remove/on'] = 1;
           });
         })
-
-        // .then(function() {
-        //   return clusterPeer.onAsync('/_TAGS/*', function(data, meta) {
-        //     emitted['clusterPeer /_TAGS/*'] = 1;
-        //   });
-        // })
 
         .then(function() {
           return normalClient.set('/some/data/to/tag', null, {tag: 'tagName', noCluster: true});
