@@ -128,11 +128,11 @@ describe('b6_eventemitter_search', function () {
       var options = {
         sort: {"_meta.created": -1},
         limit: 1
-      }
+      };
 
       var criteria = {
         "genre": "family"
-      }
+      };
 
       var latestResult;
 

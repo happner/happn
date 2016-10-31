@@ -3,110 +3,99 @@ describe('d8_session_management', function () {
   require('benchmarket').start();
   after(require('benchmarket').store());
 
+  this.timeout(60000);
+
   var expect = require('expect.js');
   var happn = require('../lib/index')
   var service = happn.service;
   var async = require('async');
-
-  var SecurityService = require('../lib/services/security/service');
-  var CacheService = require('../lib/services/cache/service');
-  var DataService = require('../lib/services/data/service');
-  var CryptoService = require('../lib/services/crypto/service');
-  var PubSubService = require('../lib/services/pubsub/service');
-  var UtilsService = require('../lib/services/utils/service');
-  var SessionService = require('../lib/services/session/service');
-  var SystemService = require('../lib/services/system/service');
+  var Promise = require('bluebird');
 
   var Logger = require('happn-logger');
 
+  var Services = {};
+
+  Services.SecurityService = require('../lib/services/security/service');
+  Services.CacheService = require('../lib/services/cache/service');
+  Services.DataService = require('../lib/services/data/service');
+  Services.CryptoService = require('../lib/services/crypto/service');
+  Services.ProtocolService = require('../lib/services/protocol/service');
+  Services.PubSubService = require('../lib/services/pubsub/service');
+  Services.UtilsService = require('../lib/services/utils/service');
+  Services.SessionService = require('../lib/services/session/service');
+  Services.SystemService = require('../lib/services/system/service');
+  Services.ErrorService = require('../lib/services/error/service');
+  Services.QueueService = require('../lib/services/queue/service');
+  Services.LayerService = require('../lib/services/layer/service');
+  Services.LogService = require('../lib/services/log/service');
+
+  var mockService = Promise.promisify(function(happn, serviceName, config, callback){
+
+    if (typeof config === 'function') {
+      callback = config;
+      if (config !== false) config = {};
+    }
+
+    try{
+
+      var serviceClass = Services[serviceName + 'Service'];
+
+      var serviceInstance = new serviceClass({logger:Logger});
+
+      serviceInstance.happn = happn;
+
+      serviceInstance.config = config;
+
+      happn.services[serviceName.toLowerCase()] = serviceInstance;
+
+      if (typeof serviceInstance.initialize != 'function' || config === false) return callback();
+
+      serviceInstance.initialize(config, callback);
+
+    }catch(e){
+      callback(e);
+    }
+
+  });
+
   var mockServices = function(sessionManagementActive, callback){
+
+    var happn = {services:{}, config:{}};
 
     if (typeof sessionManagementActive == 'function'){
       callback = sessionManagementActive;
       sessionManagementActive = true;
     }
 
-    var dataService = new DataService({logger: Logger});
-    var cacheService = new CacheService({logger: Logger});
-    var securityService = new SecurityService({logger: Logger});
-    var cryptoService = new CryptoService({logger: Logger});
-    var pubsubService = new PubSubService({logger: Logger});
-    var utilsService = new UtilsService({logger: Logger});
-    var sessionService = new SessionService({logger: Logger});
-    var systemService = new SystemService({logger: Logger});
+    mockService(happn, 'Crypto')
+      .then(mockService(happn, 'Utils'))
+      .then(mockService(happn, 'Log'))
+      .then(mockService(happn, 'Error'))
+      .then(mockService(happn, 'Protocol'))
+      .then(mockService(happn, 'Queue'))
+      .then(mockService(happn, 'Data'))
+      .then(mockService(happn, 'Cache'))
+      .then(mockService(happn, 'System'))
+      .then(mockService(happn, 'Session', false))
+      .then(mockService(happn, 'Security', {
+        activateSessionManagement:sessionManagementActive,
+        logSessionActivity:true,
+        sessionActivityTTL:3000,
+        secure:true
+      }))
+      .then(mockService(happn, 'PubSub', {secure:true}))
+      .then(mockService(happn, 'Layer'))
+      .then(function(){
+        setTimeout(function(){
 
-    var happn = {services:{}, config:{}};
-
-    cryptoService.initialize({}, function(e){
-
-      if (e) return callback(e);
-
-      happn.services.crypto = cryptoService;
-      happn.services.utils = utilsService;
-
-      dataService.initialize({}, function(e){
-
-        if (e) return callback(e);
-
-        happn.services.data = dataService;
-
-        cacheService.happn = happn;
-
-        cacheService.initialize({}, function(e){
-
-          if (e) return callback(e);
-
-          happn.services.cache = cacheService;
-
-          systemService.happn = happn;
-
-          systemService.initialize({}, function(e){
-
+          happn.services.session.initializeCaches.bind(happn.services.session)(function(e){
             if (e) return callback(e);
-
-            happn.services.system = systemService;
-
-            sessionService.happn = happn;
-            sessionService.config = {};
-
-            sessionService.initializeCaches(function(e){
-
-              if (e) return callback(e);
-
-              happn.services.session = sessionService;
-
-              securityService.happn = happn;
-
-              securityService.dataService = dataService;
-              securityService.cacheService = cacheService;
-              securityService.cryptoService = cryptoService;
-
-              securityService.initialize({
-                activateSessionManagement:sessionManagementActive,
-                logSessionActivity:true,
-                sessionActivityTTL:3000,
-                secure:true
-              }, function(e){
-
-                if (e) return callback(e);
-
-                happn.services.security = securityService;
-
-                pubsubService.happn = happn;
-                pubsubService.securityService = securityService;
-                pubsubService.config = {secure:true};
-
-                //pubsubService.securityService.onDataChanged(pubsubService.securityDirectoryChanged.bind(pubsubService));
-
-                happn.services.pubsub = pubsubService;
-                callback(null, happn);
-
-              });
-            });
+            callback(null, happn);
           });
-        });
-      });
-    });
+        }, 5000)
+
+      })
+      .catch(callback)
   };
 
   var mockClient = function(){
@@ -114,7 +103,7 @@ describe('d8_session_management', function () {
       on:function(evt, handler){},
       end:function(data, options){}
     }
-  }
+  };
 
   var mockSession = function(type, id, username, ttl, securityService){
 
@@ -186,8 +175,6 @@ describe('d8_session_management', function () {
   });
 
   it('tests security services update session activity, list session activity', function (done) {
-
-    this.timeout(10000);
 
     mockServices(function(e, happn){
 
@@ -328,8 +315,6 @@ describe('d8_session_management', function () {
 
   it('tests pubsub services session logging', function (done) {
 
-    this.timeout(4000);
-
     var mockSocket = {
 
     };
@@ -379,8 +364,6 @@ describe('d8_session_management', function () {
 
   it('tests pubsub services session logging switched on', function (done) {
 
-    this.timeout(4000);
-
     var mockSocket = {};
 
     mockServices(false, function(e, happn) {
@@ -426,8 +409,6 @@ describe('d8_session_management', function () {
 
   it('tests session revocation times out', function (done) {
 
-    this.timeout(7000);
-
     var mockSocket = {};
 
     mockServices(true, function(e, happn) {
@@ -470,8 +451,6 @@ describe('d8_session_management', function () {
 
   it('tests session revocation times out after restart', function (done) {
 
-
-    this.timeout(7000);
 
     var mockSocket = {};
 

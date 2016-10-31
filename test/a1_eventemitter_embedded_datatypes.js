@@ -6,12 +6,9 @@ describe('a1_eventemitter_embedded_datatypes', function () {
   var expect = require('expect.js');
   var happn = require('../lib/index')
   var service = happn.service;
-  var happn_client = happn.client;
   var async = require('async');
 
-  var testport = 8000;
   var test_secret = 'test_secret';
-  var mode = "embedded";
   var default_timeout = 10000;
   var happnInstance = null;
   var test_id;
@@ -257,13 +254,13 @@ describe('a1_eventemitter_embedded_datatypes', function () {
 
         if (!e) {
 
-          expect(result.value).to.be(null);
+          expect(result.value).to.be(undefined);
 
           publisherclient.get(test_base_url, null, function (e, result) {
 
             if (e) return callback(e);
 
-            expect(result.value).to.be(null);
+            expect(result.value).to.be(undefined);
 
             callback(e);
           });

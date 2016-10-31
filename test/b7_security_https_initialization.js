@@ -95,8 +95,7 @@ describe('b7_security_https', function () {
   it('starts an https server, with a configured cert and key file path pointing to non-existing files', function (done) {
     //we check for the files existences afterwards - then delete them as well
 
-    if (process.env.TRAVIS)
-      return done();
+    if (process.env.TRAVIS) return done();
 
     var serviceConfig = config.test3_config;
 
@@ -108,14 +107,14 @@ describe('b7_security_https', function () {
 
         if (e) return done(e);
 
-        var certStats = fs.statSync(serviceConfig.config.certPath);
-        var keyStats = fs.statSync(serviceConfig.config.keyPath)
+        var certStats = fs.statSync(serviceConfig.services.transport.config.certPath);
+        var keyStats = fs.statSync(serviceConfig.services.transport.config.keyPath)
 
         expect(certStats.isFile()).to.equal(true);
         expect(keyStats.isFile()).to.equal(true);
 
-        fs.unlinkSync(serviceConfig.config.certPath);
-        fs.unlinkSync(serviceConfig.config.keyPath);
+        fs.unlinkSync(serviceConfig.services.transport.config.certPath);
+        fs.unlinkSync(serviceConfig.services.transport.config.keyPath);
 
         done();
 
@@ -157,8 +156,7 @@ describe('b7_security_https', function () {
 
   it('it fails to start an https server, missing key', function (done) {
 
-    if (process.env.TRAVIS)
-      return done();
+    if (process.env.TRAVIS) return done();
 
     var serviceConfig = config.test6_config;
 
@@ -171,8 +169,7 @@ describe('b7_security_https', function () {
 
   it('it fails to start an https server, missing cert', function (done) {
 
-    if (process.env.TRAVIS)
-      return done();
+    if (process.env.TRAVIS) return done();
 
     var serviceConfig = config.test7_config;
 
