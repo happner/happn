@@ -6,7 +6,6 @@ describe('c1_security_pubpriv_login', function () {
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
-  var happn_client = happn.client;
   var async = require('async');
 
   var happnInstance = null;
@@ -17,7 +16,6 @@ describe('c1_security_pubpriv_login', function () {
   var http = require('http');
 
   var adminClient;
-  var testClient;
 
   var Crypto = require('happn-util-crypto');
   var crypto = new Crypto();
@@ -25,7 +23,6 @@ describe('c1_security_pubpriv_login', function () {
   var clientKeyPair = crypto.createKeyPair();
   var clientKeyPair1 = crypto.createKeyPair();
   var serverKeyPair = crypto.createKeyPair();
-  var serverKeyPair1 = crypto.createKeyPair();
 
   /*
    This test demonstrates starting up the happn service -

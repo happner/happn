@@ -6,7 +6,6 @@ describe('b9_security_web_token', function () {
   var expect = require('expect.js');
   var happn = require('../lib/index');
   var service = happn.service;
-  var happn_client = happn.client;
   var async = require('async');
 
   var happnInstance = null;
@@ -128,12 +127,15 @@ describe('b9_security_web_token', function () {
 
   after(function (done) {
 
+    this.timeout(5000);
+
     adminClient.disconnect()
       .then(testClient.disconnect()
         .then(happnInstance.stop()
-          .then(done)))
+          .then(function(){
+            done();
+          })))
       .catch(done);
-
 
   });
 
