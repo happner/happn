@@ -1,7 +1,7 @@
 describe('b9_security_web_token', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  // require('benchmarket').start();
+  // after(require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index');
@@ -127,16 +127,15 @@ describe('b9_security_web_token', function () {
 
   after(function (done) {
 
-    this.timeout(5000);
+    this.timeout(15000);
 
-    adminClient.disconnect()
-      .then(testClient.disconnect()
-        .then(happnInstance.stop()
-          .then(function(){
-            done();
-          })))
-      .catch(done);
-
+    adminClient.disconnect(function(e){
+      if (e) return done(e);
+      testClient.disconnect(function(e){
+        if (e) return done(e);
+        happnInstance.stop(done);
+      });
+    });
   });
 
   /*
@@ -384,6 +383,6 @@ describe('b9_security_web_token', function () {
 
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

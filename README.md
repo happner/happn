@@ -101,6 +101,28 @@ HappnClient.create([options], function(e, instance) {
 
 </script>
 ```
+Intra-process client:
+---------------------
+
+```javascript
+
+service.create(function (e, happnInst) {
+
+    if (e) return callback(e);
+
+    happnInstance = happnInst;
+    
+    happnInstance.services.session.localClient(function(e, instance){
+    
+      var myLocalClient = instance;
+      
+      //myLocalClient.set(...)
+    
+    });
+    
+  });
+
+```
 
 SET
 -------------------------

@@ -27,7 +27,6 @@ describe('c7a_db_compaction', function () {
     port: 4444,
     services: {
       data: {
-        path: './services/data_embedded/service.js',
         config: {
           filename: test_file1
         }
@@ -39,7 +38,6 @@ describe('c7a_db_compaction', function () {
     port: 4445,
     services: {
       data: {
-        path: './services/data_embedded/service.js',
         config: {
           filename: test_file2
         }
@@ -52,7 +50,6 @@ describe('c7a_db_compaction', function () {
     port: 4446,
     services: {
       data: {
-        path: './services/data_embedded/service.js',
         config: {
           filename: test_file3,
           compactInterval: 5000//compact every 5 seconds
@@ -66,7 +63,6 @@ describe('c7a_db_compaction', function () {
     port: 4447,
     services: {
       data: {
-        path: './services/data_embedded/service.js',
         config: {
           datastores: [
             {

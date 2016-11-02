@@ -1,7 +1,7 @@
 describe('c1_security_pubpriv_login', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  // require('benchmarket').start();
+  // after(require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index');
@@ -11,11 +11,9 @@ describe('c1_security_pubpriv_login', function () {
   var happnInstance = null;
   var encryptedPayloadInstance = null;
 
-  var test_id = Date.now() + '_' + require('shortid').generate();
-
   var http = require('http');
 
-  var adminClient;
+  var admClient;
 
   var Crypto = require('happn-util-crypto');
   var crypto = new Crypto();
@@ -81,7 +79,7 @@ describe('c1_security_pubpriv_login', function () {
 
   after(function (done) {
 
-    adminClient.disconnect()
+    admClient.disconnect()
       .then(happnInstance.stop()
         .then(encryptedPayloadInstance.stop()
           .then(done)))
@@ -138,10 +136,10 @@ describe('c1_security_pubpriv_login', function () {
 
       .then(function (clientInstance) {
 
-        adminClient = clientInstance;
+        admClient = clientInstance;
 
-        expect(adminClient.session.secret).to.not.equal(undefined);
-        expect(adminClient.session.secret).to.not.equal(null);
+        expect(admClient.session.secret).to.not.equal(undefined);
+        expect(admClient.session.secret).to.not.equal(null);
 
         callback();
       })
@@ -164,14 +162,14 @@ describe('c1_security_pubpriv_login', function () {
 
       .then(function (clientInstance) {
 
-        adminClient = clientInstance;
+        admClient = clientInstance;
 
-        adminClient.set('/an/encrypted/payload/target', {"encrypted": "test"}, {}, function (e, response) {
+        admClient.set('/an/encrypted/payload/target', {"encrypted": "test"}, {}, function (e, response) {
 
           expect(e).to.equal(null);
           expect(response.encrypted == "test").to.equal(true);
 
-          adminClient.get('/an/encrypted/payload/target', function (e, response) {
+          admClient.get('/an/encrypted/payload/target', function (e, response) {
 
             expect(e).to.equal(null);
             expect(response.encrypted == "test").to.equal(true);
@@ -202,9 +200,9 @@ describe('c1_security_pubpriv_login', function () {
 
       .then(function (clientInstance) {
 
-        adminClient = clientInstance;
+        admClient = clientInstance;
 
-        adminClient.on('/an/encrypted/payload/target/event', {count: 1}, function (data) {
+        admClient.on('/an/encrypted/payload/target/event', {count: 1}, function (data) {
 
           callback();
 
@@ -212,7 +210,7 @@ describe('c1_security_pubpriv_login', function () {
 
           expect(e).to.equal(null);
 
-          adminClient.set('/an/encrypted/payload/target/event', {"test": "on"}, function (e, response) {
+          admClient.set('/an/encrypted/payload/target/event', {"test": "on"}, function (e, response) {
             if (e) return callback(e);
           })
 
@@ -239,7 +237,7 @@ describe('c1_security_pubpriv_login', function () {
 
       .then(function (clientInstance) {
 
-        adminClient = clientInstance;
+        admClient = clientInstance;
 
         happn.client.create({
             config: {
@@ -251,9 +249,9 @@ describe('c1_security_pubpriv_login', function () {
 
           .then(function (clientInstance) {
 
-            adminClient1 = clientInstance;
+            admClient1 = clientInstance;
 
-            adminClient1.on('/an/encrypted/payload/target/event', function (data) {
+            admClient1.on('/an/encrypted/payload/target/event', function (data) {
 
               callback();
 
@@ -261,7 +259,7 @@ describe('c1_security_pubpriv_login', function () {
 
               expect(e).to.equal(null);
 
-              adminClient.set('/an/encrypted/payload/target/event', {"test": "on"}, function (e, response) {
+              admClient.set('/an/encrypted/payload/target/event', {"test": "on"}, function (e, response) {
                 if (e) return callback(e);
               })
 
@@ -303,6 +301,6 @@ describe('c1_security_pubpriv_login', function () {
   });
 
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });
