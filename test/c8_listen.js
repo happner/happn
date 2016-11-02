@@ -138,9 +138,10 @@ describe('c8_deferred_listen', function () {
         console.log(happnInstance.server.address()); // { address: '0.0.0.0', family: 'IPv4', port: 55000 }
         console.log(httpServer.address());           // { address: '::', family: 'IPv6', port: 55000 }
 
-        // apparently that's possible on windows (2012 server)
+        // apparently that's possible on node v4 / windows (2012 server)
+        // - listening at '0.0.0.0' works even if something else is already at unspecified ('0.0.0.0' + '::')
 
-        return done();
+        return callback();
       }
 
       //cannot listen
