@@ -1,4 +1,4 @@
-describe.only('1_eventemitter_embedded_sanity', function () {
+describe('1_eventemitter_embedded_sanity', function () {
 
   // require('benchmarket').start();
   // after(require('benchmarket').store());
@@ -418,7 +418,7 @@ describe.only('1_eventemitter_embedded_sanity', function () {
     };
 
     var path = '/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end;
-    console.log('path1', path);
+    // console.log('path1', path);
 
     publisherclient.set(path, complex_obj, null, function (e, put_result) {
 
@@ -475,7 +475,7 @@ describe.only('1_eventemitter_embedded_sanity', function () {
       var from = Date.now();
       var to;
       var path = '/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end;
-      console.log('path2', path);
+      // console.log('path2', path);
 
       publisherclient.set(path, complex_obj, null, function (e, put_result) {
 
