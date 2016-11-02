@@ -83,12 +83,14 @@ describe('1_eventemitter_embedded_benchmarks', function () {
       happnInstance.services.session.localClient(function(e, instance){
 
         if (e) return callback(e);
+
         publisherclient = instance;
         testClients.push(publisherclient);
 
         happnInstance.services.session.localClient(function(e, instance){
 
           if (e) return callback(e);
+
           listenerclient = instance;
           testClients.push(listenerclient);
 
@@ -106,6 +108,8 @@ describe('1_eventemitter_embedded_benchmarks', function () {
     this.timeout(default_timeout);
 
     happnInstance.services.session.localClient(function(e, stressTestClient){
+
+      if (e) return callback(e);
 
         if (e) return callback(e);
         testClients.push(stressTestClient);
@@ -125,7 +129,7 @@ describe('1_eventemitter_embedded_benchmarks', function () {
           }, function (e, result) {
             writeData();
           });
-        };
+        }
 
         stressTestClient.on('/e2e_test1/testsubscribe/sequence5', {
             event_type: 'set',
