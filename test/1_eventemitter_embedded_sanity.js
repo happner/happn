@@ -454,55 +454,64 @@ describe.only('1_eventemitter_embedded_sanity', function () {
 
   it('should search for a complex object by dates', function (callback) {
 
-    var test_path_end = require('shortid').generate();
+    // this test depends on the previous test having set at a similar path
 
-    var complex_obj = {
-      regions: ['North', 'South'],
-      towns: ['North.Cape Town'],
-      categories: ['Action', 'History'],
-      subcategories: ['Action.angling', 'History.art'],
-      keywords: ['bass', 'Penny Siopis'],
-      field1: 'field1'
-    };
+    setTimeout(function () {
 
-    var from = Date.now();
-    var to;
-    var path = '/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end;
-    console.log('path2', path);
+      // tests on windows vm fail because the clock reports the same Date.now() as previous test...
+      // so, wait some...
 
-    publisherclient.set(path, complex_obj, null, function (e, put_result) {
+      var test_path_end = require('shortid').generate();
 
-      if (e) return callback(e);
-      to = Date.now();
-
-      var criteria = {
-        "_meta.created": {
-          $gte: from,
-          $lte: to
-        }
+      var complex_obj = {
+        regions: ['North', 'South'],
+        towns: ['North.Cape Town'],
+        categories: ['Action', 'History'],
+        subcategories: ['Action.angling', 'History.art'],
+        keywords: ['bass', 'Penny Siopis'],
+        field1: 'field1'
       };
 
-      var options = {
-        fields: null,
-        sort: {
-          "field1": 1
-        },
-        limit: 2
-      };
+      var from = Date.now();
+      var to;
+      var path = '/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end;
+      console.log('path2', path);
 
-      ////////////console.log('searching');
-      publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/*', {
-        criteria: criteria,
-        options: options
-      }, function (e, search_result) {
+      publisherclient.set(path, complex_obj, null, function (e, put_result) {
 
         if (e) return callback(e);
-        expect(search_result.length == 1).to.be(true);
-        callback();
+        to = Date.now();
+
+        var criteria = {
+          "_meta.created": {
+            $gte: from,
+            $lte: to
+          }
+        };
+
+        var options = {
+          fields: null,
+          sort: {
+            "field1": 1
+          },
+          limit: 2
+        };
+
+        ////////////console.log('searching');
+        publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/*', {
+          criteria: criteria,
+          options: options
+        }, function (e, search_result) {
+
+          if (e) return callback(e);
+          expect(search_result.length == 1).to.be(true);
+          callback();
+
+        });
 
       });
 
-    });
+    }, 200);
 
   });
 
