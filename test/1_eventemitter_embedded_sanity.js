@@ -395,7 +395,7 @@ describe.only('1_eventemitter_embedded_sanity', function () {
       "keywords": {
         $in: ["bass", "Penny Siopis"]
       }
-    }
+    };
 
     var options1 = {
       fields: {
@@ -405,7 +405,7 @@ describe.only('1_eventemitter_embedded_sanity', function () {
         "field1": 1
       },
       limit: 1
-    }
+    };
 
     var criteria2 = null;
 
@@ -415,12 +415,15 @@ describe.only('1_eventemitter_embedded_sanity', function () {
         "field1": 1
       },
       limit: 2
-    }
+    };
 
-    publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function (e, put_result) {
+    var path = '/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end;
+    console.log('path1', path);
+
+    publisherclient.set(path, complex_obj, null, function (e, put_result) {
 
       if (e) return callback(e);
-      publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end + '/1', complex_obj, null, function (e, put_result) {
+      publisherclient.set(path + '/1', complex_obj, null, function (e, put_result) {
         expect(e == null).to.be(true);
 
         ////////////console.log('searching');
@@ -464,8 +467,10 @@ describe.only('1_eventemitter_embedded_sanity', function () {
 
     var from = Date.now();
     var to;
+    var path = '/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end;
+    console.log('path2', path);
 
-    publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function (e, put_result) {
+    publisherclient.set(path, complex_obj, null, function (e, put_result) {
 
       if (e) return callback(e);
       to = Date.now();
@@ -475,7 +480,7 @@ describe.only('1_eventemitter_embedded_sanity', function () {
           $gte: from,
           $lte: to
         }
-      }
+      };
 
       var options = {
         fields: null,
@@ -483,10 +488,10 @@ describe.only('1_eventemitter_embedded_sanity', function () {
           "field1": 1
         },
         limit: 2
-      }
+      };
 
       ////////////console.log('searching');
-      publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
+      publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/*', {
         criteria: criteria,
         options: options
       }, function (e, search_result) {
