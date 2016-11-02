@@ -82,7 +82,7 @@ describe(filename, function() {
       })
 
       .then(function() {
-        return Promise.delay(200);
+        return Promise.delay(500);
       })
 
       .then(function() {
@@ -131,7 +131,7 @@ describe(filename, function() {
       })
 
       .then(function() {
-        return Promise.delay(500);
+        return Promise.delay(1000);
       })
 
       .then(function() {
@@ -198,7 +198,7 @@ describe(filename, function() {
       })
 
       .then(function() {
-        return Promise.delay(200);
+        return Promise.delay(500);
       })
 
       .then(function() {

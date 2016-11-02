@@ -136,7 +136,7 @@ describe('c8_deferred_listen', function () {
 
       if (!e && os.platform() == 'win32') {
         console.log(happnInstance.server.address()); // { address: '0.0.0.0', family: 'IPv4', port: 55000 }
-        console.log(httpServer.server.address());    // { address: '::', family: 'IPv6', port: 55000 }
+        console.log(httpServer.address());           // { address: '::', family: 'IPv6', port: 55000 }
 
         // apparently that's possible on windows (2012 server)
 
