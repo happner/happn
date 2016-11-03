@@ -149,7 +149,7 @@ describe('1_eventemitter_embedded_sanity', function () {
     publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/unfound/exact/' + test_path_end, null, function (e, results) {
       ////////////console.log('new data results');
 
-      expect(e).to.be(null);
+      if (e) return callback(e);
       expect(results).to.be(null);
 
       callback(e);
@@ -349,15 +349,15 @@ describe('1_eventemitter_embedded_sanity', function () {
       }
       done();
     }, function (err) {
-      expect(err).to.not.be.ok();
+      if (err) return done(err);
       publisherclient.set('mergeTest/object', object, {
         merge: true
       }, function (err) {
-        expect(err).to.not.be.ok();
+        if (err) return done(err);
         publisherclient.set('mergeTest/object', object, {
           merge: true
         }, function (err) {
-          expect(err).to.not.be.ok();
+          if (err) return done(err);
         });
       });
     })
@@ -395,7 +395,7 @@ describe('1_eventemitter_embedded_sanity', function () {
       "keywords": {
         $in: ["bass", "Penny Siopis"]
       }
-    }
+    };
 
     var options1 = {
       fields: {
@@ -405,7 +405,7 @@ describe('1_eventemitter_embedded_sanity', function () {
         "field1": 1
       },
       limit: 1
-    }
+    };
 
     var criteria2 = null;
 
@@ -415,12 +415,15 @@ describe('1_eventemitter_embedded_sanity', function () {
         "field1": 1
       },
       limit: 2
-    }
+    };
 
-    publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function (e, put_result) {
+    var path = '/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end;
+    // console.log('path1', path);
 
-      expect(e == null).to.be(true);
-      publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end + '/1', complex_obj, null, function (e, put_result) {
+    publisherclient.set(path, complex_obj, null, function (e, put_result) {
+
+      if (e) return callback(e);
+      publisherclient.set(path + '/1', complex_obj, null, function (e, put_result) {
         expect(e == null).to.be(true);
 
         ////////////console.log('searching');
@@ -429,14 +432,14 @@ describe('1_eventemitter_embedded_sanity', function () {
           options: options1
         }, function (e, search_result) {
 
-          expect(e == null).to.be(true);
+          if (e) return callback(e);
           expect(search_result.length == 1).to.be(true);
 
           publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
             criteria: criteria2,
             options: options2
           }, function (e, search_result) {
-            expect(e == null).to.be(true);
+            if (e) return callback(e);
             expect(search_result.length == 2).to.be(true);
             callback(e);
           });
@@ -451,53 +454,64 @@ describe('1_eventemitter_embedded_sanity', function () {
 
   it('should search for a complex object by dates', function (callback) {
 
-    var test_path_end = require('shortid').generate();
+    // this test depends on the previous test having set at a similar path
 
-    var complex_obj = {
-      regions: ['North', 'South'],
-      towns: ['North.Cape Town'],
-      categories: ['Action', 'History'],
-      subcategories: ['Action.angling', 'History.art'],
-      keywords: ['bass', 'Penny Siopis'],
-      field1: 'field1'
-    };
+    setTimeout(function () {
 
-    var from = Date.now();
-    var to;
+      // tests on windows vm fail because the clock reports the same Date.now() as previous test...
+      // so, wait some...
 
-    publisherclient.set('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end, complex_obj, null, function (e, put_result) {
+      var test_path_end = require('shortid').generate();
 
-      expect(e == null).to.be(true);
-      to = Date.now();
+      var complex_obj = {
+        regions: ['North', 'South'],
+        towns: ['North.Cape Town'],
+        categories: ['Action', 'History'],
+        subcategories: ['Action.angling', 'History.art'],
+        keywords: ['bass', 'Penny Siopis'],
+        field1: 'field1'
+      };
 
-      var criteria = {
-        "_meta.created": {
-          $gte: from,
-          $lte: to
-        }
-      }
+      var from = Date.now();
+      var to;
+      var path = '/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/' + test_path_end;
+      // console.log('path2', path);
 
-      var options = {
-        fields: null,
-        sort: {
-          "field1": 1
-        },
-        limit: 2
-      }
+      publisherclient.set(path, complex_obj, null, function (e, put_result) {
 
-      ////////////console.log('searching');
-      publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex*', {
-        criteria: criteria,
-        options: options
-      }, function (e, search_result) {
+        if (e) return callback(e);
+        to = Date.now();
 
-        expect(e == null).to.be(true);
-        expect(search_result.length == 1).to.be(true);
-        callback();
+        var criteria = {
+          "_meta.created": {
+            $gte: from,
+            $lte: to
+          }
+        };
+
+        var options = {
+          fields: null,
+          sort: {
+            "field1": 1
+          },
+          limit: 2
+        };
+
+        ////////////console.log('searching');
+        publisherclient.get('/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/complex/*', {
+          criteria: criteria,
+          options: options
+        }, function (e, search_result) {
+
+          if (e) return callback(e);
+          expect(search_result.length == 1).to.be(true);
+          callback();
+
+        });
 
       });
 
-    });
+    }, 200);
 
   });
 
@@ -520,7 +534,7 @@ describe('1_eventemitter_embedded_sanity', function () {
           noPublish: true
         }, function (e, result) {
 
-          expect(e).to.be(null);
+          if (e) return callback(e);
           expect(result._meta.status).to.be('ok');
 
           ////////////////////console.log('DELETE RESULT');
@@ -551,7 +565,7 @@ describe('1_eventemitter_embedded_sanity', function () {
         noPublish: true
       }, function (e, insertResult) {
 
-        expect(e).to.be(null);
+        if (e) return callback(e);
 
         publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
           property1: 'property1',
@@ -562,13 +576,12 @@ describe('1_eventemitter_embedded_sanity', function () {
           noPublish: true
         }, function (e, updateResult) {
 
-          expect(e).to.be(null);
+          if (e) return callback(e);
           expect(updateResult._meta.id == insertResult._meta.id).to.be(true);
 
           publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end + '*', function(e, items){
 
-            expect(e).to.be(null);
-
+            if (e) return callback(e);
             expect(items.length).to.be(1);
 
             callback();
@@ -620,7 +633,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
         publisherclient.get('/_TAGS/1_eventemitter_embedded_sanity/' + test_id + '/test/tag/*', null, function (e, results) {
 
-          expect(e).to.be(null);
+          if (e) return callback(e);
 
           expect(results.length > 0).to.be(true);
 
@@ -742,7 +755,7 @@ describe('1_eventemitter_embedded_sanity', function () {
         property3: 'property3'
       }, null, function (e, insertResult) {
 
-        expect(e == null).to.be(true);
+        if (e) return callback(e);
 
         publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/' + test_path_end, {
           property1: 'property1',
@@ -751,7 +764,7 @@ describe('1_eventemitter_embedded_sanity', function () {
           property4: 'property4'
         }, null, function (e, updateResult) {
 
-          expect(e == null).to.be(true);
+          if (e) return callback(e);
           expect(updateResult._meta._id == insertResult._meta._id).to.be(true);
           callback();
 
@@ -778,18 +791,18 @@ describe('1_eventemitter_embedded_sanity', function () {
         property2: 'sib_post_property2'
       }, function (e, results) {
 
-        expect(e == null).to.be(true);
+        if (e) return callback(e);
 
         publisherclient.setSibling('1_eventemitter_embedded_sanity/' + test_id + '/siblings/' + test_path_end, {
           property1: 'sib_post_property1',
           property2: 'sib_post_property2'
         }, function (e, results) {
 
-          expect(e == null).to.be(true);
+          if (e) return callback(e);
 
           //the child method returns a child in the collection with a specified id
           publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/siblings/' + test_path_end + '/*', null, function (e, getresults) {
-            expect(e == null).to.be(true);
+            if (e) return callback(e);
             expect(getresults.length == 2).to.be(true);
             callback(e);
           });
@@ -812,18 +825,18 @@ describe('1_eventemitter_embedded_sanity', function () {
         property2: 'sib_post_property2'
       }, function (e, results) {
 
-        expect(e == null).to.be(true);
+        if (e) return callback(e);
 
         publisherclient.set('/test/1_eventemitter_embedded_sanity/' + test_id + '/path_prefix/' + test_path_end, {
           property1: 'sib_post_property1',
           property2: 'sib_post_property2'
         }, function (e, results) {
 
-          expect(e == null).to.be(true);
+          if (e) return callback(e);
 
           //the child method returns a child in the collection with a specified id
           publisherclient.get('1_eventemitter_embedded_sanity/' + test_id + '/path_prefix/*', null, function (e, getresults) {
-            expect(e == null).to.be(true);
+            if (e) return callback(e);
             expect(getresults.length).to.be(1);
             callback(e);
           });
@@ -887,7 +900,7 @@ describe('1_eventemitter_embedded_sanity', function () {
       property2: 'property2',
       property3: 'property3'
     }, null, function (e, insertResult) {
-      expect(e == null).to.be(true);
+      if (e) return callback(e);
       publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '/1', {
         property1: 'property1',
         property2: 'property2',
@@ -916,16 +929,17 @@ describe('1_eventemitter_embedded_sanity', function () {
       property2: 'property2',
       property3: 'property3'
     }, null, function (e, insertResult) {
-      expect(e == null).to.be(true);
+      if (e) return callback(e);
       publisherclient.set('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '/1', {
         property1: 'property1',
         property2: 'property2',
         property3: 'property3'
       }, null, function (e, insertResult) {
-        expect(e == null).to.be(true);
+        if (e) return callback(e);
 
         publisherclient.getPaths('1_eventemitter_embedded_sanity/' + test_id + '/testwildcard/' + test_path_end + '*', function (e, results) {
 
+          if (e) return callback(e);
           expect(results.length == 2).to.be(true);
           callback(e);
 
@@ -963,7 +977,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
       }, function (e) {
 
-        if (!e) return callback(e);
+        if (!e) return callback(e); // ?
 
         expect(listenerclient.events['/REMOVE@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me'].length).to.be(1);
 
@@ -991,7 +1005,7 @@ describe('1_eventemitter_embedded_sanity', function () {
       listenerclient.offPath('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test', function (e) {
 
         if (e)
-          return callback(new Error(e));
+          return callback(new Error(e)); // ?
 
         listenerclient.on('/2_websockets_embedded_sanity/' + test_id + '/testsubscribe/data/off_event_test', {
             event_type: 'set',
@@ -1224,7 +1238,7 @@ describe('1_eventemitter_embedded_sanity', function () {
         expect(message).to.not.be.ok();
       });
     }, function (e) {
-      expect(e).to.not.be.ok();
+      if (e) return done(e);
 
       timeout = setTimeout(function () {
         listenerclient.offPath('/1_eventemitter_embedded_sanity/' + test_id + '/testNoPublish', function () {
@@ -1238,7 +1252,7 @@ describe('1_eventemitter_embedded_sanity', function () {
       }, {
         noPublish: true
       }, function (e, result) {
-        expect(e).to.not.be.ok();
+        if (e) return done(e);
       });
     });
 
@@ -1249,9 +1263,11 @@ describe('1_eventemitter_embedded_sanity', function () {
       publisherclient.log.info('Done setting');
     });
     publisherclient.remove('/test_event_order', function (err) {
+      if (err) return done(err);
       publisherclient.log.info('Done removing');
       setTimeout(function () {
         publisherclient.get('/test_event_order', null, function (e, result) {
+          if (e) return done(e);
           expect(result).to.be(null);
           done();
         });
