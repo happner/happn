@@ -2,6 +2,11 @@
 
 <img src="https://raw.githubusercontent.com/happner/happner-website/master/images/HAPPN%20Logo%20B.png" width="300"></img>
 
+HAPPN-3 released!
+------------------
+
+happn version 3 has been released, the repo is [here](https://github.com/happner/happn-3) - this version of happn has a bunch of maintainability updates whereby the code has been better structured. The intra-process client is now using the same code as the websockets one, now just spoofs the primus spark. There is also now notably a protocol abstraction layer, so we can now use different protocols to interact with the happn database and subscriptions, such as an MQTT plugin etc. 
+
 Introduction
 -------------------------
 
