@@ -377,13 +377,12 @@ UNSUBSCRIBING FROM EVENTS
 TAGGING
 ----------------------------
 
-*You can do a set command and specify that you want to tag the data at the end of the path (or the data that is created as a result of the command), tagging will take a snapshot of the data as it currently stands, and will save the snapshot to a path that starts with the path you specify, and a '/' with the tag you specify at the end*
+*You can do a set command and specify that you want to tag the data at the path. Tagging will take a snapshot of the data as it currently stands, and will save the snapshot to a new path in `/_TAGS`*
 
 ```javascript
 
-var randomTag = require('shortid').generate();
-
-my_client_instance.set('e2e_test1/test/tag', {property1:'property1',property2:'property2',property3:'property3'}, {tag:randomTag}, function(e, result){
+my_client_instance.set('path/with/existing/data', null, {tag:'tagName'}, function(e, result) {});
+my_client_instance.get('_TAGS/path/with/existing/data/*', function(e, result) {});
 
 ```
 
