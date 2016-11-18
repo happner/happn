@@ -384,3 +384,8 @@
 - allow 3rd party services in config
 - emit whole session on pubsub 'authentic' and 'disconnect' events
 - add noCluster option on publish to not emit to clients attached with clusterName in login.info
+
+2.16.1 2016-11-18
+-----------------
+
+- default security policies both have ttl 0, to prevent unexpected failure after a previous 30 days
