@@ -715,8 +715,8 @@ describe('d3-security-tokens', function () {
 
       happnMock.services.security.__profileSession(session);
 
-      expect(session.policy[0].ttl).to.be(2592000000);
-      expect(session.policy[1].ttl).to.be(2592000000);
+      expect(session.policy[0].ttl).to.be(0);
+      expect(session.policy[1].ttl).to.be(0);
 
       expect(session.policy[0].inactivity_threshold).to.be(Infinity);
       expect(session.policy[1].inactivity_threshold).to.be(Infinity);
