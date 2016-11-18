@@ -442,7 +442,7 @@ happn.client.create({config:{username:'_ADMIN', password:'testPWD'}, secure:true
 SECURITY PROFILES 
 -----------------
 
-*profiles can be configured to fit vdifferent session types*
+*profiles can be configured to fit different session types, profiles are ordered sets of rules that match incoming sessions with specific policies, the first matching rule in the set is selected when a session is profiled, so the order they are configured in the array is important*
 
 ```javascript
 
@@ -554,6 +554,38 @@ SECURITY PROFILES
 ```
 
 *the test that clearly demonstrates profiles can be found [here](https://github.com/happner/happn/blob/master/test/d3-security-tokens)*
+
+*the default policies look like this:*
+
+```javascript
+//stateful - so ws sessions:
+{
+    name:"default-stateful",// this is the default underlying profile for stateful sessions
+    session:{
+      $and:[{type:{$eq:1}}]
+    },
+    policy: {
+      ttl: 0, //never goes stale
+      inactivity_threshold:Infinity
+    }
+  }
+  
+  
+//stateless - so token based http requests (REST)
+{
+    name:"default-stateless",// this is the default underlying profile for stateless sessions (REST)
+    session:{
+      $and:[{type:{$eq:0}}]
+    },
+    policy: {
+      ttl: 0, //never goes stale
+      inactivity_threshold:Infinity
+    }
+  }
+
+```
+
+*NB NB - if no matching profile is found for an incoming session, one of the above is selected based on whether the session is stateful or stateless, there is no ttl or inactivity timeout on both policies - this means that tokens can be reused forever (unless the user in the token is deleted) rather push to default polcies to your policy list which would sit above these less secure ones, with a ttl and possibly inactivity timeout*
 
 WEB PATH LEVEL SECURITY
 -----------------------
