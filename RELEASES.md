@@ -389,3 +389,8 @@
 -----------------
 
 - default security policies both have ttl 0, to prevent unexpected failure after a previous 30 days
+
+2.16.2 2016-11-21
+-----------------
+
+- proper access denied error is reported if group is changed or user is deleted, and a token is being used for a web request
