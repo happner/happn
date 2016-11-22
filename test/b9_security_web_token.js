@@ -114,6 +114,20 @@ describe('b9_security_web_token', function () {
 
         });
 
+        happnInstance.connect.use('/secure/test/removed/group', function (req, res, next) {
+
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({"secure": "value"}));
+
+        });
+
+        happnInstance.connect.use('/secure/test/removed/user', function (req, res, next) {
+
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({"secure": "value"}));
+
+        });
+
         callback();
 
       });
@@ -367,14 +381,158 @@ describe('b9_security_web_token', function () {
 
   });
 
-  xit('removes the permission from the test group - we ensure we can not access the resource with the token', function (callback) {
+  it('removes the permission from the test group - we ensure we can not access the resource with the token', function (callback) {
 
+    var testGroup1 = {
+      name: 'TEST GROUP1' + test_id,
+      custom_data: {
+        customString: 'custom1',
+        customNumber: 0
+      }
+    };
 
+    testGroup1.permissions = {
+      '/@HTTP/secure/test/removed/group': {actions: ['get']},
+      '/@HTTP/secure/test/not_removed/group': {actions: ['get']}
+    };
+
+    var testUser1 = {
+      username: 'TEST USER1@blah.com' + test_id,
+      password: 'TEST PWD',
+      custom_data: {
+        something: 'usefull'
+      }
+    };
+
+    var addedTestGroup1;
+    var addedTestuser1;
+
+    happnInstance.services.security.upsertGroup(testGroup1, {overwrite: false}, function (e, result) {
+
+      if (e) return done(e);
+      addedTestGroup1 = result;
+
+      happnInstance.services.security.upsertUser(testUser1, {overwrite: false}, function (e, result) {
+
+        if (e) return done(e);
+        addedTestuser1 = result;
+
+        happnInstance.services.security.linkGroup(addedTestGroup1, addedTestuser1, function (e) {
+
+          if (e) return done(e);
+
+          happn.client.create({
+              config: {username: testUser1.username, password: 'TEST PWD'},
+              secure: true
+            })
+
+            .then(function (clientInstance) {
+
+              testClient = clientInstance;
+
+              doRequest('/secure/test/removed/group', testClient.session.token, false, function (response) {
+
+                expect(response.statusCode).to.equal(200);
+
+                delete addedTestGroup1.permissions['/@HTTP/secure/test/removed/group'];
+
+                happnInstance.services.security.upsertGroup(addedTestGroup1, {overwrite: true}, function (e) {
+
+                  if (e) return done(e);
+
+                  doRequest('/secure/test/removed/group', testClient.session.token, false, function (response) {
+
+                    expect(response.statusCode).to.equal(403);
+                    callback();
+
+                  });
+                });
+              });
+            })
+
+            .catch(function (e) {
+              done(e);
+            });
+
+        });
+      });
+    });
   });
 
-  xit('access a resource using the token as part of the url as a querystring argument', function (callback) {
+  it('removes the user associated with the token - we ensure we can not access the resource with the token', function (callback) {
 
+    var testGroup2 = {
+      name: 'TEST GROUP2' + test_id,
+      custom_data: {
+        customString: 'custom2',
+        customNumber: 0
+      }
+    };
 
+    testGroup2.permissions = {
+      '/@HTTP/secure/test/removed/user': {actions: ['get']},
+      '/@HTTP/secure/test/not_removed/user': {actions: ['get']}
+    };
+
+    var testUser2 = {
+      username: 'TEST USER2@blah.com' + test_id,
+      password: 'TEST PWD',
+      custom_data: {
+        something: 'usefull'
+      }
+    };
+
+    var addedTestGroup2;
+    var addedTestuser2;
+
+    happnInstance.services.security.upsertGroup(testGroup2, {overwrite: false}, function (e, result) {
+
+      if (e) return done(e);
+      addedTestGroup2 = result;
+
+      happnInstance.services.security.upsertUser(testUser2, {overwrite: false}, function (e, result) {
+
+        if (e) return done(e);
+        addedTestuser2 = result;
+
+        happnInstance.services.security.linkGroup(addedTestGroup2, addedTestuser2, function (e) {
+
+          if (e) return done(e);
+
+          happn.client.create({
+              config: {username: testUser2.username, password: 'TEST PWD'},
+              secure: true
+            })
+
+            .then(function (clientInstance) {
+
+              testClient = clientInstance;
+
+              doRequest('/secure/test/removed/user', testClient.session.token, false, function (response) {
+
+                expect(response.statusCode).to.equal(200);
+
+                happnInstance.services.security.deleteUser(addedTestuser2, function (e) {
+
+                  if (e) return done(e);
+
+                  doRequest('/secure/test/removed/user', testClient.session.token, false, function (response) {
+
+                    expect(response.statusCode).to.equal(403);
+                    callback();
+
+                  });
+                });
+              });
+            })
+
+            .catch(function (e) {
+              done(e);
+            });
+
+        });
+      });
+    });
   });
 
   require('benchmarket').stop();
