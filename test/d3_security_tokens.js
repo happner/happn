@@ -8,7 +8,7 @@ describe('d3-security-tokens', function () {
   var happn = require('../lib/index');
   var service = happn.service;
   var async = require('async');
-  var uuid = require('node-uuid');
+  var uuid = require('uuid');
   var Logger = require('happn-logger');
   var CheckPoint = require('../lib/services/security/checkpoint');
   /*
