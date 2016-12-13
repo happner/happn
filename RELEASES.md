@@ -394,3 +394,8 @@
 -----------------
 
 - proper access denied error is reported if group is changed or user is deleted, and a token is being used for a web request
+
+2.16.3 2016-12-13
+-----------------
+
+- fixed persisted cache does not set __sync flag, when db is empty
