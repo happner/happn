@@ -7,7 +7,7 @@ var expect = require('expect.js');
 var net = require('net');
 var Happn = require('../');
 
-describe.only(filename, function () {
+describe(filename, function () {
 
   var server;
 
