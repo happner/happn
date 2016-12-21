@@ -11,6 +11,8 @@ describe(filename, function () {
 
   var server;
 
+  this.timeout(60000);
+
   benchmarket.start();
 
   before('start server', function (done) {
@@ -100,8 +102,7 @@ describe(filename, function () {
   context('subscriptions', function () {
 
     it('subscriptions are resumed without duplication after network outage', function (done) {
-
-      this.timeout(60000);
+      
       var now;
 
       var client;
