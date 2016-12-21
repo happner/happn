@@ -102,7 +102,7 @@ describe(filename, function () {
   context('subscriptions', function () {
 
     it('subscriptions are resumed without duplication after network outage', function (done) {
-      
+
       var now;
 
       var client;
