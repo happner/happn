@@ -60,19 +60,19 @@ describe('2_websockets_embedded_sanity', function () {
 
     this.timeout(20000);
 
-    secureClient.disconnect({timeout:2000}, function(e){
+    secureClient.disconnect(function(e){
 
       if (e) console.warn('issue disconnecting secureClient');
 
-      secureMiddleman.disconnect({timeout:2000}, function(e){
+      secureMiddleman.disconnect(function(e){
 
         if (e) console.warn('issue disconnecting secureMiddleman');
 
-        client.disconnect({timeout:2000}, function(e){
+        client.disconnect(function(e){
 
           if (e) console.warn('issue disconnecting client');
 
-          middleman.disconnect({timeout:2000}, function(e){
+          middleman.disconnect(function(e){
 
             if (e) console.warn('issue disconnecting middleman');
 
@@ -99,28 +99,28 @@ describe('2_websockets_embedded_sanity', function () {
    */
   before('should initialize the clients', function (callback) {
 
-    happn_client.create({port:55002}, function (e, instance) {
+    happn_client.create({config:{port:55002}}, function (e, instance) {
 
       if (e) return callback(e);
       client = instance;
 
       console.log('created client:::');
 
-      happn_client.create({port:55002}, function (e, instance) {
+      happn_client.create({config:{port:55002}}, function (e, instance) {
 
         if (e) return callback(e);
         middleman = instance;
 
         console.log('created middleman:::');
 
-        happn_client.create({port:55003, config:{username:'_ADMIN', password:'happn'}}, function (e, instance) {
+        happn_client.create({config:{username:'_ADMIN', password:'happn', port:55003}, secure:true}, function (e, instance) {
 
           if (e) return callback(e);
           secureClient = instance;
 
           console.log('created secure client:::');
 
-          happn_client.create({port:55003, config:{username:'_ADMIN', password:'happn'}}, function (e, instance) {
+          happn_client.create({config:{username:'_ADMIN', password:'happn', port:55003}, secure:true}, function (e, instance) {
 
             if (e) return callback(e);
             secureMiddleman = instance;
