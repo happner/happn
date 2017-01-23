@@ -1,0 +1,129 @@
+describe('max_message_throughput', function () {
+
+  var Happn = require('../../')
+    , fork = require('child_process').fork
+    , sep = require('path').sep
+    , remotes = {}
+    , async = require('async')
+    ;
+
+  var libFolder = __dirname + sep + 'test-resources' + sep;
+
+  var REMOTE_CLIENT_COUNT = 5;
+  var TIME = 60 * 1000;
+
+  var SECURE_CONFIG = {
+    secure: true
+  };
+
+  var NON_SECURE_CONFIG = {
+
+  };
+
+  var NON_SECURE_CONFIG_CONCURRENCY = {
+    services:{
+      queue:{
+        config:{
+         concurrency:10000
+        }
+      }
+    }
+  };
+
+  var NON_SECURE_CONFIG_DIRECT = {
+    services:{
+      queue:{
+        config:{
+          mode:'direct'
+        }
+      }
+    }
+  };
+
+  var CONFIG = NON_SECURE_CONFIG;
+
+  var server;
+
+  function startHappnService(callback) {
+
+    Happn.service.create(CONFIG)
+      .then(function (_server) {
+        server = _server;
+        callback();
+      })
+      .catch(callback);
+  }
+
+  function startRemoteClients(callback) {
+
+    async.times(REMOTE_CLIENT_COUNT, function(time, timeCB){
+
+      var remoteName = 'client ' + time.toString();
+
+      var remote = fork(libFolder + 'max_message_throughput_client', [remoteName]);
+
+      remote.on('message', function (message) {
+
+        if (message.type == 'ready') {
+
+          remotes[remoteName] = remote;
+          timeCB();
+        }
+        if (message.type == 'starterror') {
+
+          console.log('failed starting remote ' + remoteName + ': ', message.error);
+          timeCB(new Error(message.error));
+        }
+        if (message.type == 'metric') {
+          console.log(message);
+        }
+        if (message.type == 'runerror') {
+          console.log(message);
+        }
+      });
+
+    }, callback);
+
+    // remote.stdout.on('data', function (data) {
+    //   console.log(data.toString());
+    // });
+    //
+    // remote.stderr.on('data', function (data) {
+    //   console.log(data.toString());
+    // });
+  }
+
+  function stopRemoteClients() {
+
+    for (var remoteName in remotes) remotes[remoteName].kill();
+  }
+
+  before('start', function (done) {
+
+    var _this = this;
+
+    startHappnService(function (e) {
+
+      if (e) return done(e);
+
+      startRemoteClients(done);
+
+    });
+
+  });
+
+
+  after(function (done) {
+    stopRemoteClients();
+    server.stop(done);
+  });
+
+  it("can call remote component function", function (done) {
+
+    this.timeout(TIME + 100);
+    setTimeout(done, TIME);
+
+  });
+
+});
+

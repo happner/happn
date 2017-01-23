@@ -399,3 +399,8 @@
 -----------------
 
 - fixed persisted cache does not set __sync flag, when db is empty
+
+2.17.0 2017-01-23
+-----------------
+
+- targetClients feature
