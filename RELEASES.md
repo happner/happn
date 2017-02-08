@@ -404,3 +404,8 @@
 -----------------
 
 - targetClients feature
+
+2.17.1 2017-02-08
+-----------------
+
+- Issue 152 - Destroy pubsub if login fails so that we don't have primus connections retrying
