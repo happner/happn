@@ -8,6 +8,7 @@ describe('c5_client_events', function () {
   var service = happn.service;
   var happn_client = happn.client;
   var async = require('async');
+  var http = require('http');
 
   var serviceConfig = {secure: true};
   var serviceInstance;
@@ -40,11 +41,11 @@ describe('c5_client_events', function () {
   it('logs on with a client and attached to the client side end event, we stop the server and ensure the end event is fired', function (callback) {
 
     happn.client.create({
-        config: {
-          username: '_ADMIN',
-          password: 'happn'
-        }
-      })
+      config: {
+        username: '_ADMIN',
+        password: 'happn'
+      }
+    })
 
       .then(function (clientInstance) {
 
@@ -73,11 +74,11 @@ describe('c5_client_events', function () {
     };
 
     happn.client.create({
-        config: {
-          username: '_ADMIN',
-          password: 'happn'
-        }
-      })
+      config: {
+        username: '_ADMIN',
+        password: 'happn'
+      }
+    })
 
       .then(function (clientInstance) {
 
@@ -115,6 +116,36 @@ describe('c5_client_events', function () {
 
       });
 
+  });
+
+  it('does not retry after a login has failed', function (callback) {
+    this.timeout(100000);
+
+    var eventsFired = {
+      'reconnect-scheduled': false,
+      'reconnect-successful': false
+    };
+
+    var client = (new happn.client()).client({
+      config: {
+        username: '_ADMIN',
+        password: 'bad password',
+        port: 55002
+      }
+    });
+
+    client.initialize(function (e) {
+      if (e && e.code == 'ECONNREFUSED') return;
+      eventsFired['reconnect-scheduled'] = false;
+      setTimeout(function () {
+        expect(eventsFired['reconnect-scheduled']).to.eql(false);
+        callback();
+      }, 5000);
+    });
+
+    client.onEvent('reconnect-scheduled', function (opts) {
+      eventsFired['reconnect-scheduled'] = true;
+    });
   });
 
   require('benchmarket').stop();
