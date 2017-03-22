@@ -4,7 +4,7 @@ var Promise = require('bluebird');
 
 var service1Name;
 //checks info is stored next to login
-describe('e5-login-digest', function () {
+describe(require('path').basename(__filename), function () {
 
   this.timeout(60000);
 
