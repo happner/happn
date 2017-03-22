@@ -118,36 +118,6 @@ describe('c5_client_events', function () {
 
   });
 
-  it('does not retry after a login has failed', function (callback) {
-    this.timeout(100000);
-
-    var eventsFired = {
-      'reconnect-scheduled': false,
-      'reconnect-successful': false
-    };
-
-    var client = (new happn.client()).client({
-      config: {
-        username: '_ADMIN',
-        password: 'bad password',
-        port: 55002
-      }
-    });
-
-    client.initialize(function (e) {
-      if (e && e.code == 'ECONNREFUSED') return;
-      eventsFired['reconnect-scheduled'] = false;
-      setTimeout(function () {
-        expect(eventsFired['reconnect-scheduled']).to.eql(false);
-        callback();
-      }, 5000);
-    });
-
-    client.onEvent('reconnect-scheduled', function (opts) {
-      eventsFired['reconnect-scheduled'] = true;
-    });
-  });
-
   require('benchmarket').stop();
 
 });
