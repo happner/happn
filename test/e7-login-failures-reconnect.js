@@ -137,10 +137,10 @@ describe('e5-login-digest', function () {
           })
         });
       })
-      .then(function(){
+      .then(function () {
         delete server1.services.pubsub.login;
       })
-      .then(function() {
+      .then(function () {
         return new Promise(function (resolve) {
           {
             var subHandle = client.onEvent('reconnect-successful',
@@ -156,7 +156,7 @@ describe('e5-login-digest', function () {
       })
   });
 
-  it('only has one reconnect-successful event', function () {
+  it('emits when it retries to reconnect', function () {
     var client;
 
     return Happn.client.create(
@@ -192,28 +192,129 @@ describe('e5-login-digest', function () {
         });
       })
       .then(stopService)
-      .then(function() {
+      .then(function () {
         return createService(true);
       })
-      .then(function() {
+      .then(function () {
         return new Promise(function (resolve) {
           {
-            var eventCalled = 0;
-            var subHandle = client.onEvent('reconnect-successful',
+            var subHandle = client.onEvent('reconnect',
               function waitForConnectSuccess() {
-                eventCalled++;
+                resolve();
               });
-
-            setTimeout(function() {
-              expect(eventCalled).to.equal(1);
-              client.offEvent(subHandle);
-              resolve();
-            },35000)
           }
         });
       })
       .then(function () {
         return client.disconnect();
       });
+  });
+
+  it('does not retry if we are connected', function () {
+    var client;
+
+    return Happn.client.create(
+      {
+        config: {
+          username: testUser2.username,
+          password: testUser2.password
+        }
+      })
+      .then(function (clientInstance) {
+        client = clientInstance;
+        return stopService();
+      })
+      .then(function waitForDisconnect() {
+        return new Promise(function (resolve) {
+          {
+            var subHandle = client.onEvent('reconnect-scheduled',
+              function waitForReconnectScheduled() {
+                client.offEvent(subHandle);
+                resolve();
+              });
+          }
+        });
+      })
+      .then(function startServiceWithNoLogin() {
+        return createService(false);
+      })
+      .then(function waitForLoginAttempt() {
+        return new Promise(function (resolve) {
+          server1.services.pubsub.on('loginAttempt', function waitForAttempt() {
+            resolve();
+          })
+        });
+      })
+      .then(stopService)
+      .then(function () {
+        return createService(true);
+      })
+      .then(function () {
+        return new Promise(function (resolve) {
+          {
+            var subHandle = client.onEvent('reconnect-successful',
+              function waitForConnectSuccess() {
+                client.offEvent(subHandle);
+                resolve();
+              });
+          }
+        });
+      })
+      .then(function () {
+        return new Promise(function (resolve, reject) {
+          {
+            var subHandle = client.onEvent('reconnect',
+              function waitForConnectSuccess() {
+                reject(new Error('This should not happen'));
+              });
+            setTimeout(function () {
+              client.offEvent(subHandle);
+              resolve();
+            }, 20000);
+          }
+        });
+      })
+      .then(function () {
+        return client.disconnect();
+      });
+  });
+
+  it('will not reconnect after shutdown', function () {
+    var client;
+
+    return Happn.client.create(
+      {
+        config: {
+          username: testUser2.username,
+          password: testUser2.password
+        }
+      })
+      .then(function (clientInstance) {
+        client = clientInstance;
+        return stopService();
+      })
+      .then(function () {
+        return client.disconnect();
+      })
+      .then(function startServiceWithNoLogin() {
+        return createService(false);
+      })
+      .then(function () {
+        return new Promise(function (resolve) {
+          {
+            var eventCalled = 0;
+            var subHandle = client.onEvent('reconnect',
+              function waitForReconnect() {
+                eventCalled++;
+              });
+
+            setTimeout(function () {
+              expect(eventCalled).to.equal(0);
+              client.offEvent(subHandle);
+              resolve();
+            }, 20000)
+          }
+        });
+      })
   });
 });
