@@ -1,5 +1,6 @@
 var Happn = require('../');
 var expect = require('expect.js');
+var Promise = require('bluebird');
 
 var service1Name;
 //checks info is stored next to login
