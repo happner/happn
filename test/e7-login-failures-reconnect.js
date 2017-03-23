@@ -8,6 +8,8 @@ describe(require('path').basename(__filename), function () {
 
   this.timeout(60000);
 
+  var testPort = 55001;
+
   var server1;
 
   var testGroup2 = {
@@ -54,7 +56,7 @@ describe(require('path').basename(__filename), function () {
   }
 
   function createService(allowLogin) {
-    return Happn.service.create({secure: true})
+    return Happn.service.create({secure: true, port: testPort})
       .then(function (server) {
         server1 = server;
         service1Name = server.name;
@@ -98,7 +100,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: testUser2.password
+          password: testUser2.password,
+          port: testPort
         }
       })
       .then(function (clientInstance) {
@@ -113,7 +116,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: testUser2.password
+          password: testUser2.password,
+          port: testPort
         }
       })
       .then(function (clientInstance) {
@@ -168,7 +172,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: testUser2.password
+          password: testUser2.password,
+          port: testPort
         }
       })
       .then(function (clientInstance) {
@@ -223,7 +228,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: testUser2.password
+          password: testUser2.password,
+          port: testPort
         }
       })
       .then(function (clientInstance) {
@@ -293,7 +299,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: testUser2.password
+          password: testUser2.password,
+          port: testPort
         }
       })
       .then(function (clientInstance) {
@@ -333,7 +340,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: 'bad_password'
+          password: 'bad_password',
+          port: testPort
         }
       })
       .then(function () {
@@ -347,6 +355,7 @@ describe(require('path').basename(__filename), function () {
           })
           .then(function () {
             server1.services.pubsub.on('connectionAttempt', function waitForAttempt() {
+              server1.services.pubsub.removeAllListeners('connectionAttempt');
               done(new Error("Should not get a connection attempt"));
             });
             setTimeout(function () {
