@@ -328,7 +328,7 @@ describe(require('path').basename(__filename), function () {
       })
   });
 
-  it.only('kills a client that is started with create and fails to login', function (done) {
+  it('kills a client that is started with create and fails to login', function (done) {
     Happn.client.create(
       {
         config: {
