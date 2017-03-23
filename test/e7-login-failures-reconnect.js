@@ -8,6 +8,8 @@ describe(require('path').basename(__filename), function () {
 
   this.timeout(60000);
 
+  var testPort = 55001;
+
   var server1;
 
   var testGroup2 = {
@@ -54,15 +56,19 @@ describe(require('path').basename(__filename), function () {
   }
 
   function createService(allowLogin) {
-    return Happn.service.create({secure: true})
+    return Happn.service.create({secure: true, port: testPort})
       .then(function (server) {
         server1 = server;
         service1Name = server.name;
         if (!allowLogin) {
           server1.services.pubsub.login = function () {
             this.emit('loginAttempt');
-          }
+          };
         }
+        server1.services.pubsub.primus.on('connection', function () {
+          console.log('Connection attempt');
+          server1.services.pubsub.emit('connectionAttempt');
+        });
       })
       .then(linkUser);
   }
@@ -94,7 +100,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: testUser2.password
+          password: testUser2.password,
+          port: testPort
         }
       })
       .then(function (clientInstance) {
@@ -109,7 +116,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: testUser2.password
+          password: testUser2.password,
+          port: testPort
         }
       })
       .then(function (clientInstance) {
@@ -133,6 +141,7 @@ describe(require('path').basename(__filename), function () {
       .then(function waitForLoginAttempt() {
         return new Promise(function (resolve) {
           server1.services.pubsub.on('loginAttempt', function waitForAttempt() {
+            server1.services.pubsub.removeAllListeners('loginAttempt');
             resolve();
           })
         });
@@ -163,7 +172,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: testUser2.password
+          password: testUser2.password,
+          port: testPort
         }
       })
       .then(function (clientInstance) {
@@ -187,6 +197,7 @@ describe(require('path').basename(__filename), function () {
       .then(function waitForLoginAttempt() {
         return new Promise(function (resolve) {
           server1.services.pubsub.on('loginAttempt', function waitForAttempt() {
+            server1.services.pubsub.removeAllListeners('loginAttempt');
             resolve();
           })
         });
@@ -217,7 +228,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: testUser2.password
+          password: testUser2.password,
+          port: testPort
         }
       })
       .then(function (clientInstance) {
@@ -241,6 +253,7 @@ describe(require('path').basename(__filename), function () {
       .then(function waitForLoginAttempt() {
         return new Promise(function (resolve) {
           server1.services.pubsub.on('loginAttempt', function waitForAttempt() {
+            server1.services.pubsub.removeAllListeners('loginAttempt');
             resolve();
           })
         });
@@ -286,7 +299,8 @@ describe(require('path').basename(__filename), function () {
       {
         config: {
           username: testUser2.username,
-          password: testUser2.password
+          password: testUser2.password,
+          port: testPort
         }
       })
       .then(function (clientInstance) {
@@ -297,7 +311,7 @@ describe(require('path').basename(__filename), function () {
         return client.disconnect();
       })
       .then(function startServiceWithNoLogin() {
-        return createService(false);
+        return createService(true);
       })
       .then(function () {
         return new Promise(function (resolve) {
@@ -316,5 +330,40 @@ describe(require('path').basename(__filename), function () {
           }
         });
       })
+      .then(function () {
+        return client.disconnect();
+      })
+  });
+
+  it('kills a client that is started with "create" and fails to login', function (done) {
+    Happn.client.create(
+      {
+        config: {
+          username: testUser2.username,
+          password: 'bad_password',
+          port: testPort
+        }
+      })
+      .then(function () {
+        return done(new Error('Should not get a client'));
+      })
+      .catch(function (e) {
+        expect(e).to.not.be.empty();
+        stopService()
+          .then(function () {
+            return createService(true);
+          })
+          .then(function () {
+            server1.services.pubsub.on('connectionAttempt', function waitForAttempt() {
+              server1.services.pubsub.removeAllListeners('connectionAttempt');
+              done(new Error("Should not get a connection attempt"));
+            });
+            setTimeout(function () {
+              server1.services.pubsub.removeAllListeners('connectionAttempt');
+              done();
+            }, 10000);
+          });
+      });
+
   });
 });

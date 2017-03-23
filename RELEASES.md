@@ -410,7 +410,12 @@
 
 - Issue 152 - Destroy pubsub if login fails so that we don't have primus connections retrying
 
-2.17.2 2017-02-08
+2.17.2 2017-03-22
 -----------------
 
 - Issue 157 - Retry login if it timed out after a reconnect.
+
+2.17.3 2017-03-23
+-----------------
+
+- Issue 160 - When creating a client with "create", disconnect if the login fails.
