@@ -61,8 +61,12 @@ describe(require('path').basename(__filename), function () {
         if (!allowLogin) {
           server1.services.pubsub.login = function () {
             this.emit('loginAttempt');
-          }
+          };
         }
+        server1.services.pubsub.primus.on('connection', function () {
+          console.log('Connection attempt');
+          server1.services.pubsub.emit('connectionAttempt');
+        });
       })
       .then(linkUser);
   }
@@ -133,6 +137,7 @@ describe(require('path').basename(__filename), function () {
       .then(function waitForLoginAttempt() {
         return new Promise(function (resolve) {
           server1.services.pubsub.on('loginAttempt', function waitForAttempt() {
+            server1.services.pubsub.removeAllListeners('loginAttempt');
             resolve();
           })
         });
@@ -187,6 +192,7 @@ describe(require('path').basename(__filename), function () {
       .then(function waitForLoginAttempt() {
         return new Promise(function (resolve) {
           server1.services.pubsub.on('loginAttempt', function waitForAttempt() {
+            server1.services.pubsub.removeAllListeners('loginAttempt');
             resolve();
           })
         });
@@ -241,6 +247,7 @@ describe(require('path').basename(__filename), function () {
       .then(function waitForLoginAttempt() {
         return new Promise(function (resolve) {
           server1.services.pubsub.on('loginAttempt', function waitForAttempt() {
+            server1.services.pubsub.removeAllListeners('loginAttempt');
             resolve();
           })
         });
@@ -316,5 +323,38 @@ describe(require('path').basename(__filename), function () {
           }
         });
       })
+      .then(function () {
+        return client.disconnect();
+      })
+  });
+
+  it.only('kills a client that is started with create and fails to login', function (done) {
+    Happn.client.create(
+      {
+        config: {
+          username: testUser2.username,
+          password: 'bad_password'
+        }
+      })
+      .then(function () {
+        return done(new Error('Should not get a client'));
+      })
+      .catch(function (e) {
+        expect(e).to.not.be.empty();
+        stopService()
+          .then(function () {
+            return createService(true);
+          })
+          .then(function () {
+            server1.services.pubsub.on('connectionAttempt', function waitForAttempt() {
+              done(new Error("Should not get a connection attempt"));
+            });
+            setTimeout(function () {
+              server1.services.pubsub.removeAllListeners('connectionAttempt');
+              done();
+            }, 10000);
+          });
+      });
+
   });
 });
