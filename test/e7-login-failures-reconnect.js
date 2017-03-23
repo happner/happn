@@ -304,7 +304,7 @@ describe(require('path').basename(__filename), function () {
         return client.disconnect();
       })
       .then(function startServiceWithNoLogin() {
-        return createService(false);
+        return createService(true);
       })
       .then(function () {
         return new Promise(function (resolve) {
@@ -328,7 +328,7 @@ describe(require('path').basename(__filename), function () {
       })
   });
 
-  it('kills a client that is started with create and fails to login', function (done) {
+  it('kills a client that is started with "create" and fails to login', function (done) {
     Happn.client.create(
       {
         config: {
