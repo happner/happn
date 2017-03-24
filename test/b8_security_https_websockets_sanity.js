@@ -1005,12 +1005,9 @@ describe('b8_security_https_websockets_sanity', function () {
     happn_client.create({config: {protocol: 'http'}, testMode: true}, function (e) {
       expect(e).to.be.an('object');
       expect(happn_client.lastClient).to.be.an('object');
-      setTimeout(function () {
-        expect(happn_client.lastClient).to.have.property('options');
-        expect(happn_client.lastClient).to.not.have.property('pubsub');
-        done();
-      }, 5000);
-
+      expect(happn_client.lastClient).to.have.property('options');
+      expect(happn_client.lastClient).to.not.have.property('pubsub');
+      done();
     });
 
   });
