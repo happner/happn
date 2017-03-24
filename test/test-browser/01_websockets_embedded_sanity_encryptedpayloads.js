@@ -54,7 +54,7 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function () {
 
   });
 
-  it('attaches token as cookie with custom name', function(callback) {
+  it('attaches token as cookie with custom name', function (callback) {
     expect(document.cookie.indexOf('custom_cookie_name=')).to.equal(0);
     callback();
   });
@@ -767,6 +767,32 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function () {
         }
       );
     });
+  });
+
+  it('should fail to connect and then not retry', function (callback) {
+    try {
+      happn_client.create({
+        config: {
+          username: '_ADMIN',
+          password: 'bad_password',
+          keyPair: {
+            publicKey: 'AjN7wyfbEdI2LzWyFo6n31hvOrlYvkeHad9xGqOXTm1K',
+            privateKey: 'y5RTfdnn21OvbQrnBMiKBP9DURduo0aijMIGyLJFuJQ='
+          }
+        },
+        testMode: true
+      }, function (e, instance) {
+
+        expect(e).to.be.an("error");
+        expect(e.message).to.equal("Invalid credentials");
+        expect(happn_client.lastClient).to.be.an('object');
+        expect(happn_client.lastClient).to.have.property('options');
+        expect(happn_client.lastClient).to.not.have.property('pubsub');
+        callback();
+      });
+    } catch (e) {
+      callback(e);
+    }
   });
 
 });

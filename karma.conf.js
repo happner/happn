@@ -13,8 +13,8 @@ module.exports = function (config) {
     frameworks: ['mocha', 'chai'],
 
     files: [
-      'lib/client/base.js',
-      'test/c2_websockets_embedded_sanity_encryptedpayloads.js'
+      'lib/client/base.js'
+
     ],
 
     // list of files / patterns to load in the browser
