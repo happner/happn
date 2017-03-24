@@ -3,11 +3,12 @@
   "description": "pub/sub api as a service using primus and mongo & redis or nedb, can work as cluster, single process or embedded using nedb, use in production at your own risk",
   "version": "2.17.4",
   "main": "./lib/index",
-  "protocol":"1.1.0",
+  "protocol": "1.1.0",
   "scripts": {
     "test": "mocha --expose-gc silence.js test",
     "test-cover": "istanbul cover _mocha -- silence.js test",
-    "test-memory": "mocha --expose-gc test/test-memory"
+    "test-memory": "mocha --expose-gc test/test-memory",
+    "test-browser": "gulp --gulpfile test/test-browser/gulp-01.js"
   },
   "author": "",
   "license": "MIT",
