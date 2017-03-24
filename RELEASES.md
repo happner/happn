@@ -419,3 +419,8 @@
 -----------------
 
 - Issue 160 - When creating a client with "create", disconnect if the login fails.
+
+2.17.4 2017-03-24
+-----------------
+
+- Issue 162 - Handle socket level failures for disconnect when not initialized.

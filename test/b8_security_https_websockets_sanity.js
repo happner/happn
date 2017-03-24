@@ -1001,6 +1001,17 @@ describe('b8_security_https_websockets_sanity', function () {
     });
   });
 
+  it('fails to connect on http and the client is destroyed', function (done) {
+    happn_client.create({config: {protocol: 'http'}, testMode: true, connectTimeout:1000}, function (e) {
+      expect(e).to.be.an('object');
+      expect(happn_client.lastClient).to.be.an('object');
+      expect(happn_client.lastClient).to.have.property('options');
+      expect(happn_client.lastClient).to.not.have.property('pubsub');
+      done();
+    });
+
+  });
+
   require('benchmarket').stop();
 
 });

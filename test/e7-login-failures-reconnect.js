@@ -366,4 +366,23 @@ describe(require('path').basename(__filename), function () {
       });
 
   });
+
+  it('only calls the create callback once', function (done) {
+    var callbackCalled = 0;
+    Happn.client.create(
+      {
+        config: {
+          username: testUser2.username,
+          password: testUser2.password,
+          port: testPort + 1
+        }
+      }, function (e) {
+        callbackCalled++;
+        expect(e).to.be.an('object');
+        setTimeout(function () {
+          expect(callbackCalled).to.equal(1);
+          done();
+        }, 30000);
+      });
+  });
 });
