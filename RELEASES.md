@@ -424,3 +424,8 @@
 -----------------
 
 - Issue 162 - Handle socket level failures for disconnect when not initialized.
+
+2.17.5 2017-03-28
+-----------------
+
+- utils crypto 0.2.2
