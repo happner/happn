@@ -1,11 +1,12 @@
-var Happn = require('../');
-var expect = require('expect.js');
-var Promise = require('bluebird');
-var async = require('async');
-
-var service1Name;
 //checks info is stored next to login
 describe(require('path').basename(__filename), function () {
+
+  var Happn = require('../');
+  var expect = require('expect.js');
+  var Promise = require('bluebird');
+  var async = require('async');
+
+  var service1Name;
 
   this.timeout(60000);
 
@@ -518,6 +519,5 @@ describe(require('path').basename(__filename), function () {
           })
       }
     ], done);
-
   });
 });

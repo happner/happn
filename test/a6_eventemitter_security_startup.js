@@ -25,11 +25,12 @@ describe('a6_eventemitter_security_groups', function () {
     var happnMock = {services: {}, utils: require('../lib/utils')};
     testServices = {};
 
+    testServices.cache = require('../lib/services/cache/service');
     testServices.crypto = require('../lib/services/crypto/service');
     testServices.data = require('../lib/services/data/service');
     testServices.security = require('../lib/services/security/service');
 
-    async.eachSeries(['crypto', 'data', 'security'], function (serviceName, eachServiceCB) {
+    async.eachSeries(['cache','crypto', 'data', 'security'], function (serviceName, eachServiceCB) {
 
       testServices[serviceName] = new testServices[serviceName]({logger: Logger});
       testServices[serviceName].happn = happnMock;

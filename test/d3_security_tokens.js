@@ -1600,7 +1600,7 @@ describe('d3-security-tokens', function () {
 
                 .catch(function (e) {
 
-                  expect(e.toString()).to.be('Invalid credentials');
+                  expect(e.toString()).to.be('AccessDenied: Invalid credentials');
                   serviceInstance.stop(done);
                 });
 
