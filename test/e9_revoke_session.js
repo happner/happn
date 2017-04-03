@@ -112,7 +112,7 @@ describe('e9_client_disconnect', function () {
     });
   });
 
-  it('logs in with the eventemitter user - we then test a call to a web-method, then disconnects with the revokeToken flag set to true, we try and reuse the token and ensure that it fails', function (done) {
+  it('logs in with the websockets user - we then test a call to a web-method, then disconnects with the revokeToken flag set to true, we try and reuse the token and ensure that it fails', function (done) {
 
     happn.client.create({
         config: {username: testUser.username, password: 'TEST PWD'},
@@ -151,7 +151,7 @@ describe('e9_client_disconnect', function () {
 
   });
 
-  it('logs in with the eventemitter user - we then test a call to a web-method, then disconnects with the revokeToken flag set to false, we try and reuse the token and ensure that it succeeds', function (done) {
+  it('logs in with the websockets user - we then test a call to a web-method, then disconnects with the revokeToken flag set to false, we try and reuse the token and ensure that it succeeds', function (done) {
 
     happn.client.create({
         config: {username: testUser.username, password: 'TEST PWD'},
@@ -187,7 +187,7 @@ describe('e9_client_disconnect', function () {
       });
   });
 
-  it('logs in with the eventemitter user - we then test a call to a web-method, then disconnects with the revokeToken flag set to true, we try and reuse the token and ensure that it fails, then wait longer and ensure even after the token is revoked it still fails', function (done) {
+  it('logs in with the websockets user - we then test a call to a web-method, then disconnects with the revokeToken flag set to true, we try and reuse the token and ensure that it fails, then wait longer and ensure even after the token is revoked it still fails', function (done) {
 
     this.timeout(10000);
 

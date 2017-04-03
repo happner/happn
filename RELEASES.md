@@ -440,7 +440,7 @@
 
 - account lockout
 
-2.18.1 2017-04-01
+2.19.0 2017-04-01
 -----------------
 
 - node-uuid updated to uuid
