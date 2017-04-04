@@ -439,3 +439,9 @@
 -----------------
 
 - account lockout
+
+2.19.0 2017-04-01
+-----------------
+
+- node-uuid updated to uuid
+- revoke session flag on client disconnect
