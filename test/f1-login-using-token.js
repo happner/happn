@@ -333,8 +333,6 @@ describe('h1_login_using_token', function () {
             }
           };
 
-          console.log('credentials:::', credentials);
-
           getClient(credentials, function(e, tokenInstance) {
 
             if (e) return done(e);
