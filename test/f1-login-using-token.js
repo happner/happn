@@ -43,7 +43,6 @@ describe('h1_login_using_token', function () {
               name:"short-session",
               session:{
                 $and:[{
-                  user:{username:{$eq:'_ADMIN'}},
                   info:{shortSession:{$eq:true}}
                 }]
               },
@@ -299,7 +298,7 @@ describe('h1_login_using_token', function () {
     });
   });
 
-  it.only('001: logs in with the test client, supplying a public key, we perform a bunch of operations - we remember the token and logout - then login with the token, and test operations', function (done) {
+  it('001: logs in with the test client, supplying a public key, we perform a bunch of operations - we remember the token and logout - then login with the token, and test operations', function (done) {
 
     getClient({
       config: {
@@ -327,7 +326,6 @@ describe('h1_login_using_token', function () {
 
           var credentials = {
             config: {
-              username: '_ADMIN',
               token:token,
               port:10000
             }
@@ -359,10 +357,10 @@ describe('h1_login_using_token', function () {
         keyPair: {
           publicKey: 'AjN7wyfbEdI2LzWyFo6n31hvOrlYvkeHad9xGqOXTm1K',
           privateKey: 'y5RTfdnn21OvbQrnBMiKBP9DURduo0aijMIGyLJFuJQ='
-        },
-        info:{
-          shortSession:true
         }
+      },
+      info:{
+        shortSession:true
       }
     }, function(e, instance){
 
@@ -381,10 +379,12 @@ describe('h1_login_using_token', function () {
           setTimeout(function(){
 
             getClient({
-              token:token,
-              port:10000
+              config:{
+                token:token,
+                port:10000
+              }
             }, function(e) {
-              expect(e.toString()).to.be('AccessDenied: expired session token');
+              expect(e.toString()).to.be('AccessDenied: Invalid credentials');
               done();
             });
 
@@ -423,8 +423,10 @@ describe('h1_login_using_token', function () {
           setTimeout(function(){
 
             getClient({
-              token:token,
-              port:10000
+              config:{
+                token:token,
+                port:10000
+              }
             }, done);
 
           }, 2010);
@@ -462,10 +464,12 @@ describe('h1_login_using_token', function () {
           setTimeout(function(){
 
             getClient({
-              token:token,
-              port:10000
+              config:{
+                token:token,
+                port:10000
+              }
             }, function(e){
-              expect(e.toString()).to.be('AccessDenied: session with id ' + instance.session.id + ' has been revoked');
+              expect(e.toString()).to.be('AccessDenied: Invalid credentials');
               done();
             });
 
@@ -475,48 +479,7 @@ describe('h1_login_using_token', function () {
     });
   });
 
-  it('005: we log in to a test service, supplying a public key, we perform a bunch of operations - the token is remembered and matches the locked profile, we then ensure we are able to login to the same server with the token but are unable to log in to a different server using the locked token', function (done) {
-
-    getClient({
-      config: {
-        username: '_ADMIN',
-        password: 'happn',
-        port:10000,
-        keyPair: {
-          publicKey: 'AjN7wyfbEdI2LzWyFo6n31hvOrlYvkeHad9xGqOXTm1K',
-          privateKey: 'y5RTfdnn21OvbQrnBMiKBP9DURduo0aijMIGyLJFuJQ='
-        },
-        info:{
-          tokenOriginLocked:true
-        }
-      }
-    }, function(e, instance){
-
-      if (e) return done(e);
-
-      testOperations(instance, function(e){
-
-        if (e) return done(e);
-
-        var token = instance.session.token;
-
-        instance.disconnect(function(e){
-
-          if (e) return done(e);
-
-          getClient({
-            token:token,
-            port:10001
-          }, function(e){
-            expect(e.toString()).to.be('AccessDenied: invalid credentials: this token is locked to a different origin by policy');
-            done();
-          });
-        });
-      });
-    });
-  });
-
-  it('006: inverse of 005, we check we are able to log in to another instance with the same token.', function (done) {
+  it('005: checks we are able to log in to another instance with the same token.', function (done) {
 
     getClient({
       config: {
@@ -545,52 +508,13 @@ describe('h1_login_using_token', function () {
           setTimeout(function(){
 
             getClient({
-              token:token,
-              port:10001
+              config:{
+                token:token,
+                port:10001
+              }
             }, done);
 
           }, 2010);
-        });
-      });
-    });
-  });
-
-  it('we log in to a test service, supplying a public key, we perform a bunch of operations - the token is remembered and matches the disallow profile, we then ensure we are unable to login with the login disallowed token', function (done) {
-
-    getClient({
-      config: {
-        username: '_ADMIN',
-        password: 'happn',
-        port:10000,
-        keyPair: {
-          publicKey: 'AjN7wyfbEdI2LzWyFo6n31hvOrlYvkeHad9xGqOXTm1K',
-          privateKey: 'y5RTfdnn21OvbQrnBMiKBP9DURduo0aijMIGyLJFuJQ='
-        },
-        info:{
-          tokenNotAllowedForLogin:true
-        }
-      }
-    }, function(e, instance){
-
-      if (e) return done(e);
-
-      testOperations(instance, function(e){
-
-        if (e) return done(e);
-
-        var token = instance.session.token;
-
-        instance.disconnect(function(e){
-
-          if (e) return done(e);
-
-          getClient({
-            token:token,
-            port:10000
-          }, function(e){
-            expect(e.toString()).to.be('AccessDenied: invalid credentials: logins with this token are disallowed by policy');
-            done();
-          });
         });
       });
     });
