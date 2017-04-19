@@ -1,7 +1,7 @@
 describe('b7_security_https', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var happn = require('../lib/index');
   var happn_client = happn.client;
@@ -210,6 +210,6 @@ describe('b7_security_https', function () {
 
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

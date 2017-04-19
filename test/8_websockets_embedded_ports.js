@@ -1,7 +1,7 @@
 describe('8_websockets_embedded_ports', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index')
@@ -106,6 +106,6 @@ describe('8_websockets_embedded_ports', function () {
     }
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

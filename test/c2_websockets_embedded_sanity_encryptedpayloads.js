@@ -1,7 +1,7 @@
 describe('c2_websockets_embedded_sanity_encryptedpayloads', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index')
@@ -830,6 +830,6 @@ describe('c2_websockets_embedded_sanity_encryptedpayloads', function () {
     });
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

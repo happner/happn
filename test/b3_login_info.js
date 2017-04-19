@@ -6,8 +6,8 @@ var service2Name;
 //checks info is stored next to login
 context('b3_login_info', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   this.timeout(60000);
 
@@ -145,6 +145,6 @@ context('b3_login_info', function () {
 
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

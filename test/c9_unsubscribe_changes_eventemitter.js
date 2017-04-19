@@ -1,7 +1,7 @@
 describe('c9_unsubscribe_changes_eventemitter', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index');
@@ -311,6 +311,6 @@ describe('c9_unsubscribe_changes_eventemitter', function () {
     });
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

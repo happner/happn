@@ -1,14 +1,14 @@
 var path = require('path');
 var filename = path.basename(__filename);
 
-var benchmarket = require('benchmarket');
+//var benchmarket = //require('benchmarket');
 var Promise = require('bluebird');
 var expect = require('expect.js');
 var Happn = require('../');
 
 describe(filename, function() {
 
-  benchmarket.start();
+  //benchmarket.start();
 
   var server;
 
@@ -211,7 +211,7 @@ describe(filename, function() {
 
   });
 
-  after(benchmarket.store());
-  benchmarket.stop();
+  // after(benchmarket.store());
+  // benchmarket.stop();
 
 });

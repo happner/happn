@@ -1,7 +1,7 @@
 describe('5_eventemitter_stoppingstarting', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   context('stopping and starting meshes', function () {
 
@@ -198,6 +198,6 @@ describe('5_eventemitter_stoppingstarting', function () {
 
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

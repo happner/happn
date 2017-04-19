@@ -1,7 +1,7 @@
 describe('b4_start_no_config', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index')
@@ -44,6 +44,6 @@ describe('b4_start_no_config', function () {
     happnInstance.stop(done);
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

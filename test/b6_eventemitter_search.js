@@ -1,7 +1,7 @@
 describe('b6_eventemitter_search', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var happn = require('../lib/index');
   var serviceInstance;
@@ -248,6 +248,6 @@ describe('b6_eventemitter_search', function () {
 
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

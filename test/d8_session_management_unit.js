@@ -1,7 +1,7 @@
 describe('d8_session_management', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index')
@@ -495,5 +495,5 @@ describe('d8_session_management', function () {
     });
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 });

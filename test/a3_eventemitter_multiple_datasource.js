@@ -1,7 +1,7 @@
 describe('a3_eventemitter_multiple_datasource', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var async = require('async');
@@ -736,6 +736,6 @@ describe('a3_eventemitter_multiple_datasource', function () {
 
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

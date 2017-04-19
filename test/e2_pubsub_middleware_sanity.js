@@ -1,7 +1,7 @@
 describe('e2_pubsub_middleware_sanity', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index')
@@ -249,6 +249,6 @@ describe('e2_pubsub_middleware_sanity', function () {
   });
 
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

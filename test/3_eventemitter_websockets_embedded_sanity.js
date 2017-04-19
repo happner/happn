@@ -1,7 +1,7 @@
 describe('3_eventemitter_websockets_embedded_sanity', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index')
@@ -786,47 +786,65 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
     });
   });
 
-  it('unsubscribe from the right event', function (callback) {
+  it('unsubscribe from the right event', function (done) {
+
     this.timeout(10000);
 
     var path1 = '/this/is/the/first/path';
     var path2 = '/this/is/the/second/path';
-
 
     var handle1;
     var handle2;
 
     var utils = {
       subscribeToPath: function subscribeToPath(path) {
+
+        console.log('subscribeToPath happened:::');
+
         return new Promise(function (resolve, reject) {
-          publisherclient.on(path, {event_type: 'set', count: 0}, function () {
+          publisherclient.on(path, {event_type: 'set', count: 0}, function (data) {
+
           }, function (err, handle) {
             if (err) return reject(err);
+            console.log('subscribeToPath subscription worked:::');
             resolve(handle);
           });
         })
       },
       storeHandle1: function (handle) {
+        console.log('storeHandle1 happened:::');
         handle1 = handle;
       },
       storeHandle2: function (handle) {
+        console.log('storeHandle2 happened:::');
         handle2 = handle;
       },
       unsubscribeFromHandle: function unsubscribeFromHandle(handle) {
+
+        console.log('unsubscribeFromHandle happened:::');
+
         return new Promise(function (resolve) {
-          publisherclient.off(handle, resolve);
+          publisherclient.off(handle, function(e){
+            console.log('unsubscribeFromHandle unsubscribe happened:::', e);
+            resolve();
+          });
         });
       },
       checkResults: function checkResults() {
+
+        console.log('checkResults happened:::');
+
         return new Promise(function (resolve) {
           // path 1 should have no listeners
           expect(publisherclient.events['/SET@' + path1].length).to.equal(0);
           // path 2 should still have its listener
           expect(publisherclient.events['/SET@' + path2].length).to.equal(1);
+
+          console.log('checkResults expectations reached:::');
           resolve();
         })
       }
-    }
+    };
 
     return utils.subscribeToPath(path1)
       .then(utils.storeHandle1)
@@ -841,10 +859,16 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
       .then(function () {
         return utils.unsubscribeFromHandle(handle2);
       })
-      .then(callback)
-      .catch(callback);
+      .then(function(){
+        console.log('ALL GOOD CALLING BACK:::');
+        done();
+      })
+      .catch(function(e){
+        console.log('error happened:::', e.toString());
+        done(e);
+      });
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });
