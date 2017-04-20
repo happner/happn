@@ -1,8 +1,8 @@
 describe('d3-security-tokens', function () {
 
   // TODO:benchmarket stuff
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index');
@@ -1635,6 +1635,6 @@ describe('d3-security-tokens', function () {
 
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

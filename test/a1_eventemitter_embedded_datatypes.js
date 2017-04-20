@@ -1,7 +1,7 @@
 describe('a1_eventemitter_embedded_datatypes', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index')
@@ -386,6 +386,6 @@ describe('a1_eventemitter_embedded_datatypes', function () {
     }
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

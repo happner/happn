@@ -1,7 +1,7 @@
 describe('7a_websockets_listeners', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index');
@@ -509,6 +509,6 @@ describe('7a_websockets_listeners', function () {
     });
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

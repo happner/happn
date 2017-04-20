@@ -4,7 +4,7 @@ var expect = require('expect.js');
 
 describe('b1_websockets_security_check_for_holes', function () {
 
-  require('benchmarket').start();
+  //require('benchmarket').start();
   this.timeout(60000);
 
   var getService = function (config, callback) {
@@ -50,7 +50,7 @@ describe('b1_websockets_security_check_for_holes', function () {
     websocketsClient.disconnect()
       .then(serviceInstance.stop()
         .then(function(){
-          require('benchmarket').store();
+          //require('benchmarket').store();
           callback();
         }))
       .catch(callback);
@@ -82,6 +82,6 @@ describe('b1_websockets_security_check_for_holes', function () {
 
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });

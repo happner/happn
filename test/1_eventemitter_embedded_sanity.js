@@ -1,7 +1,7 @@
 describe('1_eventemitter_embedded_sanity', function () {
 
-  // require('benchmarket').start();
-  // after(require('benchmarket').store());
+  // //require('benchmarket').start();
+  // //after(//require('benchmarket').store());
 
   var expect = require('expect.js');
   var happn = require('../lib/index');
@@ -1275,6 +1275,6 @@ describe('1_eventemitter_embedded_sanity', function () {
     });
   });
 
-  //require('benchmarket').stop();
+  ////require('benchmarket').stop();
 
 });

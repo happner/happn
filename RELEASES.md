@@ -445,3 +445,10 @@
 
 - node-uuid updated to uuid
 - revoke session flag on client disconnect
+
+2.20.0 2017-04-20
+-----------------
+
+- login with token
+
+

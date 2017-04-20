@@ -1,7 +1,7 @@
 describe('b2_eventemitter_security_stoppingstarting', function () {
 
-  require('benchmarket').start();
-  after(require('benchmarket').store());
+  //require('benchmarket').start();
+  //after(//require('benchmarket').store());
 
   context('stopping and starting secure meshes', function () {
 
@@ -238,6 +238,6 @@ describe('b2_eventemitter_security_stoppingstarting', function () {
 
   });
 
-  require('benchmarket').stop();
+  //require('benchmarket').stop();
 
 });
