@@ -451,4 +451,9 @@
 
 - login with token
 
+2.20.1 2017-04-21
+-----------------
+
+- fixed race condition on .on, sets _this.events before the callback
+
 
