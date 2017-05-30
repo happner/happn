@@ -1,7 +1,7 @@
 {
   "name": "happn",
   "description": "pub/sub api as a service using primus and mongo & redis or nedb, can work as cluster, single process or embedded using nedb, use in production at your own risk",
-  "version": "2.20.1",
+  "version": "2.20.2",
   "main": "./lib/index",
   "protocol": "1.1.0",
   "scripts": {
@@ -34,6 +34,7 @@
     "deep-copy": "1.1.2",
     "happn-logger": "0.0.2",
     "happn-nedb": "1.8.1",
+    "happn-sillyname": "0.1.0",
     "happn-util-crypto": "0.2.3",
     "jsonpack": "1.1.5",
     "jwt-simple": "0.2.0",
@@ -47,7 +48,6 @@
     "serve-static": "1.10.0",
     "shortid": "2.2.4",
     "sift": "3.2.6",
-    "sillyname": "0.1.0",
     "traverse": "0.6.6",
     "underscore.string": "3.3.4",
     "user-home": "2.0.0",
