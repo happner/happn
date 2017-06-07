@@ -456,8 +456,13 @@
 
 - fixed race condition on .on, sets _this.events before the callback
 
-
 2.20.2 2017-05-30
 -----------------
 
 - update to forked sillyname (removed objectionable words)
+
+3.0.0 2017-06-06
+----------------
+
+- updated to happn-primus 6.0.0
+- configurable client-side ping/pong
