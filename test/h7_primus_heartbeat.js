@@ -13,7 +13,7 @@ if (!process.version.match(/^v0\.10/)) {
 
     this.timeout(40000);
 
-    var log = true; // show tested events
+    var log = false; // show tested events
 
     var happnPort = 55000;
     var relayPort = 8080;
@@ -51,7 +51,18 @@ if (!process.version.match(/^v0\.10/)) {
         events.push('FLATLINED ' + data);
       }
 
-      HappnServer.create({})
+      HappnServer.create({
+          services: {
+            pubsub: {
+              config: {
+                primusOpts: {
+                  allowSkippedHeartBeats: 1, // gets reset to 2 minimum in happn-primus server
+                  pongSkipTime: 500
+                }
+              }
+            }
+          }
+        })
 
         .then(function (server) {
           _this.server = server;

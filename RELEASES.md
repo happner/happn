@@ -466,3 +466,4 @@
 
 - updated to happn-primus 6.0.0
 - configurable client-side ping/pong
+- configurable serverside allowSkippedHeartBeats, pongSkipTime
