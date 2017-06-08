@@ -464,6 +464,7 @@
 3.0.0 2017-06-08
 ----------------
 
-- updated to happn-primus 6.0.0
+- switched primus to happn-primus 6.0.0
 - configurable client-side ping/pong
 - configurable server-side allowSkippedHeartBeats, pongSkipTime
+- set wildcard on dependencies where appropriate
