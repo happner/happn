@@ -468,3 +468,8 @@
 - configurable client-side ping/pong
 - configurable server-side allowSkippedHeartBeats, pongSkipTime
 - set wildcard on dependencies where appropriate
+
+3.1.0 2017-06-08
+----------------
+
+- updated to use the happn-password-hash-and-salt
