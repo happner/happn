@@ -461,7 +461,7 @@
 
 - update to forked sillyname (removed objectionable words)
 
-3.0.0 2017-06-08
+3.0.0 (reverted to 2.21.0) 2017-06-08
 ----------------
 
 - switched primus to happn-primus 6.0.0
@@ -469,7 +469,7 @@
 - configurable server-side allowSkippedHeartBeats, pongSkipTime
 - set wildcard on dependencies where appropriate
 
-3.1.0 2017-06-08
+3.1.0  (reverted to 2.21.0) 2017-06-08
 ----------------
 
 - updated to use the happn-password-hash-and-salt
