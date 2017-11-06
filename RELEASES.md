@@ -473,3 +473,8 @@
 ----------------
 
 - updated to use the happn-password-hash-and-salt
+
+2.21.1  2017-11-06
+----------------
+
+- don't publish test folder
