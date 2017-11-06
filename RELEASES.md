@@ -478,3 +478,8 @@
 ----------------
 
 - don't publish test folder
+
+2.21.2  2017-11-06
+----------------
+
+- use request@2.81.0 for Node 0.10 compatibility
