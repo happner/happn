@@ -483,3 +483,7 @@
 ----------------
 
 - use request@2.81.0 for Node 0.10 compatibility
+
+2.21.3 2018-04-18
+-----------------
+- Increase happn client login timeout to 60000.

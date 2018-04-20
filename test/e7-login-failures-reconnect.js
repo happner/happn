@@ -293,6 +293,7 @@ describe(require('path').basename(__filename), function () {
   });
 
   it('will not reconnect after shutdown', function () {
+    this.timeout(120000);
     var client;
 
     return Happn.client.create(
