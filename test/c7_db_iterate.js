@@ -101,7 +101,7 @@ describe('c7_ds_iterate', function () {
   }
 
   before('it creates 2 test dss', function (callback) {
-    this.timeout(4000);
+    this.timeout(8000);
     getService(serviceConfig1, function (e, serviceInstance) {
       if (e) return callback(e);
       serviceInstance1 = serviceInstance;
