@@ -436,7 +436,7 @@ describe('7a_websockets_listeners', function () {
     var caughtCount = 0;
 
     listenerclient.onAll(function (eventData, meta) {
-
+      console.log('caught', meta.action);
       if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' ||
         meta.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
         caughtCount++;
