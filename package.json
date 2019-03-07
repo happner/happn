@@ -1,7 +1,7 @@
 {
   "name": "happn",
   "description": "pub/sub api as a service using primus and mongo & redis or nedb, can work as cluster, single process or embedded using nedb, use in production at your own risk",
-  "version": "2.21.3",
+  "version": "2.21.4",
   "main": "./lib/index",
   "protocol": "1.1.0",
   "scripts": {
@@ -43,7 +43,7 @@
     "lru-cache": "^4.0.0",
     "ms": "^0.7.1",
     "happn-password-hash-and-salt": "1.1.0",
-    "pem": "^1.8.3",
+    "pem": "~1.11.0",
     "serve-static": "^1.10.0",
     "shortid": "^2.2.4",
     "sift": "^3.2.6",

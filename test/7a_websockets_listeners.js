@@ -77,7 +77,7 @@ describe('7a_websockets_listeners', function () {
         count: 1
       }, function (message, meta) {
 
-        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event/*'].length).to.be(0);
+        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event/*']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -116,7 +116,7 @@ describe('7a_websockets_listeners', function () {
       //first listen for the change
       listenerclient.on('/e2e_test1/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(0);
+        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -157,7 +157,7 @@ describe('7a_websockets_listeners', function () {
       //first listen for the change
       listenerclient.on('/e2e_test1/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(0);
+        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -211,7 +211,7 @@ describe('7a_websockets_listeners', function () {
           //instance of this event - the event listener should have been removed
           ////console.log('listenerclient.events');
           ////console.log(listenerclient.events);
-          expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me'].length).to.be(0);
+          expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me']).to.be.undefined;
 
           ////console.log(eventData);
 
@@ -279,8 +279,10 @@ describe('7a_websockets_listeners', function () {
 
               if (e)
                 return callback(new Error(e));
-              else
+              else{
+                expect(publisherclient.events['/e2e_test1/testsubscribe/data/on_off_test']).to.be.undefined;
                 return callback();
+              }
 
             });
 
@@ -326,6 +328,7 @@ describe('7a_websockets_listeners', function () {
       if (e) return callback(e);
 
       listenerclient.on('/e2e_test1/testsubscribe/data/value_on_callback_test', {
+        "event_count": 1,
         "event_type": "set",
         "initialCallback": true
       }, function (message) {
@@ -433,13 +436,13 @@ describe('7a_websockets_listeners', function () {
     var caughtCount = 0;
 
     listenerclient.onAll(function (eventData, meta) {
-
       if (meta.action == '/REMOVE@/e2e_test1/testsubscribe/data/catch_all' ||
         meta.action == '/SET@/e2e_test1/testsubscribe/data/catch_all')
         caughtCount++;
 
-      if (caughtCount == 2)
-        callback();
+      if (caughtCount == 2){
+        listenerclient.offAll(callback);
+      }
 
     }, function (e) {
 
@@ -462,51 +465,6 @@ describe('7a_websockets_listeners', function () {
 
     });
 
-  });
-
-  it('should unsubscribe from all events', function (callback) {
-    this.timeout(10000);
-
-    var onHappened = false;
-
-    listenerclient.onAll(function (message) {
-
-      onHappened = true;
-      callback(new Error('this wasnt meant to happen'));
-
-    }, function (e) {
-
-      if (e) return callback(e);
-
-      listenerclient.on('/e2e_test1/testsubscribe/data/off_all_test', {event_type: 'set', count: 0},
-        function (message) {
-          onHappened = true;
-          callback(new Error('this wasnt meant to happen'));
-        },
-        function (e) {
-          if (e) return callback(e);
-
-          listenerclient.offAll(function (e) {
-            if (e) return callback(e);
-
-            publisherclient.set('/e2e_test1/testsubscribe/data/off_all_test', {
-              property1: 'property1',
-              property2: 'property2',
-              property3: 'property3'
-            }, null, function (e, put_result) {
-              if (e) return callback(e);
-
-              setTimeout(function () {
-
-                if (!onHappened)
-                  callback();
-
-              }, 3000);
-            });
-          });
-        }
-      );
-    });
   });
 
   //require('benchmarket').stop();

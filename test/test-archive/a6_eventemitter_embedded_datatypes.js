@@ -366,7 +366,7 @@ describe('a6_eventemitter_embedded_datatypes', function () {
       //first listen for the change
       listenerclient.on(test_base_url + '/*', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@' + test_base_url + '/*'].length).to.be(0);
+        expect(listenerclient.events['/SET@' + test_base_url + '/*']).to.be.undefined;
 
         expect(message.value == "test string").to.be(true);
 

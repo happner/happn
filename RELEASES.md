@@ -487,3 +487,7 @@
 2.21.3 2018-04-18
 -----------------
 - Increase happn client login timeout to 60000.
+
+2.21.4 2019-03-07
+-----------------
+- Issue #177 - Remove old subscription events when there are no more listeners

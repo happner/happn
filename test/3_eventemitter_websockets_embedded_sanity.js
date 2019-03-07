@@ -345,7 +345,7 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
       //first listen for the change
       listenerclient.on('/e2e_test1/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(0);
+        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -498,7 +498,7 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
       //first listen for the change
       listenerclient.on('/e2e_test1/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(0);
+        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -587,7 +587,7 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
           //instance of this event - the event listener should have been removed
           //////console.log('listenerclient.events');
           //////console.log(listenerclient.events);
-          expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me'].length).to.be(0);
+          expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me']).to.be.undefined;
 
           //////console.log(eventData);
 
@@ -828,7 +828,7 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
 
         return new Promise(function (resolve) {
           // path 1 should have no listeners
-          expect(publisherclient.events['/SET@' + path1].length).to.equal(0);
+          expect(publisherclient.events['/SET@' + path1]).to.equal.undefined;
           // path 2 should still have its listener
           expect(publisherclient.events['/SET@' + path2].length).to.equal(1);
 
