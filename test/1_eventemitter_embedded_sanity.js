@@ -116,7 +116,7 @@ describe('1_eventemitter_embedded_sanity', function () {
         count: 1
       }, function (message) {
 
-        expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/*'].length).to.be(0);
+        expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event/*']).to.undefined;
         callback();
 
       }, function (e) {
@@ -680,7 +680,9 @@ describe('1_eventemitter_embedded_sanity', function () {
         count: 1
       }, function (message) {
 
-        expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
+        console.log("doing test")
+        expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event']).to.be.undefined;
+        console.log("Calling callback")
         callback();
 
       }, function (e) {
@@ -852,7 +854,7 @@ describe('1_eventemitter_embedded_sanity', function () {
 
   //  We set the listener client to listen for a PUT event according to a path, then we set a value with the publisher client.
 
-  it('the listener should pick up a single published event', function (callback) {
+  it('the listener should pick up a single published event 2', function (callback) {
 
     try {
 
@@ -862,7 +864,7 @@ describe('1_eventemitter_embedded_sanity', function () {
         count: 1
       }, function (message) {
 
-        expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event'].length).to.be(0);
+        expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -968,7 +970,7 @@ describe('1_eventemitter_embedded_sanity', function () {
       }, function (eventData) {
         //we are looking at the event internals on the listener to ensure our event management is working - because we are only listening for 1
         //instance of this event - the event listener should have been removed
-        expect(listenerclient.events['/REMOVE@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me'].length).to.be(0);
+        expect(listenerclient.events['/REMOVE@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/delete_me']).to.be.undefined;
 
         //we needed to have removed a single item
         expect(eventData.payload.removed).to.be(1);

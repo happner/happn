@@ -125,7 +125,7 @@ describe('c3_websockets_embedded_sanity_encryptedpayloads', function () {
       //first listen for the change
       eventEmitterClient.on('/e2e_test1/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(eventEmitterClient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(0);
+        expect(eventEmitterClient.events['/SET@/e2e_test1/testsubscribe/data/event']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -163,7 +163,7 @@ describe('c3_websockets_embedded_sanity_encryptedpayloads', function () {
       //first listen for the change
       socketClient.on('/e2e_test1/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(socketClient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(0);
+        expect(socketClient.events['/SET@/e2e_test1/testsubscribe/data/event']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -546,7 +546,7 @@ describe('c3_websockets_embedded_sanity_encryptedpayloads', function () {
       //first listen for the change
       eventEmitterClient.on('/e2e_test1/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(eventEmitterClient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(0);
+        expect(eventEmitterClient.events['/SET@/e2e_test1/testsubscribe/data/event']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -635,7 +635,7 @@ describe('c3_websockets_embedded_sanity_encryptedpayloads', function () {
           //instance of this event - the event listener should have been removed
           ////console.log('eventEmitterClient.events');
           ////console.log(eventEmitterClient.events);
-          expect(eventEmitterClient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me'].length).to.be(0);
+          expect(eventEmitterClient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me']).to.be.undefined;
 
           ////console.log(eventData);
 

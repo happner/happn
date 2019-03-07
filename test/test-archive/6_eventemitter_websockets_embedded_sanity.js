@@ -337,7 +337,7 @@ describe('6_eventemitter_websockets_embedded_sanity', function () {
       //first listen for the change
       listenerclient.on('/e2e_test1/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(0);
+        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -490,7 +490,7 @@ describe('6_eventemitter_websockets_embedded_sanity', function () {
       //first listen for the change
       listenerclient.on('/e2e_test1/testsubscribe/data/event', {event_type: 'set', count: 1}, function (message) {
 
-        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event'].length).to.be(0);
+        expect(listenerclient.events['/SET@/e2e_test1/testsubscribe/data/event']).to.be.undefined;
         callback();
 
       }, function (e) {
@@ -579,7 +579,7 @@ describe('6_eventemitter_websockets_embedded_sanity', function () {
           //instance of this event - the event listener should have been removed 
           ////console.log('listenerclient.events');
           ////console.log(listenerclient.events);
-          expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me'].length).to.be(0);
+          expect(listenerclient.events['/REMOVE@/e2e_test1/testsubscribe/data/delete_me']).to.be.undefined;
 
           ////console.log(eventData);
 
