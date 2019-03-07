@@ -328,6 +328,7 @@ describe('7a_websockets_listeners', function () {
       if (e) return callback(e);
 
       listenerclient.on('/e2e_test1/testsubscribe/data/value_on_callback_test', {
+        "event_count": 1,
         "event_type": "set",
         "initialCallback": true
       }, function (message) {

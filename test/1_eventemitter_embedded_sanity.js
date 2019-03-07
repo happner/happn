@@ -680,8 +680,6 @@ describe('1_eventemitter_embedded_sanity', function () {
         count: 1
       }, function (message) {
 
-        console.log("doing test")
-        expect(listenerclient.events['/SET@/1_eventemitter_embedded_sanity/' + test_id + '/testsubscribe/data/event']).to.be.undefined;
         console.log("Calling callback")
         callback();
 
